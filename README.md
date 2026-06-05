@@ -1,3 +1,3 @@
-## °Admin 
+## °Leida 
 
-![NextJS](public/shared/png/opengraph/apps.png) 
+![NextJS](public/shared/png/opengraph/python.png) 

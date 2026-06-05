@@ -1,7 +1,7 @@
 #!/bin/bash
-# Robustly kill any process using port 2000 (default dev port)
+# Robustly kill any process using port 2005 (default dev port)
 
-PORT=2000
+PORT=2005
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	PID=$(lsof -ti tcp:$PORT)
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then

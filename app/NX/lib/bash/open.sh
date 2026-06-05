@@ -2,7 +2,7 @@
 
 
 # Open appropriate URL in the default web browser
-URL="http://localhost:2000/"
+URL="http://localhost:2005/"
 
 # Detect OS and use appropriate open command
 if command -v xdg-open > /dev/null; then
