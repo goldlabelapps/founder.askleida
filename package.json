@@ -2,7 +2,7 @@
   "name": "nx-admin",
   "version": "1.0.0",
   "scripts": {
-    "dev": "yarn kill && yarn install && rm -rf .next && next dev -p 2000 --webpack",
+    "dev": "yarn kill && yarn install && rm -rf .next && next dev -p 2005 --webpack",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
