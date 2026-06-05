@@ -8,22 +8,6 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'live.staticflickr.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'budbuddies.cc',
-      },
-      {
-        protocol: 'https',
-        hostname: 'img1.wsimg.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'echopay.goldlabel.pro',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.aquaponics.net.au',
       }
     ],
   },

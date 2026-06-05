@@ -1,11 +1,11 @@
 {
     "tenant": "nxadmin",
-    "siteName": "°Admin",
-    "description": "Level Five AIs only",
-    "url": "https://nx-admin.goldlabel.pro/",
+    "siteName": "°Leida",
+    "description": "Level Five Supabase access required",
+    "url": "https://founder.askleida.com/",
     "owner": {
-        "name": "°Admin",
-        "email": "admin@goldlabel.pro"
+        "name": "Millie",
+        "email": "hello@askleida.com"
     },
     "favicon": "/nxadmin/svg/favicon.svg",
     "avatars": {
