@@ -7,9 +7,6 @@ import { DesktopLayout, Header, MobileLayout } from './components/Layout';
 import PageRouter from './components/PageRouter';
 
 // Page components
-import { Queue, FilterSelect } from './components/Queue';
-import { Fingerprints } from './components/Fingerprints';
-import { Prospects } from './components/Prospects';
 import { Tenants } from './components/Tenants';
 
 // UI components
@@ -64,14 +61,9 @@ export {
     PageRouter,
     Header,
     MobileLayout,
+
     // Page components
-    Queue,
-    Fingerprints,
-    Fingerprints as FingerprintListItem,
-    // Prospects page module
-    Prospects,
     Tenants,
-    FilterSelect,
 
 
     // UI components
