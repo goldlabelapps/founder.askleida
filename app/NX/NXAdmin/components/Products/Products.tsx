@@ -39,7 +39,7 @@ export default function Products() {
         <>
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
-                    <pre>{JSON.stringify(products, null, 2)}</pre>
+                    {/* <pre>{JSON.stringify(products, null, 2)}</pre> */}
                 </Grid>
             </Grid>
         </>
