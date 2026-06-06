@@ -7,6 +7,8 @@ import { useDispatch } from '../../../Uberedux';
 import { setNXAdmin, useNXAdmin } from '../../../NXAdmin';
 import { initDash, useDash } from '../MegaDash';
 import { Account } from '../Account';
+import { Practitioners } from '../Practitioners';
+import { Products } from '../Products';
 
 export default function MegaDash() {
     
@@ -40,10 +42,10 @@ export default function MegaDash() {
                             <Account />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 4 }}>
-                            Practitioners
+                            <Practitioners />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 4 }}>
-                            Products
+                            <Products />
                         </Grid>
                     </Grid>
                 </Grid>

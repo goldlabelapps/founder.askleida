@@ -23,13 +23,9 @@ import PageRouter from '../PageRouter';
 
 const drawerBleeding = 25;
 const NAV_ROUTES = new Set([
-    'accounts',
     'account',
-    'prospects',
-    'fingerprints',
-    'avatars',
-    'queue',
-    'virus',
+    'practitioners',
+    'products',
 ]);
 const FALLBACK_ADMIN_BASE_PATH = '/';
 

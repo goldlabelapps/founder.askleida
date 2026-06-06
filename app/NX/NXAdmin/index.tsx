@@ -8,6 +8,8 @@ import PageRouter from './components/PageRouter';
 
 // Page components
 import { Account } from './components/Account';
+import { Practitioners } from './components/Practitioners';
+import { Products } from './components/Products';
 
 // UI components
 import OptionSelect from './components/UI/OptionSelect';
@@ -64,6 +66,8 @@ export {
 
     // Page components
     Account,
+    Practitioners,
+    Products,
 
 
     // UI components
