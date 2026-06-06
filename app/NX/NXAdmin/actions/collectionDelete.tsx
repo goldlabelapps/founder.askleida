@@ -1,6 +1,6 @@
 import type { Dispatch } from 'redux';
 import { setCRUD} from '../../NXAdmin';
-import { getFirebaseFirestore } from '../../lib/firebase';
+import { supabase } from '../../lib/supabase';
 
 export const collectionDelete = (
     collection: string,
@@ -9,10 +9,13 @@ export const collectionDelete = (
     async (dispatch: Dispatch) => {
         try {
             const { id } = selected;
-            const firestore = getFirebaseFirestore();
-            const { doc, deleteDoc } = await import('firebase/firestore');
-            const docRef = doc(firestore, collection, id);
-            await deleteDoc(docRef);
+            const { error } = await supabase
+                .from(collection)
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
             dispatch(setCRUD(collection, 'mode', 'read'));
             dispatch(setCRUD(collection, 'selected', null));
         } catch (e) {

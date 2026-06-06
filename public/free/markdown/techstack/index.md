@@ -4,7 +4,7 @@ title: Techstack
 description: Built with Open Source
 slug: /techstack
 icon: techstack
-tags: Techstack, Vercel, Firebase, Render, React
+tags: Techstack, Vercel, Supabase, Render, React
 image: /free/png/python.png
 ---
 

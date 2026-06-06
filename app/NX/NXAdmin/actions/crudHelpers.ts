@@ -1,5 +1,4 @@
-import { getFirebaseFirestore } from '../../lib/firebase';
-import { collection, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { supabase } from '../../lib/supabase';
 
 type CollectionQueryOptions = {
     orderByField?: string;
@@ -45,43 +44,52 @@ function matchesSearchTerm(doc: Record<string, unknown>, searchTerm?: string) {
     });
 }
 
-function buildCollectionQuery(collectionName: string, options: CollectionQueryOptions = {}) {
-    const firestore = getFirebaseFirestore();
-    const colRef = collection(firestore, collectionName);
-
-    if (!options.orderByField) {
-        return colRef;
-    }
-
-    return query(colRef, orderBy(options.orderByField, options.orderDirection ?? 'asc'));
-}
-
-function parseCollectionSnapshot(snapshot: any) {
+function parseCollectionRows(rows: any[]) {
     const docs: any[] = [];
     let typescriptDoc: any = null;
 
-    snapshot.docs.forEach((doc: any) => {
-        const docObj = { id: doc.id, ...doc.data() };
-        if (doc.id === 'typescript') {
-            typescriptDoc = docObj;
+    rows.forEach((row: any) => {
+        if (row.id === 'typescript') {
+            typescriptDoc = row;
         } else {
-            docs.push(docObj);
+            docs.push(row);
         }
     });
 
     return { docs, typescript: typescriptDoc };
 }
 
-export async function fetchCollectionDocs(
+async function fetchRows(
     collectionName: string,
     options: CollectionQueryOptions = {},
 ) {
-    const snapshot = await getDocs(buildCollectionQuery(collectionName, options));
-    const parsed = parseCollectionSnapshot(snapshot);
+    let query = supabase.from(collectionName).select('*');
+
+    if (options.orderByField) {
+        query = query.order(options.orderByField, {
+            ascending: (options.orderDirection ?? 'asc') === 'asc',
+        });
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+}
+
+function parseAndFilter(rows: any[], options: CollectionQueryOptions = {}) {
+    const parsed = parseCollectionRows(rows);
     return {
         ...parsed,
         docs: parsed.docs.filter((doc) => matchesSearchTerm(doc, options.searchTerm)),
     };
+}
+
+export async function fetchCollectionDocs(
+    collectionName: string,
+    options: CollectionQueryOptions = {},
+) {
+    const rows = await fetchRows(collectionName, options);
+    return parseAndFilter(rows, options);
 }
 
 export function subscribeToCollectionDocs(
@@ -89,8 +97,27 @@ export function subscribeToCollectionDocs(
     onDocs: (docs: any[], typescript: any) => void,
     options: CollectionQueryOptions = {},
 ) {
-    return onSnapshot(buildCollectionQuery(collectionName, options), (snapshot) => {
-        const { docs, typescript } = parseCollectionSnapshot(snapshot);
-        onDocs(docs.filter((doc) => matchesSearchTerm(doc, options.searchTerm)), typescript);
-    });
+    let cancelled = false;
+
+    const load = async () => {
+        try {
+            const rows = await fetchRows(collectionName, options);
+            const { docs, typescript } = parseAndFilter(rows, options);
+            if (!cancelled) {
+                onDocs(docs, typescript);
+            }
+        } catch {
+            if (!cancelled) {
+                onDocs([], null);
+            }
+        }
+    };
+
+    load();
+    const intervalId = setInterval(load, 5000);
+
+    return () => {
+        cancelled = true;
+        clearInterval(intervalId);
+    };
 }

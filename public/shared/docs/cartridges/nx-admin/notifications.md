@@ -1,6 +1,6 @@
 # NX° Admin — Push Notifications (FCM)
 
-NX° Admin integrates Firebase Cloud Messaging (FCM) to deliver push notifications to authenticated users. The system covers foreground messages (tab in focus), background messages (service worker), permission management, and OS app badge counts.
+NX° Admin integrates Supabase Cloud Messaging (FCM) to deliver push notifications to authenticated users. The system covers foreground messages (tab in focus), background messages (service worker), permission management, and OS app badge counts.
 
 ---
 
@@ -11,12 +11,12 @@ Server                    Client (tab open)          Background SW
   │                            │                          │
   │  POST /api/notify          │                          │
   │──────────────────────────► API route                  │
-  │                            │ firebase-admin           │
+  │                            │ supabase-admin           │
   │                            │ sendEachForMulticast()   │
   │                            │                          │
   │                    FCM ────┼──────────────────────────►
   │                            │                          │
-  │                    onMessage()                  firebase-messaging-sw.js
+  │                    onMessage()                  supabase-messaging-sw.js
   │                    (foreground)                 (background/OS notification)
   │                            │
   │                    show Notification
@@ -31,23 +31,23 @@ Server                    Client (tab open)          Background SW
 ### 1. Environment variables
 
 ```env
-NEXT_PUBLIC_FIREBASE_API_KEY=…
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=…
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=…
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=…
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=…
-NEXT_PUBLIC_FIREBASE_APP_ID=…
-NEXT_PUBLIC_FIREBASE_VAPID_KEY=…       # Web Push certificate (VAPID key from Firebase Console)
+NEXT_PUBLIC_SUPABASE_API_KEY=…
+NEXT_PUBLIC_SUPABASE_AUTH_DOMAIN=…
+NEXT_PUBLIC_SUPABASE_PROJECT_ID=…
+NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET=…
+NEXT_PUBLIC_SUPABASE_MESSAGING_SENDER_ID=…
+NEXT_PUBLIC_SUPABASE_APP_ID=…
+NEXT_PUBLIC_SUPABASE_VAPID_KEY=…       # Web Push certificate (VAPID key from Supabase Console)
 
 # Server-side only (for /api/notify)
-FIREBASE_ADMIN_PROJECT_ID=…
-FIREBASE_ADMIN_CLIENT_EMAIL=…
-FIREBASE_ADMIN_PRIVATE_KEY=…
+SUPABASE_ADMIN_PROJECT_ID=…
+SUPABASE_ADMIN_CLIENT_EMAIL=…
+SUPABASE_ADMIN_PRIVATE_KEY=…
 ```
 
 ### 2. Service Worker
 
-Place `firebase-messaging-sw.js` in your `public/` root. This file handles background push notifications (when the browser tab is closed or not focused). It listens for the `FIREBASE_CONFIG` message from the client to initialise Firebase dynamically.
+Place `supabase-messaging-sw.js` in your `public/` root. This file handles background push notifications (when the browser tab is closed or not focused). It listens for the `SUPABASE_CONFIG` message from the client to initialise Supabase dynamically.
 
 ### 3. Notification sound
 
@@ -72,8 +72,8 @@ requestNotifications action:
   3. Dispatch { permission, initialized: true } → nxAdmin.notifications
   4. If 'denied' → stop
   5. If 'granted':
-       a. getFirebaseMessaging()
-       b. Post FIREBASE_CONFIG to service worker
+       a. getSupabaseMessaging()
+       b. Post SUPABASE_CONFIG to service worker
        c. getToken(messaging, { vapidKey, serviceWorkerRegistration })
        d. Dispatch { fcmToken } → nxAdmin.notifications
        e. Persist fcmToken to Firestore: users/{uid}.fcmTokens (arrayUnion)
@@ -152,19 +152,19 @@ const response = await fetch('/api/notify', {
 });
 ```
 
-The route uses `firebase-admin` and `sendEachForMulticast` to fan the message out to all provided FCM tokens.
+The route uses `supabase-admin` and `sendEachForMulticast` to fan the message out to all provided FCM tokens.
 
 ---
 
 ## Background Notifications
 
-Background notifications are handled by `public/firebase-messaging-sw.js`. When a push arrives while the tab is not focused:
+Background notifications are handled by `public/supabase-messaging-sw.js`. When a push arrives while the tab is not focused:
 
 1. The service worker receives the push event.
-2. Firebase Messaging SDK displays an OS-level notification automatically.
+2. Supabase Messaging SDK displays an OS-level notification automatically.
 3. Clicking the notification focuses the browser and navigates to the notification URL.
 
-**Important:** The service worker must receive `FIREBASE_CONFIG` from the client before it can process messages. This is done automatically by `requestNotifications()` via `serviceWorker.active.postMessage(...)`.
+**Important:** The service worker must receive `SUPABASE_CONFIG` from the client before it can process messages. This is done automatically by `requestNotifications()` via `serviceWorker.active.postMessage(...)`.
 
 ---
 

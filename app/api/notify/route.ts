@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { makeRes } from '../lib/makeRes';
-import { getAdminApp, getAdminMessaging } from './firebaseAdmin';
 
 export interface I_NotifyBody {
     tokens: string[];
@@ -13,19 +12,7 @@ export interface I_NotifyBody {
 
 /**
  * POST /api/notify
- *
- * Sends a multicast FCM push notification to one or more device tokens.
- *
- * Request headers:
- *   Authorization: Bearer <NOTIFY_SECRET>
- *
- * Request body (JSON):
- *   tokens  – array of FCM registration tokens
- *   title   – notification title
- *   body    – notification body (optional)
- *   icon    – notification icon URL (optional)
- *   url     – click-through URL stored in data.url (optional)
- *   data    – extra key/value pairs forwarded as FCM data (optional)
+ * Push notifications are currently disabled.
  */
 export async function POST(req: NextRequest) {
     // ── Auth ──────────────────────────────────────────────────────────────────
@@ -67,46 +54,15 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    // ── Send via FCM ──────────────────────────────────────────────────────────
-    try {
-        const app = getAdminApp();
-        const messaging = getAdminMessaging(app);
-
-        const extraData: Record<string, string> = { ...(data || {}) };
-        if (url) extraData.url = url;
-
-        const result = await messaging.sendEachForMulticast({
-            tokens,
-            notification: {
-                title,
-                body: notifBody,
-                imageUrl: icon,
-            },
-            data: extraData,
-            webpush: {
-                notification: {
-                    icon: icon || '/nxadmin/png/favicon.png',
-                    badge: '/nxadmin/png/favicon.png',
-                },
-                fcmOptions: url ? { link: url } : undefined,
-            },
-        });
-
-        const successCount = result.responses.filter((r) => r.success).length;
-        const failureCount = result.responses.length - successCount;
-
-        return NextResponse.json(
-            makeRes({
-                severity: failureCount === 0 ? 'success' : 'warning',
-                message: `Sent ${successCount}/${tokens.length} notifications`,
-                data: { successCount, failureCount },
-            }),
-        );
-    } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : String(e);
-        return NextResponse.json(
-            makeRes({ severity: 'error', message }),
-            { status: 500 },
-        );
-    }
+    void notifBody;
+    void icon;
+    void url;
+    void data;
+    return NextResponse.json(
+        makeRes({
+            severity: 'warning',
+            message: 'Push notifications are disabled. No provider is configured.',
+        }),
+        { status: 501 },
+    );
 }

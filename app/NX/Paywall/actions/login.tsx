@@ -1,8 +1,7 @@
 import type { Dispatch } from 'redux';
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { setUbereduxKey } from '../../Uberedux';
 import { setPaywall } from '../../Paywall';
-import { getFirebaseAuth } from "../../lib/firebase";
+import { supabase } from '../../lib/supabase';
 
 
 export const login =
@@ -13,14 +12,16 @@ export const login =
         async (dispatch: Dispatch, getState: () => any) => {
             try {
                 dispatch(setPaywall('loggingIn', true));
-                
-                const auth = getFirebaseAuth();
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error || !data.user) {
+                    throw error || new Error('Unable to sign in.');
+                }
                 
                 const userData = {
-                    uid: userCredential.user.uid,
-                    email: userCredential.user.email,
-                    displayName: userCredential.user.displayName,
+                    uid: data.user.id,
+                    email: data.user.email,
+                    displayName: data.user.user_metadata?.display_name ?? null,
                 };
                 
                 dispatch(setPaywall('user', userData));

@@ -1,6 +1,6 @@
 # NX° Framework Documentation
 
-Welcome to the official documentation for the **NX° Framework** — a modular, cartridge-based React/Next.js architecture built on Firebase, MUI, and Redux Toolkit.
+Welcome to the official documentation for the **NX° Framework** — a modular, cartridge-based React/Next.js architecture built on Supabase, MUI, and Redux Toolkit.
 
 ---
 

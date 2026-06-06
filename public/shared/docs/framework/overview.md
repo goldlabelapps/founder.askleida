@@ -29,7 +29,7 @@ app/
     ├── Paywall/                 # Authentication / paywall cartridge
     ├── Shortcodes/              # Content shortcodes cartridge
     ├── Uberedux/                # Global Redux state layer
-    └── lib/                     # Shared utilities (Firebase helpers, server hooks…)
+    └── lib/                     # Shared utilities (Supabase helpers, server hooks…)
 ```
 
 ---
@@ -93,6 +93,6 @@ Key types shared across all cartridges:
 | **DesignSystem** | `NX/DesignSystem` | MUI theming, feedback toasts, icons, nav |
 | **Flash** | `NX/Flash` | ActionScript-style animation / MovieClip system |
 | **NXAdmin** | `NX/NXAdmin` | Full admin back-office panel |
-| **Paywall** | `NX/Paywall` | Firebase Auth sign-in, account management |
+| **Paywall** | `NX/Paywall` | Supabase Auth sign-in, account management |
 | **Shortcodes** | `NX/Shortcodes` | WordPress-style content shortcodes |
 | **Uberedux** | `NX/Uberedux` | Shared Redux store (not a UI cartridge) |

@@ -1,4 +1,4 @@
-import { firebaseLogin, firebaseLogout } from './actions/firebaseAuth';
+import { supabaseLogin, supabaseLogout } from './actions/supabaseAuth';
 // Components
 import SignIn from './components/SignIn';
 import AccountCard from './components/AccountCard';
@@ -22,7 +22,7 @@ import { useAuthed } from './hooks/useAuthed';
 import { usePaywall } from './hooks/usePaywall';
 import { useAccount } from './hooks/useAccount';
 import { useIsAuthed } from './hooks/useIsAuthed';
-import { useFirebaseAuthListener } from './hooks/useFirebaseAuthListener';
+import { useSupabaseAuthListener } from './hooks/useSupabaseAuthListener';
 
 
 
@@ -44,8 +44,8 @@ export {
     avatarsByUID,
     subscribeAccount,
     updateAccount,
-    firebaseLogin,
-    firebaseLogout,
+    supabaseLogin,
+    supabaseLogout,
     login,
     logout,
 };
@@ -57,5 +57,5 @@ export {
     usePaywall,
     useAccount,
     useIsAuthed,
-    useFirebaseAuthListener,
+    useSupabaseAuthListener,
 };

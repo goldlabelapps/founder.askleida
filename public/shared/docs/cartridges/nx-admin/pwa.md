@@ -115,7 +115,7 @@ function InstallBanner() {
 ## Requirements
 
 - The app must be served over **HTTPS** (or `localhost`) — `isSecureContext` must be `true`.
-- A **service worker** must be registered. The `firebase-messaging-sw.js` file in `public/` satisfies this requirement.
+- A **service worker** must be registered. The `supabase-messaging-sw.js` file in `public/` satisfies this requirement.
 - The app must meet the browser's [PWA installability criteria](https://web.dev/install-criteria/) (manifest, icons, etc.).
 
 ---

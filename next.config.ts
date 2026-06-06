@@ -12,8 +12,7 @@ const nextConfig: NextConfig = {
     ],
   },
   webpack: (config, { isServer }) => {
-    // Suppress protobufjs dynamic require warnings - this is a known issue with Firebase/Firestore
-    // The code runs server-side only and the dynamic requires are safe
+    // Suppress protobufjs dynamic require warnings from transitive dependencies.
     config.ignoreWarnings = [
       ...(config.ignoreWarnings || []),
       { module: /@protobufjs\/inquire/ },

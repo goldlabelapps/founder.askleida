@@ -2,7 +2,7 @@ import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../Uberedux';
 import { setPaywall } from '../../Paywall';
 import { setFeedback } from '../../DesignSystem';
-import { getFirebaseFirestore } from "../../lib/firebase";
+import { supabase } from '../../lib/supabase';
 
 export const updateAccount = (
     key: string, 
@@ -16,12 +16,19 @@ async (dispatch: Dispatch, getState: () => any) => {
             dispatch(setPaywall('error', 'No UID found'));
             return;
         }
-        const firestore = getFirebaseFirestore();
-        const { collection, query, where, getDocs, updateDoc } = await import('firebase/firestore');
-        const accountsRef = collection(firestore, 'accounts');
-        const q = query(accountsRef, where('uid', '==', uid));
-        const snapshot = await getDocs(q);
-        if (snapshot.empty) {
+        const updateObj: Record<string, any> = {};
+        updateObj[key] = value;
+        updateObj['updated'] = Date.now();
+
+        const { data, error } = await supabase
+            .from('accounts')
+            .update(updateObj)
+            .eq('uid', uid)
+            .select();
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
             dispatch(setPaywall('error', 'Account not found'));
             dispatch(setFeedback({ 
                 severity: 'warning', 
@@ -30,11 +37,7 @@ async (dispatch: Dispatch, getState: () => any) => {
             }));     
             return;
         }
-        const docRef = snapshot.docs[0].ref;
-        const updateObj: Record<string, any> = {};
-        updateObj[key] = value;
-        updateObj['updated'] = Date.now();
-        await updateDoc(docRef, updateObj);
+
         dispatch(setFeedback({
             severity: 'info',
             title: successMsg || 'Account updated',

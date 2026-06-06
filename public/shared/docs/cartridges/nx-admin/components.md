@@ -23,7 +23,7 @@ import { NXAdmin } from '@/NX/NXAdmin';
 | `config` | `T_Config` | ✓ | Application configuration |
 
 **Behaviour:**
-- Mounts `useFirebaseAuthListener()` to track auth state.
+- Mounts `useSupabaseAuthListener()` to track auth state.
 - On auth, dispatches `requestNotifications()` to set up FCM.
 - Shows `<SimpleSignIn>` when unauthenticated.
 - Shows `<MiniDrawer>` when authenticated.
