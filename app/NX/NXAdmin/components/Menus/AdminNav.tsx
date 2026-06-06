@@ -4,6 +4,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   Box,
 } from '@mui/material';
+import { useDispatch } from '../../../Uberedux';
+import { logout } from '../../../Paywall';
+import { ConfirmAction } from '../../../DesignSystem';
 import { MiniListItem } from '../../../NXAdmin';
 
 export default function AdminNav({
@@ -14,6 +17,8 @@ export default function AdminNav({
 
   const router = useRouter();
   const pathname = usePathname();
+  const dispatch = useDispatch();
+  const [confirmSignOutOpen, setConfirmSignOutOpen] = React.useState(false);
 
   const buildAdminPath = (route?: string) => {
     if (!route) return '/';
@@ -28,6 +33,20 @@ export default function AdminNav({
       }
       onNavigate?.();
   }, [onNavigate, pathname, router]);
+
+    const handleOpenSignOutConfirm = React.useCallback(() => {
+      setConfirmSignOutOpen(true);
+    }, []);
+
+    const handleCloseSignOutConfirm = React.useCallback(() => {
+      setConfirmSignOutOpen(false);
+    }, []);
+
+    const handleSignOut = React.useCallback(() => {
+      setConfirmSignOutOpen(false);
+      dispatch(logout());
+      onNavigate?.();
+    }, [dispatch, onNavigate]);
 
   const open = true;
 
@@ -73,7 +92,25 @@ export default function AdminNav({
           }}
         />
 
+        <MiniListItem
+          open={open}
+          onClick={handleOpenSignOutConfirm}
+          options={{
+            label: 'Sign out',
+            icon: 'signout',
+          }}
+        />
+
         <Box sx={{ height: 50 }} />
+
+        <ConfirmAction
+          open={confirmSignOutOpen}
+          icon="signout"
+          title="Sign out?"
+          body="This will log you out of Firebase."
+          handleConfirm={handleSignOut}
+          handleClose={handleCloseSignOutConfirm}
+        />
     </>
   );
 }
