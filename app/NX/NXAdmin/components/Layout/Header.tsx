@@ -44,7 +44,7 @@ export default function Header() {
                 </Typography>}
                 subheader={header?.subheader || null}
                 action={ <Box sx={{}}>
-                          <NXAdminMenu />
+                            <NXAdminMenu />
                         </Box>}
             />
         </>

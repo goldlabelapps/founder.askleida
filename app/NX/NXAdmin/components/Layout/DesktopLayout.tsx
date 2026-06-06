@@ -1,8 +1,7 @@
 "use client";
 import * as React from 'react';
 import { 
-    usePathname, 
-    // useRouter,
+    usePathname,
 } from 'next/navigation';
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import { useMediaQuery } from '@mui/material';
