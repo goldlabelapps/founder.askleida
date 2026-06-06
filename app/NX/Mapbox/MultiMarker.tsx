@@ -8,7 +8,6 @@ import {
   useTheme,
 } from '@mui/material';
 import Map, { Marker } from 'react-map-gl/mapbox';
-import AvaFlag from '../NXAdmin/components/Fingerprints/components/AvaFlag';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -234,11 +233,13 @@ export default function MultiMarker({ markers = [], geos = [], focusGeo, focusZo
                     />
                   ) : null}
                   {point.countryCode ? (
-                    <AvaFlag
-                      avatarUrl={point.avatarUrl}
-                      countryCode={point.countryCode}
-                      size={isFocused ? 72 : 60}
-                      position="bottom-right"
+                    <Avatar
+                      src={point.avatarUrl}
+                      sx={{
+                        width: isFocused ? 72 : 60,
+                        height: isFocused ? 72 : 60,
+                        border: `2px solid ${theme.palette.secondary.main}`,
+                      }}
                     />
                   ) : (
                     <Avatar
