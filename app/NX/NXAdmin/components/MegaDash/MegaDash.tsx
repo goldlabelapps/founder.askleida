@@ -25,7 +25,7 @@ export default function MegaDash() {
     React.useEffect(() => {
         if (dash && dash.title) {
             dispatch(setNXAdmin('header', {
-                title: '°Admin',
+                title: 'Dashboard',
                 icon: 'dashboard',
             }));
         }
@@ -35,7 +35,17 @@ export default function MegaDash() {
         <>
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
-                    <Tenants />
+                    <Grid container spacing={2}>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            Account
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            Practitioners
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            Products
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
         </>

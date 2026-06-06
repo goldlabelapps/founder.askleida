@@ -212,7 +212,7 @@ export default function MobileLayout(props: Props) {
                             boxShadow: 0,
                         }}
                     >
-                        <Icon icon={open ? 'close' : 'star'} />
+                        <Icon icon={open ? 'close' : 'up'} />
                     </Fab>
                 </Box>
             )}

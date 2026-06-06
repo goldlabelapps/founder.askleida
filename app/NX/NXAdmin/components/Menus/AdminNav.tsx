@@ -37,11 +37,42 @@ export default function AdminNav({
             open={open}
             onClick={navigateToRoute}
             options={{
-              label: '°Leida',
+              label: 'Dashboard',
               icon: 'dashboard',
               route: '/',
             }}
         />
+
+        <MiniListItem
+          open={open}
+          onClick={navigateToRoute}
+          options={{
+            label: 'Account',
+            icon: 'account',
+            route: '/account',
+          }}
+        />
+
+        <MiniListItem
+          open={open}
+          onClick={navigateToRoute}
+          options={{
+            label: 'Practitioners',
+            icon: 'visitor',
+            route: '/practitioners',
+          }}
+        />
+
+        <MiniListItem
+          open={open}
+          onClick={navigateToRoute}
+          options={{
+            label: 'Products',
+            icon: 'products',
+            route: '/products',
+          }}
+        />
+
         <Box sx={{ height: 50 }} />
     </>
   );
