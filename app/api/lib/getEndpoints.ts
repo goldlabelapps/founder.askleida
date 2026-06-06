@@ -8,6 +8,10 @@ export const getEndpoints = (name?: string) => {
             route: `${baseURL}/products`,
         },
         {
+            name: 'AWIN',
+            route: `${baseURL}/awin`,
+        },
+        {
             name: 'Practitioners',
             route: `${baseURL}/practitioners`,
         }

@@ -34,7 +34,6 @@ export default function Products() {
         }
     }, [dispatch, dash?.title]);
 
-
     return (
         <>
             <Grid container spacing={2}>
