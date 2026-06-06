@@ -25,7 +25,6 @@ const drawerBleeding = 25;
 const NAV_ROUTES = new Set([
     'accounts',
     'account',
-    'tenants',
     'prospects',
     'fingerprints',
     'avatars',

@@ -31,7 +31,7 @@ const drawerWidth = 220;
 const NAV_ROUTES = new Set([
     'prospects', 
     'fingerprints',
-    'tenants',
+    'account',
 ]);
 
 const FALLBACK_ADMIN_BASE_PATH = '/';

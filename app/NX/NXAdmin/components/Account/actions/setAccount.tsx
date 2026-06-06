@@ -1,14 +1,14 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../Uberedux';
 
-export const setTenants =
+export const setAccount =
     (key: string, value: any): any =>
         async (dispatch: Dispatch, getState: () => any) => {
             try {
                 const state = getState();
-                const current = (state?.redux?.nxAdmin?.tenants) || {};
+                const current = (state?.redux?.nxAdmin?.account) || {};
                 const updated = { ...current, [key]: value };
-                dispatch(setUbereduxKey({ key: 'nxAdmin.tenants', value: updated }));
+                dispatch(setUbereduxKey({ key: 'nxAdmin.account', value: updated }));
             } catch (e: unknown) {
                 const msg = e instanceof Error ? e.message : String(e);
                 dispatch(setUbereduxKey({ key: 'error', value: msg }));

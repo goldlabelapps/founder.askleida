@@ -2,12 +2,12 @@ import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../Uberedux';
 import { setNXAdmin } from '../../../../NXAdmin';
 
-export const initTenants = (): any =>
+export const initAccount = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {
         try {
             const nxAdmin = getState()?.redux?.nxAdmin || {};
-            if (!nxAdmin.tenants) await dispatch(setNXAdmin('tenants', {
-                slice: 'tenants',
+            if (!nxAdmin.account) await dispatch(setNXAdmin('account', {
+                slice: 'account',
             }));
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);
