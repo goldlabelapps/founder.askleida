@@ -20,24 +20,7 @@ const normalizeText = (value: unknown): string | null | undefined => {
   return trimmed.length > 0 ? trimmed : null;
 };
 
-const normalizePrice = (value: unknown): number | null | undefined => {
-  if (value === undefined) {
-    return undefined;
-  }
-
-  if (value === null || value === '') {
-    return null;
-  }
-
-  const parsed = typeof value === 'number' ? value : Number(value);
-  if (!Number.isFinite(parsed) || parsed < 0) {
-    return null;
-  }
-
-  return parsed;
-};
-
-// PATCH /api/products - Update a product (expects { product_id, ...fields })
+// PATCH /api/practitioners - Update a practitioner (expects { practitioner_id, ...fields })
 export async function PATCH(req: Request) {
   let body: Record<string, unknown>;
   try {
@@ -53,10 +36,10 @@ export async function PATCH(req: Request) {
     return NextResponse.json(res, { status: 400 });
   }
 
-  const { product_id, ...fields } = body;
-  const productId = typeof product_id === 'string' ? product_id.trim() : '';
-  if (!productId) {
-    const res = makeRes({ tenant, message: 'Missing product_id', severity: 'error' });
+  const { practitioner_id, ...fields } = body;
+  const practitionerId = typeof practitioner_id === 'string' ? practitioner_id.trim() : '';
+  if (!practitionerId) {
+    const res = makeRes({ tenant, message: 'Missing practitioner_id', severity: 'error' });
     return NextResponse.json(res, { status: 400 });
   }
 
@@ -66,9 +49,9 @@ export async function PATCH(req: Request) {
   }
 
   const { data: existingRow, error: existingError } = await supabase
-    .from('products')
+    .from('practitioners')
     .select('data')
-    .eq('product_id', productId)
+    .eq('practitioner_id', practitionerId)
     .single();
 
   if (existingError) {
@@ -90,23 +73,13 @@ export async function PATCH(req: Request) {
 
   const name = normalizeText(fields.name ?? incomingData.name);
   const category = normalizeText(fields.category ?? incomingData.category);
-  const sku = normalizeText(fields.sku ?? incomingData.sku);
   const description = normalizeText(fields.description ?? incomingData.description);
   const notes = normalizeText(fields.notes ?? incomingData.notes);
-  const priceInput = fields.price ?? incomingData.price;
-  const price = normalizePrice(priceInput);
-
-  if (priceInput !== undefined && price === null) {
-    const res = makeRes({ tenant, message: 'price must be a valid number >= 0', severity: 'error' });
-    return NextResponse.json(res, { status: 400 });
-  }
 
   if (name !== undefined) mergedData.name = name;
   if (category !== undefined) mergedData.category = category;
-  if (sku !== undefined) mergedData.sku = sku;
   if (description !== undefined) mergedData.description = description;
   if (notes !== undefined) mergedData.notes = notes;
-  if (price !== undefined) mergedData.price = price;
 
   const updatePayload: Record<string, unknown> = {
     data: mergedData,
@@ -118,20 +91,17 @@ export async function PATCH(req: Request) {
     updatePayload.title = name;
   }
 
-  if (typeof fields.practitioner_id === 'string' && fields.practitioner_id.trim()) {
-    updatePayload.practitioner_id = fields.practitioner_id.trim();
-  }
-
   const { data, error } = await supabase
-    .from('products')
+    .from('practitioners')
     .update(updatePayload)
-    .eq('product_id', productId)
+    .eq('practitioner_id', practitionerId)
     .select();
+
   if (error) {
     const res = makeRes({ tenant, message: error.message, severity: 'error' });
     return NextResponse.json(res, { status: 500 });
   }
 
-  const res = makeRes({ tenant, message: 'Product updated', severity: 'success', data });
+  const res = makeRes({ tenant, message: 'Practitioner updated', severity: 'success', data });
   return NextResponse.json(res);
 }

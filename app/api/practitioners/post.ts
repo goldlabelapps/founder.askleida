@@ -2,17 +2,14 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { makeRes } from '../';
 
-export type T_Product = {
-  product_id?: string;
-  practitioner_id?: string | null;
+export type T_Practitioner = {
+  practitioner_id?: string;
   title?: string | null;
   created?: string;
   updated?: string | null;
   data?: Record<string, unknown> | null;
   name?: string | null;
   category?: string | null;
-  sku?: string | null;
-  price?: number | null;
   description?: string | null;
   notes?: string | null;
 };
@@ -31,22 +28,9 @@ const normalizeText = (value: unknown): string | null => {
   return trimmed.length > 0 ? trimmed : null;
 };
 
-const normalizePrice = (value: unknown): number | null => {
-  if (value === null || value === undefined || value === '') {
-    return null;
-  }
-
-  const parsed = typeof value === 'number' ? value : Number(value);
-  if (!Number.isFinite(parsed) || parsed < 0) {
-    return null;
-  }
-
-  return parsed;
-};
-
-// POST /api/products - Create a new product
+// POST /api/practitioners - Create a new practitioner
 export async function POST(req: Request) {
-  let body: T_Product;
+  let body: T_Practitioner;
   try {
     body = await req.json();
   } catch {
@@ -65,31 +49,21 @@ export async function POST(req: Request) {
 
   const name = normalizeText(body.name ?? dataObject.name);
   const category = normalizeText(body.category ?? dataObject.category);
-  const sku = normalizeText(body.sku ?? dataObject.sku);
   const description = normalizeText(body.description ?? dataObject.description);
   const notes = normalizeText(body.notes ?? dataObject.notes);
-  const price = normalizePrice(body.price ?? dataObject.price);
 
   if (!name) {
     const res = makeRes({ tenant, message: 'name is required', severity: 'error' });
     return NextResponse.json(res, { status: 400 });
   }
 
-  if ((body.price ?? dataObject.price) !== undefined && (body.price ?? dataObject.price) !== null && price === null) {
-    const res = makeRes({ tenant, message: 'price must be a valid number >= 0', severity: 'error' });
-    return NextResponse.json(res, { status: 400 });
-  }
-
-  const payload: T_Product = {
-    ...(body.product_id ? { product_id: body.product_id } : {}),
+  const payload: T_Practitioner = {
     ...(body.practitioner_id ? { practitioner_id: body.practitioner_id } : {}),
     title: normalizeText(body.title) || name,
     data: {
       ...dataObject,
       name,
       category,
-      sku,
-      price,
       description,
       notes,
     },
@@ -97,12 +71,12 @@ export async function POST(req: Request) {
     ...(body.updated ? { updated: body.updated } : {}),
   };
 
-  const { data, error } = await supabase.from('products').insert([payload]).select();
+  const { data, error } = await supabase.from('practitioners').insert([payload]).select();
   if (error) {
     const res = makeRes({ tenant, message: error.message, severity: 'error' });
     return NextResponse.json(res, { status: 500 });
   }
 
-  const res = makeRes({ tenant, message: 'Product created', severity: 'success', data });
+  const res = makeRes({ tenant, message: 'Practitioner created', severity: 'success', data });
   return NextResponse.json(res);
 }

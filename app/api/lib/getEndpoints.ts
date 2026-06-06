@@ -6,6 +6,10 @@ export const getEndpoints = (name?: string) => {
         {
             name: 'Affiliate products',
             route: `${baseURL}/products`,
+        },
+        {
+            name: 'Practitioners',
+            route: `${baseURL}/practitioners`,
         }
     ];
     if (name) {
