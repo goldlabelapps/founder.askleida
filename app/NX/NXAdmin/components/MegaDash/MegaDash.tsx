@@ -6,8 +6,6 @@ import {
 import { useDispatch } from '../../../Uberedux';
 import { setNXAdmin, useNXAdmin } from '../../../NXAdmin';
 import { initDash, useDash } from '../MegaDash';
-import { Surface as Fingerprints } from '../Fingerprints';
-import { Surface as Prospects } from '../Prospects';
 import { Surface as Tenants } from '../Tenants';
 
 export default function MegaDash() {
@@ -27,7 +25,7 @@ export default function MegaDash() {
     React.useEffect(() => {
         if (dash && dash.title) {
             dispatch(setNXAdmin('header', {
-                title: '°Admin',
+                title: 'Dashboard',
                 icon: 'dashboard',
             }));
         }
@@ -37,13 +35,17 @@ export default function MegaDash() {
         <>
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
-                    <Tenants />
-                </Grid>
-                <Grid size={{ xs: 12, lg: 6 }}>
-                    <Fingerprints />
-                </Grid>
-                <Grid size={{ xs: 12, lg: 6 }}>
-                    <Prospects />
+                    <Grid container spacing={2}>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            Account
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            Practitioners
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            Products
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
         </>

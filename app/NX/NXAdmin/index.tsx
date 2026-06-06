@@ -7,9 +7,6 @@ import { DesktopLayout, Header, MobileLayout } from './components/Layout';
 import PageRouter from './components/PageRouter';
 
 // Page components
-import { Queue, FilterSelect } from './components/Queue';
-import { Fingerprints } from './components/Fingerprints';
-import { Prospects } from './components/Prospects';
 import { Tenants } from './components/Tenants';
 
 // UI components
@@ -30,7 +27,7 @@ import NXAdminMenu from './components/Menus/NXAdminMenu';
 import MiniListItem from './components/Menus/MiniListItem';
 import PWAAlert from './components/Menus/PWAAlert';
 import NotificationBell from './components/Menus/NotificationBell';
-import AdminNav from './components/Layout/AdminNav';
+import AdminNav from './components/Menus/AdminNav';
 import {MegaDash} from './components/MegaDash';
 
 // Actions
@@ -64,14 +61,9 @@ export {
     PageRouter,
     Header,
     MobileLayout,
+
     // Page components
-    Queue,
-    Fingerprints,
-    Fingerprints as FingerprintListItem,
-    // Prospects page module
-    Prospects,
     Tenants,
-    FilterSelect,
 
 
     // UI components

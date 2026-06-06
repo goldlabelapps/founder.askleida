@@ -98,7 +98,7 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
                         type="submit"
                         fullWidth
                         endIcon={<Icon icon="signin" color="primary" />}
-                        variant={isFormValid ? "contained" : "text"}
+                        variant={"contained"}
                         sx={{ mt: 2 }}
                         disabled={!isFormValid}
                         onClick={handleSubmit}

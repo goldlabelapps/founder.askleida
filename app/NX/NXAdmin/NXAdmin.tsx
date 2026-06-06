@@ -69,7 +69,7 @@ export default function NXAdmin({
         <Feedback />
         {!isAuthed ? <>
           <Container 
-            maxWidth="lg" 
+            maxWidth="md" 
             sx={{ 
               display: 'flex', 
               alignItems: 'center', 
