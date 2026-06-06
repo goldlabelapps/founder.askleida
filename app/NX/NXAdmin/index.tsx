@@ -7,7 +7,9 @@ import { DesktopLayout, Header, MobileLayout } from './components/Layout';
 import PageRouter from './components/PageRouter';
 
 // Page components
-import { Tenants } from './components/Tenants';
+import { Account } from './components/Account';
+import { Practitioners } from './components/Practitioners';
+import { Products } from './components/Products';
 
 // UI components
 import OptionSelect from './components/UI/OptionSelect';
@@ -63,7 +65,9 @@ export {
     MobileLayout,
 
     // Page components
-    Tenants,
+    Account,
+    Practitioners,
+    Products,
 
 
     // UI components

@@ -29,9 +29,9 @@ import { useDispatch } from '../../../Uberedux';
 
 const drawerWidth = 220;
 const NAV_ROUTES = new Set([
-    'prospects', 
-    'fingerprints',
-    'tenants',
+    'account',
+    'practitioners',
+    'products',
 ]);
 
 const FALLBACK_ADMIN_BASE_PATH = '/';

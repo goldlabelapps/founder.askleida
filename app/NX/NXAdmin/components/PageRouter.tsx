@@ -2,7 +2,9 @@
 import * as React from 'react';
 import {
   MegaDash,
-  Tenants,
+  Account,
+  Practitioners,
+  Products,
 } from '../../NXAdmin';
 
 interface I_PageRouter {
@@ -12,8 +14,12 @@ interface I_PageRouter {
 export default function PageRouter({ active }: I_PageRouter) {
     if (!active) return <MegaDash />;
     switch (active) {
-      case 'tenants':
-        return <Tenants />;
+      case 'account':
+        return <Account />;
+      case 'practitioners':
+        return <Practitioners />;
+      case 'products':
+        return <Products />;
       default:
         return <MegaDash />;
     }
