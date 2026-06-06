@@ -42,7 +42,7 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
             {config && (
                 <CardHeader
                     sx={{ width: '100%' }}
-                    title={<Typography variant="h6" color="text.secondary">
+                    title={<Typography variant="h4" color="text.secondary">
                         {config.siteName}
                     </Typography>}
                     // avatar={
@@ -57,7 +57,7 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
 
                 <TextField
                     label="Email"
-                    variant='standard'
+                    variant='outlined'
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
@@ -67,7 +67,7 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
                 />
                 <TextField
                     label="Password"
-                    variant='standard'
+                    variant='outlined'
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -99,7 +99,7 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
                         fullWidth
                         endIcon={<Icon icon="signin" color="primary" />}
                         variant={"contained"}
-                        sx={{ mt: 2 }}
+                        sx={{ mt: 0 }}
                         disabled={!isFormValid}
                         onClick={handleSubmit}
                     >

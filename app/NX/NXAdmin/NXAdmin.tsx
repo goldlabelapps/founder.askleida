@@ -77,12 +77,12 @@ export default function NXAdmin({
               minHeight: '100vh',
             }}>
               <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 4 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <Box>
                     <SimpleSignIn config={config} /> 
                   </Box>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 8 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <Box sx={{ mx: 3, mt: 3}}>
                     <README />
                   </Box>
