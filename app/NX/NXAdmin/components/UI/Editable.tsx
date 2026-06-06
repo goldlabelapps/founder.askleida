@@ -230,10 +230,11 @@ export default function Editable({
 	return (
 		<TextField
 			sx={{
-				'& .MuiInputBase-root': {
-					backgroundColor: isEmpty ? 
-						'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.75)',
-				},
+				// '& .MuiInputBase-root': {
+				// 	backgroundColor: isEmpty ? 
+				// 		'rgba(255, 255, 255, 0.25)' : 
+				// 		'rgba(255, 255, 255, 0.75)',
+				// },
 			}}
 			fullWidth
 			variant={variant}
