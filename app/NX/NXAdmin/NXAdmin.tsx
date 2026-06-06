@@ -15,7 +15,7 @@ import {
   useDesignSystem,
 } from '../DesignSystem';
 import { 
-  useFirebaseAuthListener, 
+  useSupabaseAuthListener, 
   usePaywall, 
   SimpleSignIn, 
   useIsAuthed,
@@ -33,7 +33,7 @@ export default function NXAdmin({
   config,
 }: I_NXAdmin) {
   
-  useFirebaseAuthListener();
+  useSupabaseAuthListener();
 
   const dispatch = useDispatch();
   const paywall = usePaywall();

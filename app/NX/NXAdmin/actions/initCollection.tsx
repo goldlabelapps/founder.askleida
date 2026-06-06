@@ -1,7 +1,6 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../Uberedux';
-import { getFirebaseApp } from '../../lib/firebase';
-import { fetchCollectionDocs, subscribeToCollectionDocs } from './firebaseCrudHelpers';
+import { fetchCollectionDocs, subscribeToCollectionDocs } from './crudHelpers';
 
 type InitCollectionOptions = {
     subscribe?: boolean;

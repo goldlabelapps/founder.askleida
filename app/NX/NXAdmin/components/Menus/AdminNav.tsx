@@ -107,7 +107,7 @@ export default function AdminNav({
           open={confirmSignOutOpen}
           icon="signout"
           title="Sign out?"
-          body="This will log you out of Firebase."
+          body="This will log you out."
           handleConfirm={handleSignOut}
           handleClose={handleCloseSignOutConfirm}
         />

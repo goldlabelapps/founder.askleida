@@ -1,16 +1,16 @@
 "use client";
 import { useState } from "react";
-import { User } from "firebase/auth";
-import { useFirebaseAuthListener } from './useFirebaseAuthListener';
+import type { User } from '@supabase/supabase-js';
+import { useSupabaseAuthListener } from './useSupabaseAuthListener';
 
 /**
- * useAuthed - React hook to get Firebase auth state
+ * useAuthed - React hook to get Supabase auth state
  * Returns: User object if authenticated, null otherwise
  */
 export function useAuthed(): User | null {
     const [user, setUser] = useState<User | null>(null);
-    useFirebaseAuthListener((firebaseUser) => {
-        setUser(firebaseUser ?? null);
+    useSupabaseAuthListener((supabaseUser) => {
+        setUser(supabaseUser ?? null);
     });
     return user;
 }

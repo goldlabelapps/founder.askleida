@@ -218,7 +218,7 @@ dispatch(requestNotifications());
 **Behaviour:**
 1. Checks/requests `Notification.permission`.
 2. If granted: obtains FCM token via VAPID key.
-3. Posts `FIREBASE_CONFIG` message to the service worker.
+3. Posts `SUPABASE_CONFIG` message to the service worker.
 4. Saves the FCM token to `users/{uid}.fcmTokens` in Firestore (using `arrayUnion`).
 5. Dispatches token and permission to `nxAdmin.notifications`.
 

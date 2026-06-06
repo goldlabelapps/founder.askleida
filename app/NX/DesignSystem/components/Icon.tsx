@@ -168,7 +168,6 @@ import BookIcon from '@mui/icons-material/MenuBook';
 import MathsIcon from '@mui/icons-material/Calculate';
 import VirusIcon from '@mui/icons-material/Coronavirus';
 import ForwardIcon from '@mui/icons-material/Send';
-import FirebaseIcon from '@mui/icons-material/Whatshot';
 import MediaIcon from '@mui/icons-material/AttachFile';
 import CashIcon from '@mui/icons-material/Savings';
 import TenantIcon from '@mui/icons-material/Anchor';
@@ -298,9 +297,6 @@ export default function Icon({ icon, color }: I_Icon) {
       break;
     case 'notify':
       iconFragment = <BellIcon color={color} />;
-      break;
-    case 'firebase':
-      iconFragment = <FirebaseIcon color={color} />;
       break;
     case 'virus':
       iconFragment = <VirusIcon color={color} />;

@@ -1,11 +1,5 @@
-// Firebase utilities
-import {
-    getFirebaseApp,
-    getFirebaseAuth,
-    getFirebaseFirestore,
-    getFirebaseStorage,
-    getFirebaseMessaging,
-} from './firebase';
+// Supabase utilities
+import { supabase } from './supabase';
 
 // Tenant & metadata utilities
 import { getTenant } from './getTenant';
@@ -17,15 +11,11 @@ import { makeIdentity } from './vanilla-js/makeIdentity';
 import { militaryTime } from './vanilla-js/militaryTime';
 
 // Hooks
-import { useFirebaseAuthListener } from '../Paywall/hooks/useFirebaseAuthListener';
+import { useSupabaseAuthListener } from '../Paywall/hooks/useSupabaseAuthListener';
 
 export {
-    // Firebase
-    getFirebaseApp,
-    getFirebaseAuth,
-    getFirebaseFirestore,
-    getFirebaseStorage,
-    getFirebaseMessaging,
+    // Supabase
+    supabase,
     // Tenant & metadata
     getTenant,
     getMeta,
@@ -34,5 +24,5 @@ export {
     makeIdentity,
     militaryTime,
     // Hooks
-    useFirebaseAuthListener,
+    useSupabaseAuthListener,
 };

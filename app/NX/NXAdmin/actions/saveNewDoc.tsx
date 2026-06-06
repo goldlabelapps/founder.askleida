@@ -1,7 +1,7 @@
 import type { Dispatch } from 'redux';
 // import { setUbereduxKey } from '../../Uberedux';
 import { setCRUD} from '../../NXAdmin';
-import { getFirebaseFirestore } from '../../lib/firebase'
+import { supabase } from '../../lib/supabase';
 
 export const saveNewDoc = (
     collection: string,
@@ -9,11 +9,15 @@ export const saveNewDoc = (
 ): any =>
     async (dispatch: Dispatch) => {
         try {
-            const firestore = getFirebaseFirestore();
-            const { addDoc, collection: col } = await import('firebase/firestore');
-            const colRef = col(firestore, collection);
-            const docRef = await addDoc(colRef, data);
-            const newDoc = { id: docRef.id, ...data };
+            const { data: rows, error } = await supabase
+                .from(collection)
+                .insert(data)
+                .select()
+                .limit(1);
+
+            if (error) throw error;
+
+            const newDoc = rows?.[0] || data;
             dispatch(setCRUD(collection, 'selected', newDoc));
             dispatch(setCRUD(collection, 'mode', 'update'));
         } catch (e) {

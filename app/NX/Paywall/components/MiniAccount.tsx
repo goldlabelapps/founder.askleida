@@ -15,7 +15,7 @@ import {
 import { 
     usePaywall, 
     setPaywall,
-    firebaseLogout,
+    supabaseLogout,
     updateAccount,
     ChooseAvatar,
 } from '../../Paywall';
@@ -40,7 +40,7 @@ export default function MiniAccount({ onCloseDrawer }: { onCloseDrawer?: () => v
     const handleClose = () => setOpen(false);
 
     const handleSignout = async () => {
-        await firebaseLogout();
+        await supabaseLogout();
         dispatch(setPaywall('user', null));
         dispatch(setPaywall('account', null));
         setOpen(false);

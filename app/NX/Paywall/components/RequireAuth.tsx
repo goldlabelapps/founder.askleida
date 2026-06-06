@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import type { T_Config } from "../../types";
 import SignIn from './SignIn';
-import { firebaseLogin } from '../../Paywall';
-import { User } from 'firebase/auth';
-import { useFirebaseAuthListener } from '../../lib';
+import { supabaseLogin } from '../../Paywall';
+import type { User } from '@supabase/supabase-js';
+import { useSupabaseAuthListener } from '../../lib';
 import { Typography, Backdrop, CircularProgress, Box } from "@mui/material";
 import { useDispatch } from '../../Uberedux';
 import { setPaywall } from '../../Paywall';
@@ -16,7 +16,7 @@ export default function RequireAuth({ children, config }: { children: React.Reac
     const handleSignIn = async (email: string, password: string) => {
         setLoading(true);
         try {
-            const user = await firebaseLogin(email, password, dispatch);
+            const user = await supabaseLogin(email, password, dispatch);
             setUser(user);
         } catch (e) {
             // dispatch(setPaywall("user", null));
@@ -25,8 +25,8 @@ export default function RequireAuth({ children, config }: { children: React.Reac
         }
     };
 
-    useFirebaseAuthListener((firebaseUser) => {
-        setUser(firebaseUser);
+    useSupabaseAuthListener((supabaseUser) => {
+        setUser(supabaseUser);
         setLoading(false);
     });
 

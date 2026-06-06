@@ -18,7 +18,7 @@ import {
     setPaywall, 
     useAccount,
 } from '../../Paywall';
-import { getAuth } from 'firebase/auth';
+import { supabase } from '../../lib/supabase';
 
 export interface I_ChooseAvatar {
     onSave: (newAvatar: string) => void;
@@ -75,17 +75,15 @@ export default function ChooseAvatar({
         formData.append('uid', account.uid);
 
         try {
-            // Get Firebase ID token for the current user
-            const auth = getAuth();
-            const user = auth.currentUser;
-            if (!user) throw new Error('User not authenticated');
-            const idToken = await user.getIdToken();
+            const { data } = await supabase.auth.getSession();
+            const accessToken = data.session?.access_token;
+            if (!accessToken) throw new Error('User not authenticated');
 
             const res = await fetch('/api/avatars', {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'Authorization': `Bearer ${idToken}`
+                    'Authorization': `Bearer ${accessToken}`
                 }
             });
             const result = await res.json();
