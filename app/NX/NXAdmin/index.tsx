@@ -27,7 +27,7 @@ import NXAdminMenu from './components/Menus/NXAdminMenu';
 import MiniListItem from './components/Menus/MiniListItem';
 import PWAAlert from './components/Menus/PWAAlert';
 import NotificationBell from './components/Menus/NotificationBell';
-import AdminNav from './components/Layout/AdminNav';
+import AdminNav from './components/Menus/AdminNav';
 import {MegaDash} from './components/MegaDash';
 
 // Actions

@@ -41,15 +41,6 @@ export default function AdminNav({
               icon: 'dashboard',
               route: '/',
             }}
-        /> 
-        <MiniListItem
-          open={open}
-          onClick={navigateToRoute}
-          options={{
-            label: 'Supabase°',
-            icon: 'database',
-            route: '/tenants',
-          }}
         />
         <Box sx={{ height: 50 }} />
     </>
