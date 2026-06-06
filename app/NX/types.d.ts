@@ -6,6 +6,7 @@ export type { T_RootState, T_UbereduxDispatch };
 export type T_Severity = 'success' | 'error' | 'warning' | 'info';
 
 export interface I_MakeRes {
+    tenant?: string;
     severity: T_Severity;
     message: string;
     data?: any;

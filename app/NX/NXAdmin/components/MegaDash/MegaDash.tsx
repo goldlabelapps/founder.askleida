@@ -38,13 +38,11 @@ export default function MegaDash() {
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
                     <Grid container spacing={2}>
-                        <Grid size={{ xs: 12, sm: 4 }}>
-                            <Account />
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 4 }}>
+                        
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <Practitioners />
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 4 }}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <Products />
                         </Grid>
                     </Grid>
