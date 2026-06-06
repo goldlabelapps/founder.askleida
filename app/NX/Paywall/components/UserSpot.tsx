@@ -22,10 +22,29 @@ export default function UserSpot({ onClick }: I_UserSpot) {
     const avatarsFetching = paywall ? paywall.avatarsFetching : null;
     const uid = paywall ? paywall.uid : null;
     const dispatch = useDispatch();
+    const attemptedAccountUIDRef = React.useRef<string | null>(null);
 
     const [show, setShow] = React.useState(true);
 
     React.useEffect(() => {
+        if (!uid) {
+            attemptedAccountUIDRef.current = null;
+            return;
+        }
+
+        if (account) {
+            attemptedAccountUIDRef.current = uid;
+            return;
+        }
+
+        if (accountSubscribing) return;
+
+        // Avoid infinite retry loops when the backend returns a persistent error
+        // (for example: missing `accounts` table in Supabase).
+        if (attemptedAccountUIDRef.current === uid) return;
+
+        attemptedAccountUIDRef.current = uid;
+
         if (uid && !account && !accountSubscribing) {
             dispatch(setPaywall('accountSubscribing', true));
             dispatch(subscribeAccount());

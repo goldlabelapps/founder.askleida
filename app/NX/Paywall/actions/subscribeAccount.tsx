@@ -21,7 +21,16 @@ async (dispatch: Dispatch, getState: () => any) => {
             .limit(1);
 
         if (error) {
-            dispatch(setPaywall('error', error.message || 'Error loading account'));
+            const missingAccountsTable =
+                error.code === 'PGRST205' ||
+                error.message?.toLowerCase().includes('could not find the table') ||
+                error.message?.toLowerCase().includes('relation "accounts" does not exist');
+
+            const message = missingAccountsTable
+                ? 'Supabase table `accounts` was not found. Create it or update Paywall to the correct table name.'
+                : (error.message || 'Error loading account');
+
+            dispatch(setPaywall('error', message));
             dispatch(setPaywall('accountSubscribing', false));
             return;
         }
