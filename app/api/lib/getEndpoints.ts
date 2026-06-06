@@ -1,11 +1,11 @@
-// import { getBaseurl } from './getBaseurl';
+import { getBaseurl } from './getBaseurl';
 
 export const getEndpoints = (name?: string) => {
-    // const baseURL = getBaseurl();
+    const baseURL = getBaseurl();
     const endpoints = [
         {
-            name: 'Prompt° endpoint',
-            route: `/api/prompt`,
+            name: 'Affiliate products',
+            route: `${baseURL}/products`,
         }
     ];
     if (name) {
