@@ -111,7 +111,6 @@ function SwipeableEdgeDrawer(props: SwipeableEdgeDrawerProps) {
             ModalProps={{ keepMounted }}
             PaperProps={{
                 sx: {
-                    // height: `calc(50% + ${drawerBleeding}px)`,
                     overflow: 'visible',
                     borderTopLeftRadius: 16,
                     borderTopRightRadius: 16,
