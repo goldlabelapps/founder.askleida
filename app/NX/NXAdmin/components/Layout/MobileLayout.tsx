@@ -204,14 +204,14 @@ export default function MobileLayout(props: Props) {
                     }}
                 >
                     <Fab
-                        color={'primary'}
+                        
                         aria-label={open ? 'Close NX Admin navigation' : 'Open NX Admin navigation'}
                         onClick={handleMenuClick}
                         sx={{
                             boxShadow: 0,
                         }}
                     >
-                        <Icon icon={open ? 'close' : 'up'} />
+                        <Icon icon={open ? 'close' : 'menu'} />
                     </Fab>
                 </Box>
             )}
