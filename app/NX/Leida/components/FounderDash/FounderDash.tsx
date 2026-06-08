@@ -5,7 +5,12 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import { setNXAdmin, useNXAdmin } from '../../../NXAdmin';
-import { initDash, useDash } from '../FounderDash';
+import { 
+    initDash, 
+    useDash,
+    README,
+} from '../../../Leida';
+
 
 export default function FounderDash() {
     
@@ -37,7 +42,7 @@ export default function FounderDash() {
                     <Grid container spacing={2}>
                         
                         <Grid size={{ xs: 12 }}>
-                            Founder Dash
+                            <README />
                         </Grid>
                     </Grid>
                 </Grid>

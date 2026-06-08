@@ -169,7 +169,7 @@ export default function Editable({
 				<Button
 					variant="text"
 					color="primary"
-					startIcon={<Icon icon="date" />}
+					// startIcon={<Icon icon="date" />}
 					disabled={disabled}
 					onClick={handleOpenDatePicker}
 					aria-label={label || 'Select date'}

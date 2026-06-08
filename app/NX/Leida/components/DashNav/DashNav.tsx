@@ -56,12 +56,12 @@ export default function DashNav({
             open={open}
             onClick={navigateToRoute}
             options={{
-              label: 'Dashboard',
+              label: 'Founder Dash',
               icon: 'leida',
               route: '/',
             }}
         />
-
+    {/*
         <MiniListItem
           open={open}
           onClick={navigateToRoute}
@@ -81,7 +81,7 @@ export default function DashNav({
             route: '/supabase',
           }}
         />
-        {/* <MiniListItem
+        <MiniListItem
           open={open}
           onClick={navigateToRoute}
           options={{
