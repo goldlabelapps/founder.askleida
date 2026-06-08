@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { makeRes } from '../';
 import postgres from 'postgres';
+import dns from 'node:dns';
+
+dns.setDefaultResultOrder('ipv4first');
 
 const tenant = process.env.NEXT_PUBLIC_TENANT;
 const databaseUrl =
@@ -8,17 +11,24 @@ const databaseUrl =
 	process.env.POSTGRES_URL ||
 	process.env.SUPABASE_DB_URL;
 
-const sql = databaseUrl
-	? postgres(databaseUrl, { prepare: false })
-	: null;
+const normalizedDatabaseUrl = databaseUrl?.trim();
 
 export async function GET() {
-	if (!sql) {
+	if (!normalizedDatabaseUrl) {
 		const res = makeRes({
 			tenant,
-			message: 'Missing database connection string for Supabase tables lookup',
+			message: 'Missing database connection string for Supabase tables lookup. Set DATABASE_URL, POSTGRES_URL, or SUPABASE_DB_URL.',
 			severity: 'error',
 		});
+		return NextResponse.json(res, { status: 500 });
+	}
+
+	let sql;
+	try {
+		sql = postgres(normalizedDatabaseUrl, { prepare: false });
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Invalid database URL';
+		const res = makeRes({ tenant, message: `Invalid database URL: ${message}`, severity: 'error' });
 		return NextResponse.json(res, { status: 500 });
 	}
 
@@ -42,5 +52,7 @@ export async function GET() {
 		const message = error instanceof Error ? error.message : 'Failed to fetch public schema tables';
 		const res = makeRes({ tenant, message, severity: 'error' });
 		return NextResponse.json(res, { status: 500 });
+	} finally {
+		await sql.end();
 	}
 }
