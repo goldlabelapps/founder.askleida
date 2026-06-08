@@ -1,31 +1,46 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { makeRes } from '../';
+import postgres from 'postgres';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const tenant = process.env.NEXT_PUBLIC_TENANT;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const databaseUrl =
+	process.env.DATABASE_URL ||
+	process.env.POSTGRES_URL ||
+	process.env.SUPABASE_DB_URL;
+
+const sql = databaseUrl
+	? postgres(databaseUrl, { prepare: false })
+	: null;
 
 export async function GET() {
-	const { data, error } = await supabase
-		.schema('information_schema')
-		.from('tables')
-		.select('table_name, table_schema, table_type')
-		.eq('table_schema', 'public')
-		.eq('table_type', 'BASE TABLE')
-		.order('table_name', { ascending: true });
-
-	if (error) {
-		const res = makeRes({ tenant, message: error.message, severity: 'error' });
+	if (!sql) {
+		const res = makeRes({
+			tenant,
+			message: 'Missing database connection string for Supabase tables lookup',
+			severity: 'error',
+		});
 		return NextResponse.json(res, { status: 500 });
 	}
 
-	const res = makeRes({
-		tenant,
-		message: 'Fetched public schema tables',
-		severity: 'success',
-		data,
-	});
-	return NextResponse.json(res);
+	try {
+		const data = await sql<{ table_name: string }[]>`
+			select table_name
+			from information_schema.tables
+			where table_schema = 'public'
+			  and table_type = 'BASE TABLE'
+			order by table_name asc
+		`;
+
+		const res = makeRes({
+			tenant,
+			message: 'Fetched public schema tables',
+			severity: 'success',
+			data,
+		});
+		return NextResponse.json(res);
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Failed to fetch public schema tables';
+		const res = makeRes({ tenant, message, severity: 'error' });
+		return NextResponse.json(res, { status: 500 });
+	}
 }
