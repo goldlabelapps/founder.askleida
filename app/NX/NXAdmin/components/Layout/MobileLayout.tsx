@@ -12,13 +12,13 @@ import { grey } from '@mui/material/colors';
 import { useDispatch } from '../../../Uberedux';
 import { Icon } from '../../../DesignSystem';
 import {
-    AdminNav,
     Header,
     pwaAlert,
     setNXAdmin,
     useNotifications,
     useNXAdmin,
 } from '../../../NXAdmin';    
+import { DashNav } from '../../../Leida';
 import PageRouter from '../PageRouter';
 
 const drawerBleeding = 25;
@@ -251,7 +251,8 @@ export default function MobileLayout(props: Props) {
                     <Box sx={{ 
                         // my: 4, mb: '70px' 
                     }}>
-                        <AdminNav onNavigate={closeDrawer} />
+                        <DashNav onNavigate={closeDrawer} />
+
                     </Box>
                 </Box>
             </SwipeableEdgeDrawer>

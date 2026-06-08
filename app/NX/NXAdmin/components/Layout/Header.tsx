@@ -19,26 +19,13 @@ export default function Header() {
     const header = useHeader();
     const title = header?.title || '';
     const icon = header?.icon || null;
-    const isHomePage = pathname === '/';
-
-    const handleDashboardClick = () => {
-        if (isHomePage) return;
-        dispatch(navigateTo(router, '/'));
-    };
 
     return (<>
             <CardHeader
                 sx={{ width: '100%' }}
-                avatar={<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {!isHomePage ? (
-                        <IconButton color="primary" size="small" onClick={handleDashboardClick}>
-                            <Icon icon={'dashboard' as any} />
-                        </IconButton>
-                    ) : null}
-                    {icon ? 
+                avatar={<>{icon ? 
                         <Icon icon={icon as any} />
-                    : null}
-                </Box>}
+                        : null}</>}
                 title={<Typography variant="h4" color="text.secondary">
                     {title}
                 </Typography>}

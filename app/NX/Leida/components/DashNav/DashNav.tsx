@@ -9,7 +9,7 @@ import { logout } from '../../../Paywall';
 import { ConfirmAction } from '../../../DesignSystem';
 import { MiniListItem } from '../../../NXAdmin';
 
-export default function AdminNav({
+export default function DashNav({
   onNavigate,
 }: {
   onNavigate?: () => void;
@@ -72,7 +72,6 @@ export default function AdminNav({
           }}
         />
 
-
         <MiniListItem
           open={open}
           onClick={navigateToRoute}
@@ -82,7 +81,7 @@ export default function AdminNav({
             route: '/supabase',
           }}
         />
-        <MiniListItem
+        {/* <MiniListItem
           open={open}
           onClick={navigateToRoute}
           options={{
@@ -90,7 +89,7 @@ export default function AdminNav({
             icon: 'claude',
             route: '/claude',
           }}
-        />
+        /> */}
         <Box sx={{ height: 50 }} />
 
         <ConfirmAction

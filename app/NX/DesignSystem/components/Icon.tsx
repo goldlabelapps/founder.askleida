@@ -1,6 +1,12 @@
 'use client';
 import { I_Icon } from '../../types';
 import * as React from 'react';
+
+import AwinIcon from './SVGIcons/_AwinIcon';
+import SupabaseIcon from './SVGIcons/_SupabaseIcon';
+import LeidaIcon from './SVGIcons/_LeidaIcon';
+import ClaudeIcon from './SVGIcons/_ClaudeIcon';
+
 import PingpongballIcon from './SVGIcons/PingpongballIcon';
 import OliverIcon from './SVGIcons/OliverIcon';
 import FallmanagerIcon from './SVGIcons/FallmanagerIcon';
@@ -202,7 +208,13 @@ export default function Icon({ icon, color }: I_Icon) {
     case 'stop':
       iconFragment = <StopIcon color={color} />;
       break;
-          case 'python':
+
+    case 'claude':
+      iconFragment = <ClaudeIcon color={color} />;
+      break;
+
+
+    case 'python':
       iconFragment = <PythonIcon color={color} />;
       break;
     case 'random':
@@ -264,6 +276,16 @@ export default function Icon({ icon, color }: I_Icon) {
       break;
     case 'asian':
       iconFragment = <AsianIcon color={color} />;
+      break;
+
+    case 'awin':
+      iconFragment = <AwinIcon color={color} />;
+      break;
+    case 'leida':
+      iconFragment = <LeidaIcon color={color} />;
+      break;
+    case 'supabase':
+      iconFragment = <SupabaseIcon color={color} />;
       break;
 
     case 'cake':
