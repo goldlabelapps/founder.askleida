@@ -14,6 +14,10 @@ export const getEndpoints = (name?: string) => {
         {
             name: 'Practitioners',
             route: `${baseURL}/practitioners`,
+        },
+        {
+            name: 'Supabase',
+            route: `${baseURL}/supabase`,
         }
     ];
     if (name) {

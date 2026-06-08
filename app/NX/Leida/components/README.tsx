@@ -9,7 +9,7 @@ import {
 
 const README = () => {
 
-  const imgSrc = 'https://askleida.com/assets/millie.png';
+  const imgSrc = 'https://live.staticflickr.com/65535/55111661741_6844b1cc48_b.jpg';
   const OG_WIDTH = 1200;
   const OG_HEIGHT = 630;
 
@@ -37,10 +37,32 @@ const README = () => {
         />
       </Box>
       <Typography variant="h6" sx={{mb:2}}>
-        Here comes the science bit
+        Work In Progress
       </Typography>
-      <Typography variant="body1" sx={{ mb: 2 }}>
+      <Typography component={"span"} variant="body1" sx={{ mb: 2 }}>
+          <ul>
+            <li>Create a new API endpoint; GET /api/supabase<br />
+            
+            It should connect to Supabase, fetch the list of tables in the public schema, and return it as JSON.
+            </li>
 
+          <li>Fetch the endpoint<br />
+
+            useEffect as a React developer. treat this endpoint as a healthcheck. if it's not working, here's where we need to know
+          </li>
+
+          <li>Fetch the endpoint<br />
+
+            useEffect as a React developer. treat this endpoint as a healthcheck. if it's not working, here's where we need to know
+          </li>
+
+
+          <li>Display the supabase tables<br />
+
+            as a list
+          </li>
+
+          </ul>
       </Typography>
     </Box>
   );
