@@ -22,8 +22,8 @@ import {
     pwaAlert,
     useNotifications,
     Header,
-    AdminNav,
 } from '../../../NXAdmin';
+import { DashNav } from '../../../Leida';
 import PageRouter from '../PageRouter';
 import { useDispatch } from '../../../Uberedux';
 
@@ -133,6 +133,7 @@ export default function DesktopLayout({ config }: { config: any }) {
     const pathname = usePathname() || FALLBACK_ADMIN_BASE_PATH;
     const theme = useTheme();
     const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
+    // set drawer open by default on md+ screens, closed on smaller screens
     const [open, setOpen] = React.useState(isMdUp);
     const nxAdmin = useNXAdmin();
     const { active } = nxAdmin;
@@ -200,7 +201,8 @@ export default function DesktopLayout({ config }: { config: any }) {
                         </IconButton>
                     )}
                 </DrawerHeader>  
-                <AdminNav />
+                <DashNav />
+
             </Drawer>
             <Box component="main" sx={{ flexGrow: 1, p: 3}}>
                 <DrawerHeader />

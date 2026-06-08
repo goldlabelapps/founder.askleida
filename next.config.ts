@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'live.staticflickr.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'live.staticflickr.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'askleida.com',
       }
     ],
   },

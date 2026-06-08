@@ -5,12 +5,14 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import { setNXAdmin, useNXAdmin } from '../../../NXAdmin';
-import { initDash, useDash } from '../MegaDash';
-import { Account } from '../Account';
-import { Practitioners } from '../Practitioners';
-import { Products } from '../Products';
+import { 
+    initDash, 
+    useDash,
+    README,
+} from '../../../Leida';
 
-export default function MegaDash() {
+
+export default function FounderDash() {
     
     const dispatch = useDispatch();
     const nxAdmin = useNXAdmin();
@@ -27,7 +29,7 @@ export default function MegaDash() {
     React.useEffect(() => {
         if (dash && dash.title) {
             dispatch(setNXAdmin('header', {
-                title: 'Founder Dashboard',
+                title: 'Founder Dash',
                 icon: 'leida',
             }));
         }
@@ -40,7 +42,7 @@ export default function MegaDash() {
                     <Grid container spacing={2}>
                         
                         <Grid size={{ xs: 12 }}>
-                            Awin Dashboard
+                            <README />
                         </Grid>
                     </Grid>
                 </Grid>

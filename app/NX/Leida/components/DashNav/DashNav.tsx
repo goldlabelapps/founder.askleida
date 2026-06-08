@@ -9,7 +9,7 @@ import { logout } from '../../../Paywall';
 import { ConfirmAction } from '../../../DesignSystem';
 import { MiniListItem } from '../../../NXAdmin';
 
-export default function AdminNav({
+export default function DashNav({
   onNavigate,
 }: {
   onNavigate?: () => void;
@@ -56,12 +56,12 @@ export default function AdminNav({
             open={open}
             onClick={navigateToRoute}
             options={{
-              label: 'Dashboard',
+              label: 'Founder Dash',
               icon: 'leida',
               route: '/',
             }}
         />
-
+    {/*
         <MiniListItem
           open={open}
           onClick={navigateToRoute}
@@ -71,7 +71,6 @@ export default function AdminNav({
             route: '/awin',
           }}
         />
-
 
         <MiniListItem
           open={open}
@@ -90,7 +89,7 @@ export default function AdminNav({
             icon: 'claude',
             route: '/claude',
           }}
-        />
+        /> */}
         <Box sx={{ height: 50 }} />
 
         <ConfirmAction

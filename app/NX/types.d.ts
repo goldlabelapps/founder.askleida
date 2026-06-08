@@ -461,6 +461,10 @@ export type I_Icon = {
         | 'orders'
         | 'staroff'
         | 'staron'
+        | 'leida'
+        | 'supabase'
+        | 'awin'
+        | 'claude'
         | 'bouncer';
     color?: any;
 };
