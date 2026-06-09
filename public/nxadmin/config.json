@@ -1,6 +1,6 @@
 {
     "tenant": "nxadmin",
-    "siteName": "°Leida",
+    "siteName": "Founder Dash",
     "description": "Level Five Supabase access required",
     "url": "https://founder.askleida.com/",
     "owner": {
@@ -23,7 +23,7 @@
             "themes": {
                 "light": {
                     "mode": "light",
-                    "primary": "#2c2c2a",
+                    "primary": "#2C2C2A",
                     "secondary": "#364450",
                     "background": "#F7F7F4",
                     "paper": "#FFF",
