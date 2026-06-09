@@ -49,18 +49,50 @@ export default function DashNav({
     }, [dispatch, onNavigate]);
 
   const open = true;
+  const normalizedPathname = React.useMemo(() => {
+    if (!pathname) return '/';
+    if (pathname.length > 1 && pathname.endsWith('/')) return pathname.slice(0, -1);
+    return pathname;
+  }, [pathname]);
+
+  const navItems = [
+    {
+      label: 'Founder Dash',
+      icon: 'leida',
+      route: '/',
+      activeRoutes: ['/'],
+    },
+    {
+      label: 'Supabase',
+      icon: 'supabase',
+      route: '/supabase',
+      activeRoutes: ['/supabase'],
+    },
+  ];
+
+  const isRouteActive = React.useCallback((activeRoutes?: string[]) => {
+    if (!activeRoutes || activeRoutes.length === 0) return false;
+    return activeRoutes.some((activeRoute) => {
+      if (activeRoute === '/') return normalizedPathname === '/';
+      return normalizedPathname === activeRoute || normalizedPathname.startsWith(`${activeRoute}/`);
+    });
+  }, [normalizedPathname]);
 
   return (<>
         <Box sx={{ height: 24 }} />
-        <MiniListItem
+        {navItems.map((item) => (
+          <MiniListItem
+            key={item.route}
             open={open}
+            selected={isRouteActive(item.activeRoutes)}
             onClick={navigateToRoute}
             options={{
-              label: 'Founder Dash',
-              icon: 'leida',
-              route: '/',
+              label: item.label,
+              icon: item.icon,
+              route: item.route,
             }}
-        />
+          />
+        ))}
     {/*
         <MiniListItem
           open={open}
@@ -72,15 +104,7 @@ export default function DashNav({
           }}
         />
 
-        <MiniListItem
-          open={open}
-          onClick={navigateToRoute}
-          options={{
-            label: 'Supabase',
-            icon: 'supabase',
-            route: '/supabase',
-          }}
-        />
+        
         <MiniListItem
           open={open}
           onClick={navigateToRoute}
