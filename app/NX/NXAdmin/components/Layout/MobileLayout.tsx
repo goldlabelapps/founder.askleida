@@ -18,16 +18,10 @@ import {
     useNotifications,
     useNXAdmin,
 } from '../../../NXAdmin';    
-import { DashNav } from '../../../Leida';
-import PageRouter from '../PageRouter';
+import { DashNav, PageRouter } from '../../../Leida';
+import { NAV_ROUTES, sanitizePath, getActiveFromPathname } from '../PageRouter';
 
 const drawerBleeding = 25;
-const NAV_ROUTES = new Set([
-    'account',
-    'practitioners',
-    'products',
-    'supabase',
-]);
 const FALLBACK_ADMIN_BASE_PATH = '/';
 
 interface Props {
@@ -38,25 +32,6 @@ interface Props {
     window?: () => Window;
     config?: any;
 }
-
-const sanitizePath = (value: string) => {
-    if (!value) return '/';
-    const normalized = value.startsWith('/') ? value : `/${value}`;
-    return normalized.replace(/\/+$/, '') || '/';
-};
-
-const getActiveFromPathname = (pathname: string) => {
-    const normalized = sanitizePath(pathname);
-    if (normalized === '/') return null;
-    const [segment] = normalized.slice(1).split('/');
-    if (!segment) return null;
-    try {
-        const decoded = decodeURIComponent(segment);
-        return NAV_ROUTES.has(decoded) ? decoded : null;
-    } catch {
-        return NAV_ROUTES.has(segment) ? segment : null;
-    }
-};
 
 const Root = styled('div')(({ theme }) => ({
     height: '100%',

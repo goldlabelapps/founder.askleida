@@ -23,38 +23,12 @@ import {
     useNotifications,
     Header,
 } from '../../../NXAdmin';
-import { DashNav } from '../../../Leida';
-import PageRouter from '../PageRouter';
+import { DashNav, PageRouter } from '../../../Leida';
+import { NAV_ROUTES, sanitizePath, getActiveFromPathname } from '../PageRouter';
 import { useDispatch } from '../../../Uberedux';
 
 const drawerWidth = 220;
-const NAV_ROUTES = new Set([
-    'account',
-    'practitioners',
-    'products',
-    'supabase',
-]);
-
 const FALLBACK_ADMIN_BASE_PATH = '/';
-
-const sanitizePath = (value: string) => {
-    if (!value) return '/';
-    const normalized = value.startsWith('/') ? value : `/${value}`;
-    return normalized.replace(/\/+$/, '') || '/';
-};
-
-const getActiveFromPathname = (pathname: string) => {
-    const normalized = sanitizePath(pathname);
-    if (normalized === '/') return null;
-    const [segment] = normalized.slice(1).split('/');
-    if (!segment) return null;
-    try {
-        const decoded = decodeURIComponent(segment);
-        return NAV_ROUTES.has(decoded) ? decoded : null;
-    } catch {
-        return NAV_ROUTES.has(segment) ? segment : null;
-    }
-};
 
 const buildAdminPath = (route?: string) => {
     if (!route) return '/';

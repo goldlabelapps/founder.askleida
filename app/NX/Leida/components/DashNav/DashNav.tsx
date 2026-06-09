@@ -68,6 +68,12 @@ export default function DashNav({
       route: '/supabase',
       activeRoutes: ['/supabase'],
     },
+    {
+      label: 'Awin',
+      icon: 'awin',
+      route: '/awin',
+      activeRoutes: ['/awin'],
+    },
   ];
 
   const isRouteActive = React.useCallback((activeRoutes?: string[]) => {
