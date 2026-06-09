@@ -8,7 +8,6 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useDispatch } from '../Uberedux';
 import {
   DesignSystem,
   Feedback,
@@ -20,12 +19,16 @@ import {
   SimpleSignIn, 
   useIsAuthed,
 } from '../Paywall';
-import { requestNotifications } from '../NXAdmin';
+import {
+  useDispatch,
+} from '../Uberedux';
 import {
   DesktopLayout,
   MobileLayout,
   README,
+  requestNotifications,
 } from '../NXAdmin';
+import { initLeida, useLeida } from '../Leida';
 
 export type { I_NXAdmin };
 
@@ -37,7 +40,9 @@ export default function NXAdmin({
 
   const dispatch = useDispatch();
   const paywall = usePaywall();
+  const leida = useLeida();
   const isAuthed = useIsAuthed();
+  const didInitLeida = React.useRef(false);
   const { authChecked } = paywall || {};
   const designSystem = useDesignSystem();
   const configThemes = config?.cartridges?.designSystem?.themes || {};
@@ -54,6 +59,14 @@ export default function NXAdmin({
   const isDesktopLayout = useMediaQuery(theme.breakpoints.up('md'), {
     noSsr: true,
   });
+
+  React.useEffect(() => {
+    if (!didInitLeida.current) {
+      if (!leida || !leida.initted) dispatch(initLeida());
+      didInitLeida.current = true;
+    }
+  }, [dispatch, leida]);
+
 
   React.useEffect(() => {
     if (isAuthed) {

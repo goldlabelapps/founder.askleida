@@ -5,6 +5,7 @@ import {
   Typography,
   Box,
 } from '@mui/material';
+import {useLeida} from '../../Leida';
 
 
 const README = () => {
@@ -13,9 +14,17 @@ const README = () => {
   const OG_WIDTH = 1200;
   const OG_HEIGHT = 630;
 
+  const leida = useLeida();
+
   return (
     <Box sx={{  }}>
-      <Box
+
+
+      <pre>
+        {JSON.stringify(leida, null, 2)}
+      </pre>
+
+      {/* <Box
         sx={{
           mb: 2,
           width: '100%',
@@ -35,16 +44,13 @@ const README = () => {
             objectFit: 'cover',
           }}
         />
-      </Box>
+      </Box> */}
       <Typography variant="h6" sx={{mb:2}}>
         Work In Progress
       </Typography>
       <Typography component={"span"} variant="body1" sx={{ mb: 2 }}>
           <ul>
-            <li>Create a new API endpoint; GET /api/supabase<br />
-            
-            It should connect to Supabase, fetch the list of tables in the public schema, and return it as JSON.
-            </li>
+
 
           <li>Fetch the endpoint<br />
 

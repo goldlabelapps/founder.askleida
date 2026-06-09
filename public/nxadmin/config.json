@@ -19,24 +19,24 @@
     "cartridges": {
         "designSystem": {
             "themeSwitching": true,
-            "defaultTheme": "dark",
+            "defaultTheme": "light",
             "themes": {
                 "light": {
                     "mode": "light",
                     "primary": "#2c2c2a",
                     "secondary": "#364450",
-                    "background": "#f7f7f4",
+                    "background": "#F7F7F4",
                     "paper": "#FFF",
-                    "border": "#d4d4d4",
-                    "text": "#2c2c2a"
+                    "border": "#D4D4D4",
+                    "text": "#2C2C2A"
                 },
                 "dark": {
                     "mode": "dark",
                     "primary": "#F7F5F2",
                     "secondary": "#F7F5F2",
-                    "background": "#2c2c2a",
-                    "paper": "#2c2c2a",
-                    "text": "#fff",
+                    "background": "#2C2C2A",
+                    "paper": "#2C2C2A",
+                    "text": "#FFF",
                     "border": "#F7F5F2"
                 }
             }
