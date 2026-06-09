@@ -11,10 +11,12 @@ import { Icon } from '../../../../NX/DesignSystem';
 
 export default function MiniListItem({ 
     open,
+        selected = false,
     options,
     onClick, 
 }: { 
   open: boolean;
+        selected?: boolean;
     onClick: (route?: string) => void;
   options: {
     label: string;
@@ -38,6 +40,7 @@ export default function MiniListItem({
               sx={[
                   { minHeight: 48, px: 2.5 },
                   open ? { justifyContent: 'initial' } : { justifyContent: 'center' },
+                  selected ? { bgcolor: 'action.selected' } : null,
               ]}
           >
               <ListItemIcon
@@ -46,10 +49,10 @@ export default function MiniListItem({
                       open ? { mr: 3 } : { mr: 'auto' },
                   ]}
               >
-                  <Icon icon={icon as any} color="default" />
+                  <Icon icon={icon as any} color={selected ? 'primary' : 'default'} />
               </ListItemIcon>
               <ListItemText
-                  primary={<Typography color="text.secondary">{label}</Typography>}
+                  primary={<Typography color={selected ? 'text.primary' : 'text.secondary'}>{label}</Typography>}
                   sx={[
                       open ? { opacity: 1 } : { opacity: 0 },
                   ]}

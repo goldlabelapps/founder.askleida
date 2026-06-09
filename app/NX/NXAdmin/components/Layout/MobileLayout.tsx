@@ -26,6 +26,7 @@ const NAV_ROUTES = new Set([
     'account',
     'practitioners',
     'products',
+    'supabase',
 ]);
 const FALLBACK_ADMIN_BASE_PATH = '/';
 
