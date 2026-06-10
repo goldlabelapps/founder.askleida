@@ -162,10 +162,19 @@ export async function GET(req: Request) {
   }
 
   try {
-    const response = await awinFetch({
-      path: `/publishers/${publisherId}/awinfeeds/download/${advertiserId}-${vertical}-${locale}.jsonl`,
-      includeAccessTokenQuery: false,
-    });
+    const feedUrl = process.env.AWIN_LOOKFANTASTIC_FEED_URL;
+    const response = feedUrl
+      ? await fetch(feedUrl, {
+          headers: {
+            Accept: '*/*',
+            Authorization: `Bearer ${process.env.AWIN_OAUTH_TOKEN}`,
+          },
+          cache: 'no-store',
+        })
+      : await awinFetch({
+          path: `/publishers/${publisherId}/awinfeeds/download/${advertiserId}-${vertical}-${locale}.jsonl`,
+          includeAccessTokenQuery: false,
+        });
 
     if (!response.ok) {
       const err = await parseAwinErrorBody(response);
