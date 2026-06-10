@@ -23,6 +23,7 @@ export async function GET() {
       },
       routes: {
         programmes: `${baseURL}/awin/programmes`,
+        lookfantasticProducts: `${baseURL}/awin/lookfantastic/products`,
         lookfantasticFeed: `${baseURL}/awin/lookfantastic/feed`,
         lookfantasticSave: `${baseURL}/awin/lookfantastic/save`,
       },
