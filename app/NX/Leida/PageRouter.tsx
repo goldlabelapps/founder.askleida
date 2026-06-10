@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import Awin from './components/Awin/Awin';
+import Claude from './components/Claude/Claude';
 import { FounderDash } from './components/FounderDash';
 import Supabase from './components/Supabase/Supabase';
 
@@ -15,6 +16,8 @@ export function PageRouter({ active }: I_PageRouter) {
       return <Supabase />;
     case 'awin':
       return <Awin />;
+    case 'claude':
+      return <Claude />;
     default:
       return <FounderDash />;
   }

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { usePathname } from 'next/navigation';
 import {
   Awin,
+  Claude,
   FounderDash,
   Supabase,
 } from '../../Leida';
@@ -13,6 +14,7 @@ export const NAV_ROUTES = new Set([
   'products',
   'supabase',
   'awin',
+  'claude',
 ]);
 
 export const sanitizePath = (value: string) => {
@@ -48,6 +50,8 @@ export default function PageRouter({ active }: I_PageRouter) {
         return <Supabase />;
       case 'awin':
         return <Awin />;
+      case 'claude':
+        return <Claude />;
       default:
         return <FounderDash />;
     }
