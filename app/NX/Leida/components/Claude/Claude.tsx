@@ -2,12 +2,28 @@
 import * as React from 'react';
 import { Box, Typography } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
-import { initClaude, useClaude, useLeidaBus } from '../../../Leida';
+import { 
+    initClaude, 
+    useClaude, 
+    useLeidaBus,
+    useDash,
+ } from '../../../Leida';
+import { setNXAdmin } from '../../../NXAdmin';
 
 export default function Claude() {
     const dispatch = useDispatch();
     const claude = useClaude();
     const bus = useLeidaBus('/api/claude');
+    const dash = useDash();
+
+    React.useEffect(() => {
+        if (dash && dash.title) {
+            dispatch(setNXAdmin('header', {
+                title: 'Claude',
+                icon: 'claude',
+            }));
+        }
+    }, [dispatch, dash?.title]);
 
     React.useEffect(() => {
         if (!claude?.initted) {
@@ -17,9 +33,6 @@ export default function Claude() {
 
     return (
         <Box sx={{ p: 2 }}>
-            <Typography variant="h6" color="text.primary" sx={{ mb: 1 }}>
-                Claude
-            </Typography>
             <Typography variant="body2" color="text.secondary">
                 {claude?.initted ? 'Claude is initialized.' : 'Connecting to the Claude API'}
             </Typography>
