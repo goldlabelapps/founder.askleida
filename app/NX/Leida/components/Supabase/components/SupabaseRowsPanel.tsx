@@ -9,6 +9,8 @@ import {
     MenuItem,
     Paper,
     Stack,
+    ToggleButton,
+    ToggleButtonGroup,
     Table,
     TableBody,
     TableCell,
@@ -28,9 +30,65 @@ type T_Props = {
     onDelete: (tableName: string, match: Record<string, any>) => Promise<void>;
 };
 
+type T_TableFormPreset = {
+    fieldOrder?: string[];
+    hiddenFields?: string[];
+    labels?: Record<string, string>;
+    selectOptions?: Record<string, string[]>;
+};
+
 const NUMERIC_TYPES = new Set(['int2', 'int4', 'int8', 'float4', 'float8', 'numeric', 'integer', 'bigint', 'smallint', 'real', 'double precision']);
 const BOOLEAN_TYPES = new Set(['bool', 'boolean']);
 const JSON_TYPES = new Set(['json', 'jsonb']);
+const DEFAULT_HIDDEN_FIELDS = ['created', 'updated'];
+
+const TABLE_PRESETS: Record<string, T_TableFormPreset> = {
+    products: {
+        fieldOrder: [
+            'name',
+            'title',
+            'description',
+            'category',
+            'sku',
+            'price',
+            'practitioner_id',
+            'notes',
+            'data',
+            'product_id',
+        ],
+        hiddenFields: [...DEFAULT_HIDDEN_FIELDS],
+        labels: {
+            product_id: 'Product ID',
+            practitioner_id: 'Practitioner ID',
+            sku: 'SKU',
+            data: 'Data JSON',
+        },
+        selectOptions: {
+            category: ['supplement', 'skincare', 'device', 'tool', 'service', 'other'],
+        },
+    },
+    practitioners: {
+        fieldOrder: [
+            'name',
+            'email',
+            'phone',
+            'specialty',
+            'location',
+            'status',
+            'notes',
+            'data',
+            'practitioner_id',
+        ],
+        hiddenFields: [...DEFAULT_HIDDEN_FIELDS],
+        labels: {
+            practitioner_id: 'Practitioner ID',
+            data: 'Data JSON',
+        },
+        selectOptions: {
+            status: ['active', 'inactive'],
+        },
+    },
+};
 
 function stringifyJson(value: unknown): string {
     try {
@@ -128,17 +186,46 @@ function parseFieldValue(rawValue: string, column: T_SupabaseColumn): unknown {
     return rawValue;
 }
 
+function getPreset(tableName: string | null): T_TableFormPreset {
+    if (!tableName) return {};
+    return TABLE_PRESETS[tableName] || {};
+}
+
+function normalizeColumnsForPreset(columns: T_SupabaseColumn[], preset: T_TableFormPreset): T_SupabaseColumn[] {
+    const hidden = new Set(preset.hiddenFields || []);
+    const visibleColumns = columns.filter((column) => {
+        const name = column?.name || '';
+        return !hidden.has(name);
+    });
+
+    const order = preset.fieldOrder || [];
+    const rank = new Map<string, number>();
+    order.forEach((name, index) => rank.set(name, index));
+
+    return [...visibleColumns].sort((a, b) => {
+        const aName = a.name || '';
+        const bName = b.name || '';
+        const aRank = rank.has(aName) ? (rank.get(aName) as number) : Number.MAX_SAFE_INTEGER;
+        const bRank = rank.has(bName) ? (rank.get(bName) as number) : Number.MAX_SAFE_INTEGER;
+        if (aRank !== bRank) return aRank - bRank;
+        return aName.localeCompare(bName);
+    });
+}
+
 export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreate, onUpdate, onDelete }: T_Props) {
     const tableName = table?.table_name || null;
+    const preset = React.useMemo(() => getPreset(tableName), [tableName]);
     const crudAllowed = table?.crud_allowed !== false;
     const rows = Array.isArray(rowsState?.rows) ? rowsState?.rows : [];
     const primaryKeys = Array.isArray(rowsState?.primaryKeys) ? rowsState.primaryKeys : (Array.isArray(table?.primary_keys) ? table.primary_keys : []);
-    const columns = Array.isArray(rowsState?.columns) && rowsState?.columns?.length ? rowsState.columns : (Array.isArray(table?.columns) ? table.columns : []);
+    const columnsRaw = Array.isArray(rowsState?.columns) && rowsState?.columns?.length ? rowsState.columns : (Array.isArray(table?.columns) ? table.columns : []);
+    const columns = React.useMemo(() => normalizeColumnsForPreset(columnsRaw, preset), [columnsRaw, preset]);
     const visibleColumns = columns.slice(0, 6);
     const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
     const [draft, setDraft] = React.useState('{}');
     const [error, setError] = React.useState<string | null>(null);
     const [saving, setSaving] = React.useState(false);
+    const [editorMode, setEditorMode] = React.useState<'guided' | 'json'>('guided');
 
     const parsedDraft = React.useMemo(() => {
         try {
@@ -312,7 +399,24 @@ export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreat
                         <Divider />
 
                         <Stack spacing={1}>
-                            {columns.length > 0 && parsedDraft && (
+                            <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+                                <Typography variant="subtitle2">Editor mode</Typography>
+                                <ToggleButtonGroup
+                                    size="small"
+                                    exclusive
+                                    value={editorMode}
+                                    onChange={(_, value) => {
+                                        if (value) {
+                                            setEditorMode(value);
+                                        }
+                                    }}
+                                >
+                                    <ToggleButton value="guided">Simplified</ToggleButton>
+                                    <ToggleButton value="json">Raw JSON</ToggleButton>
+                                </ToggleButtonGroup>
+                            </Stack>
+
+                            {editorMode === 'guided' && columns.length > 0 && parsedDraft && (
                                 <Stack spacing={1}>
                                     <Typography variant="subtitle2">Column-aware editor</Typography>
                                     {columns.map((column, index) => {
@@ -320,13 +424,15 @@ export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreat
                                         const value = getFieldValue(parsedDraft, column, columnName);
                                         const isPrimaryKey = primaryKeys.includes(columnName);
                                         const disabled = !crudAllowed || (Boolean(selectedRow) && isPrimaryKey);
+                                        const displayLabel = preset.labels?.[columnName] || columnName;
+                                        const selectOptions = Array.isArray(preset.selectOptions?.[columnName]) ? preset.selectOptions?.[columnName] : null;
 
                                         if (isBooleanColumn(column.data_type, column.udt_name)) {
                                             return (
                                                 <TextField
                                                     key={columnName}
                                                     select
-                                                    label={columnName}
+                                                    label={displayLabel}
                                                     value={value}
                                                     onChange={(event) => handleFieldChange(columnName, event.target.value)}
                                                     helperText={`${column.udt_name || column.data_type || 'boolean'}${column.nullable ? ' nullable' : ''}${isPrimaryKey ? ' primary key' : ''}`}
@@ -339,10 +445,31 @@ export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreat
                                             );
                                         }
 
+                                        if (selectOptions && selectOptions.length > 0) {
+                                            return (
+                                                <TextField
+                                                    key={columnName}
+                                                    select
+                                                    label={displayLabel}
+                                                    value={value}
+                                                    onChange={(event) => handleFieldChange(columnName, event.target.value)}
+                                                    helperText={`${column.udt_name || column.data_type || 'text'}${column.nullable ? ' nullable' : ''}${isPrimaryKey ? ' primary key' : ''}`}
+                                                    disabled={disabled}
+                                                >
+                                                    {column.nullable && <MenuItem value="">Unset</MenuItem>}
+                                                    {selectOptions.map((option) => (
+                                                        <MenuItem key={`${columnName}-${option}`} value={option}>
+                                                            {option}
+                                                        </MenuItem>
+                                                    ))}
+                                                </TextField>
+                                            );
+                                        }
+
                                         return (
                                             <TextField
                                                 key={columnName}
-                                                label={columnName}
+                                                label={displayLabel}
                                                 value={value}
                                                 onChange={(event) => handleFieldChange(columnName, event.target.value)}
                                                 type={isNumericColumn(column.data_type, column.udt_name) ? 'number' : 'text'}
@@ -356,21 +483,25 @@ export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreat
                                 </Stack>
                             )}
 
-                            <Typography variant="subtitle2">
-                                {selectedRow ? 'Selected row JSON' : 'New row JSON'}
-                            </Typography>
-                            {selectedRow && rowMatch && (
-                                <Typography variant="caption" color="text.secondary">
-                                    Match: {stringifyJson(rowMatch)}
-                                </Typography>
+                            {editorMode === 'json' && (
+                                <>
+                                    <Typography variant="subtitle2">
+                                        {selectedRow ? 'Selected row JSON' : 'New row JSON'}
+                                    </Typography>
+                                    {selectedRow && rowMatch && (
+                                        <Typography variant="caption" color="text.secondary">
+                                            Match: {stringifyJson(rowMatch)}
+                                        </Typography>
+                                    )}
+                                    <TextField
+                                        multiline
+                                        minRows={14}
+                                        value={draft}
+                                        onChange={(event) => setDraft(event.target.value)}
+                                        placeholder="{}"
+                                    />
+                                </>
                             )}
-                            <TextField
-                                multiline
-                                minRows={14}
-                                value={draft}
-                                onChange={(event) => setDraft(event.target.value)}
-                                placeholder="{}"
-                            />
                             <Stack direction="row" spacing={1}>
                                 <Button variant="contained" onClick={handleSave} disabled={!tableName || !crudAllowed || saving}>
                                     {selectedRow ? 'Update row' : 'Create row'}

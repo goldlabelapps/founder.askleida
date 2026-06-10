@@ -25,6 +25,7 @@ import type { T_SupabaseTable } from './types';
 import SupabaseSchemaPanel from './components/SupabaseSchemaPanel';
 import SupabaseRowsPanel from './components/SupabaseRowsPanel';
 import SupabaseAuthPanel from './components/SupabaseAuthPanel';
+import SupabaseSettingsPanel from './components/SupabaseSettingsPanel';
 
 function formatEstimatedRows(value?: number): string {
     if (typeof value !== 'number') return 'N/A';
@@ -113,6 +114,8 @@ export default function Supabase() {
                         {supabase?.schemaError || supabase?.authError}
                     </Alert>
                 )}
+
+                <SupabaseSettingsPanel schema={schema} />
 
                 <Grid container spacing={2}>
                     <Grid size={{ xs: 12, md: 4, lg: 3 }}>

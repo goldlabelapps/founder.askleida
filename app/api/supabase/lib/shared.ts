@@ -15,6 +15,11 @@ export const databaseUrl =
 const TABLE_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const DEFAULT_ADMIN_TABLE_ALLOWLIST = ['products', 'practitioners'];
 
+type T_AllowlistConfig = {
+    tables: string[];
+    source: 'env' | 'default';
+};
+
 export type T_TableRow = { table_name: string };
 export type T_ColumnRow = {
     table_name: string;
@@ -72,6 +77,10 @@ export function assertSafeTableName(value: unknown): string {
 }
 
 export function getAdminTableAllowlist(): string[] {
+    return getAdminTableAllowlistConfig().tables;
+}
+
+export function getAdminTableAllowlistConfig(): T_AllowlistConfig {
     const envValue = process.env.SUPABASE_ADMIN_TABLE_ALLOWLIST || '';
     const parsed = envValue
         .split(',')
@@ -80,15 +89,21 @@ export function getAdminTableAllowlist(): string[] {
         .filter((item) => TABLE_NAME_PATTERN.test(item));
 
     if (parsed.length > 0) {
-        return Array.from(new Set(parsed));
+        return {
+            tables: Array.from(new Set(parsed)),
+            source: 'env',
+        };
     }
 
-    return DEFAULT_ADMIN_TABLE_ALLOWLIST;
+    return {
+        tables: DEFAULT_ADMIN_TABLE_ALLOWLIST,
+        source: 'default',
+    };
 }
 
 export function assertAllowedAdminTable(value: unknown): string {
     const tableName = assertSafeTableName(value);
-    const allowlist = getAdminTableAllowlist();
+    const { tables: allowlist } = getAdminTableAllowlistConfig();
 
     if (!allowlist.includes(tableName)) {
         throw new Error(`Table ${tableName} is not allowed. Allowed tables: ${allowlist.join(', ')}`);
@@ -98,7 +113,7 @@ export function assertAllowedAdminTable(value: unknown): string {
 }
 
 export function filterAllowedTables<T extends { table_name?: string }>(tables: T[]): T[] {
-    const allowlist = getAdminTableAllowlist();
+    const { tables: allowlist } = getAdminTableAllowlistConfig();
     return tables.filter((table) => typeof table?.table_name === 'string' && allowlist.includes(table.table_name));
 }
 
@@ -290,6 +305,8 @@ export async function getTableSchema(sql: postgres.Sql, tableName?: string, incl
         }
     }
 
+    const allowlist = getAdminTableAllowlistConfig();
+
     const tables = tableRows.map((table) => ({
         table_name: table.table_name,
         estimated_rows: estimatesByTable.get(table.table_name) || 0,
@@ -297,7 +314,7 @@ export async function getTableSchema(sql: postgres.Sql, tableName?: string, incl
         columns: columnsByTable.get(table.table_name) || [],
         constraints: constraintsByTable.get(table.table_name) || [],
         primary_keys: primaryKeysByTable.get(table.table_name) || [],
-        crud_allowed: getAdminTableAllowlist().includes(table.table_name),
+        crud_allowed: allowlist.tables.includes(table.table_name),
     }));
 
     const databaseInfo = databaseInfoRows?.[0] || null;
@@ -311,7 +328,8 @@ export async function getTableSchema(sql: postgres.Sql, tableName?: string, incl
         schema: 'public',
         table_count: tables.length,
         include_exact_counts: includeExactCounts,
-        crud_allowed_tables: getAdminTableAllowlist(),
+        crud_allowed_tables: allowlist.tables,
+        crud_allowlist_source: allowlist.source,
         tables,
     };
 }

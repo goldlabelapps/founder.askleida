@@ -45,6 +45,7 @@ export type T_SupabaseSchemaData = {
     table_count?: number;
     include_exact_counts?: boolean;
     crud_allowed_tables?: string[];
+    crud_allowlist_source?: 'env' | 'default';
     tables?: T_SupabaseTable[];
     auth?: {
         available?: boolean;
