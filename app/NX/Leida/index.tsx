@@ -26,6 +26,7 @@ import { initAwin } from './components/Awin/actions/initAwin';
 import { setAwin } from './components/Awin/actions/setAwin';
 import { initClaude } from './components/Claude/actions/initClaude';
 import { setClaude } from './components/Claude/actions/setClaude';
+import { submitClaudePrompt } from './components/Claude/actions/submitClaudePrompt';
 
 // Lib
 import { normalizeLeidaRouteKey } from './lib/normalizeLeidaRouteKey';
@@ -55,6 +56,7 @@ export {
 	setLeida,
 	setAwin,
 	setClaude,
+	submitClaudePrompt,
 	setDash,
 	// Lib
 	normalizeLeidaRouteKey,
