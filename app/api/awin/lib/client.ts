@@ -38,7 +38,7 @@ export async function awinFetch({
   path,
   query,
   init,
-  includeAccessTokenQuery = true,
+  includeAccessTokenQuery = false,
 }: T_AwinFetchArgs) {
   const { token } = getAwinConfig();
 
@@ -70,6 +70,19 @@ export async function parseAwinErrorBody(response: Response) {
   try {
     return JSON.parse(text);
   } catch {
+    const lowered = text.toLowerCase();
+    const isAccessDeniedHtml = lowered.includes('<title>access denied</title>')
+      || lowered.includes('<h1>access denied</h1>');
+
+    if (isAccessDeniedHtml) {
+      return {
+        kind: 'access_denied_html',
+        status: response.status,
+        message: 'AWIN edge denied this request. Check token permissions/entitlements and avoid accessToken query usage.',
+        raw: text,
+      };
+    }
+
     return text;
   }
 }

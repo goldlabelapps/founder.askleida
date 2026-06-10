@@ -4,6 +4,7 @@ This folder exposes server-side proxy routes for AWIN data under:
 
 - `/api/awin`
 - `/api/awin/programmes`
+- `/api/awin/lookfantastic/products`
 - `/api/awin/lookfantastic/feed`
 - `/api/awin/lookfantastic/save`
 
@@ -28,6 +29,7 @@ Add these to your `.env.local`:
 AWIN_OAUTH_TOKEN=your_oauth_token
 AWIN_PUBLISHER_ID=your_publisher_id
 AWIN_LOOKFANTASTIC_ADVERTISER_ID=your_default_lookfantastic_advertiser_id
+# Optional, only needed when using source=feed or source=auto fallback:
 AWIN_LOOKFANTASTIC_FEED_URL=https://example.awin.com/path/to/lookfantastic/feed.jsonl
 NEXT_PUBLIC_TENANT=optional_tenant_name
 ```
@@ -37,7 +39,7 @@ Notes:
 - `AWIN_OAUTH_TOKEN` is required for all AWIN requests.
 - `AWIN_PUBLISHER_ID` is required for `/programmes` and `/lookfantastic/feed`.
 - `AWIN_LOOKFANTASTIC_ADVERTISER_ID` is required for `/lookfantastic/feed` unless you pass `advertiserId` as a query parameter.
-- `AWIN_LOOKFANTASTIC_FEED_URL` is optional and overrides the default Lookfantastic feed download URL shape.
+- `AWIN_LOOKFANTASTIC_FEED_URL` is optional and only used when the route is told to query feed download URLs.
 
 ## 1) Status/Discovery Route
 
@@ -91,14 +93,38 @@ Example:
 curl "http://localhost:3000/api/awin/programmes?countryCode=GB&search=lookfantastic&limit=20"
 ```
 
-## 3) Lookfantastic Feed Route
+## 3) Lookfantastic Products Route (Recommended)
+
+`GET /api/awin/lookfantastic/products`
+
+AWIN upstream:
+
+- Product API endpoint variants are tried for your account, API-only.
+- This endpoint always forces `source=api`.
+
+Supported query params:
+
+- `q` (optional): local case-insensitive search against product text fields.
+- `advertiserId` (optional): overrides `AWIN_LOOKFANTASTIC_ADVERTISER_ID`.
+- `locale` (optional): default `en_GB`.
+- `vertical` (optional): accepted but not required by product API variants.
+- `limit` (optional): number of matches returned. Default `25`, max `100`.
+
+Example:
+
+```bash
+curl "http://localhost:3000/api/awin/lookfantastic/products?q=vitamin%20c&limit=15"
+```
+
+## 4) Lookfantastic Feed Route (Optional / Fallback)
 
 `GET /api/awin/lookfantastic/feed`
 
 AWIN upstream:
 
-- `GET /publishers/{publisherId}/awinfeeds/download/{advertiserId}-{vertical}-{locale}.jsonl`
-- Or an exact override via `AWIN_LOOKFANTASTIC_FEED_URL`
+- Default (`source=api`): AWIN product endpoints are tried first (account-dependent variants).
+- Optional (`source=auto`): product API first, then feed download fallback.
+- Optional (`source=feed`): force feed download mode.
 
 Supported query params:
 
@@ -106,16 +132,16 @@ Supported query params:
 - `advertiserId` (optional): overrides `AWIN_LOOKFANTASTIC_ADVERTISER_ID`.
 - `locale` (optional): default `en_GB`.
 - `vertical` (optional): default `retail`.
+- `source` (optional): `api` (default), `auto`, or `feed`.
 - `limit` (optional): number of matches returned. Default `25`, max `100`.
 - `scanLimit` (optional): max JSONL rows scanned. Default `1000`, max `10000`.
 
 How filtering works:
 
-- The endpoint streams/parses JSONL line by line.
-- It increments `scanned` only for valid JSON rows.
-- It stops when either:
-  - collected matches reach `limit`, or
-  - scanned rows reach `scanLimit`.
+- In `source=api`, product API rows are filtered and sliced to `limit`.
+- In `source=auto` or `source=feed`, feed mode streams/parses JSONL line by line.
+- Feed mode increments `scanned` only for valid JSON rows.
+- Feed mode stops when either collected matches reach `limit` or scanned rows reach `scanLimit`.
 
 Response data shape:
 
@@ -123,11 +149,18 @@ Response data shape:
 - `limit`, `scanLimit`, `scanned`
 - `count`
 - `products`
+- `source`
 
 Example:
 
 ```bash
 curl "http://localhost:3000/api/awin/lookfantastic/feed?q=vitamin%20c&limit=15&scanLimit=2000"
+```
+
+Allow feed fallback only if API variants fail:
+
+```bash
+curl "http://localhost:3000/api/awin/lookfantastic/feed?q=vitamin%20c&source=auto"
 ```
 
 Override advertiser id example:
@@ -136,7 +169,7 @@ Override advertiser id example:
 curl "http://localhost:3000/api/awin/lookfantastic/feed?advertiserId=12345&locale=en_GB&vertical=retail"
 ```
 
-## 4) Save Lookfantastic Product Route
+## 5) Save Lookfantastic Product Route
 
 `POST /api/awin/lookfantastic/save`
 
@@ -194,7 +227,8 @@ Common failures and returned status:
 2. Start the app.
 3. Hit `/api/awin` first to confirm readiness.
 4. Call `/api/awin/programmes`.
-5. Call `/api/awin/lookfantastic/feed` with a small `limit` and reasonable `scanLimit`.
+5. Call `/api/awin/lookfantastic/products` first for normal product search.
+6. Use `/api/awin/lookfantastic/feed?source=auto` only when you want feed fallback behavior.
 
 ## Security Notes
 

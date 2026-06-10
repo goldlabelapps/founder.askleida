@@ -129,7 +129,7 @@ export default function Awin() {
                 params.set('limit', String(Math.min(Math.floor(parsedLimit), 100)));
             }
 
-            const res = await fetch(`/api/awin/lookfantastic/feed?${params.toString()}`, {
+            const res = await fetch(`/api/awin/lookfantastic/products?${params.toString()}`, {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',
