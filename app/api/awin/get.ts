@@ -24,6 +24,7 @@ export async function GET() {
       routes: {
         programmes: `${baseURL}/awin/programmes`,
         lookfantasticFeed: `${baseURL}/awin/lookfantastic/feed`,
+        lookfantasticSave: `${baseURL}/awin/lookfantastic/save`,
       },
     },
   });
