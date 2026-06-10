@@ -12,23 +12,16 @@ import {
 } from '@mui/material';
 import { Icon, navigateTo } from '../../../../DesignSystem';
 import { useDispatch } from '../../../../Uberedux';
-import {
-    fetchLeida,
-    useLeidaBus,
-} from '../../../../Leida';
-
-type T_SupabaseTable = {
-    estimated_rows?: number;
-    columns?: unknown[];
-    constraints?: unknown[];
-};
+import { initSupabase } from '../actions/initSupabase';
+import { useSupabase } from '../hooks/useSupabase';
+import type { T_SupabaseTable } from '../types';
 
 export default function SupabaseDash() {
 
     const dispatch = useDispatch();
-    const slice = useLeidaBus('/api/supabase');
+    const supabase = useSupabase();
     const router = useRouter();
-    const tables = (Array.isArray(slice?.data) ? slice.data : []) as T_SupabaseTable[];
+    const tables = (Array.isArray(supabase?.schema?.tables) ? supabase.schema.tables : []) as T_SupabaseTable[];
     const didRequest = React.useRef(false);
 
     const stats = React.useMemo(() => ({
@@ -39,11 +32,11 @@ export default function SupabaseDash() {
     }), [tables]);
 
     React.useEffect(() => {
-        if (!didRequest.current && !slice?.loading && !slice?.error && tables.length === 0) {
-            dispatch(fetchLeida('/api/supabase'));
+        if (!didRequest.current && !supabase?.initted) {
+            dispatch(initSupabase());
             didRequest.current = true;
         }
-    }, [dispatch, slice?.error, slice?.loading, tables.length]);
+    }, [dispatch, supabase?.initted]);
 
     const handleNavigate = () => {
         dispatch(navigateTo(router, '/supabase'));
@@ -61,7 +54,7 @@ export default function SupabaseDash() {
                 >
                     View {`${stats.tableCount} tables`}
                 </Button>
-                {slice?.loading && (
+                {supabase?.schemaLoading && (
                     <Paper variant="outlined" sx={{ p: 2 }}>
                         <Stack direction="row" spacing={1.5} alignItems="center">
                             <CircularProgress size={18} />
@@ -69,10 +62,10 @@ export default function SupabaseDash() {
                         </Stack>
                     </Paper>
                 )}
-                {slice?.error && (
-                    <Alert severity="error">{slice.error}</Alert>
+                {supabase?.schemaError && (
+                    <Alert severity="error">{supabase.schemaError}</Alert>
                 )}
-                {!slice?.loading && !slice?.error && tables.length === 0 && (
+                {!supabase?.schemaLoading && !supabase?.schemaError && tables.length === 0 && (
                     <Alert severity="info">No schema data found.</Alert>
                 )}
             </Stack>
