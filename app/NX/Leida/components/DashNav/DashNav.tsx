@@ -74,6 +74,12 @@ export default function DashNav({
       route: '/awin',
       activeRoutes: ['/awin'],
     },
+    {
+      label: 'Claude',
+      icon: 'claude',
+      route: '/claude',
+      activeRoutes: ['/claude'],
+    },
   ];
 
   const isRouteActive = React.useCallback((activeRoutes?: string[]) => {
