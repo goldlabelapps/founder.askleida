@@ -18,7 +18,7 @@ export async function GET() {
         hasApiKey,
       },
       routes: {
-        claude: `${baseURL}/api/claude`,
+        claude: `${baseURL}/claude`,
       },
     },
   });
