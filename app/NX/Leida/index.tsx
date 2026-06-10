@@ -14,11 +14,14 @@ import SupabaseDash from './components/Supabase/components/SupabaseDash';
 
 // Hooks
 import { useLeida, useLeidaBus } from './hooks/useLeida';
+import { useAwin } from './components/Awin/hooks/useAwin';
 
 // Actions
 import { initLeida } from './actions/initLeida';
 import { fetchLeida } from './actions/fetchLeida';
 import { setLeida } from './actions/setLeida';
+import { initAwin } from './components/Awin/actions/initAwin';
+import { setAwin } from './components/Awin/actions/setAwin';
 
 // Lib
 import { normalizeLeidaRouteKey } from './lib/normalizeLeidaRouteKey';
@@ -35,12 +38,15 @@ export {
 	// Hooks
 	useLeida,
 	useLeidaBus,
+	useAwin,
 	useDash,
 	// Actions
 	initLeida,
 	initDash,
+	initAwin,
 	fetchLeida,
 	setLeida,
+	setAwin,
 	setDash,
 	// Lib
 	normalizeLeidaRouteKey,
