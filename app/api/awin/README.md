@@ -5,6 +5,7 @@ This folder exposes server-side proxy routes for AWIN data under:
 - `/api/awin`
 - `/api/awin/programmes`
 - `/api/awin/lookfantastic/feed`
+- `/api/awin/lookfantastic/save`
 
 The handlers use `app/api/awin/lib/client.ts` to call `https://api.awin.com` with your AWIN OAuth token.
 
@@ -133,6 +134,49 @@ Override advertiser id example:
 
 ```bash
 curl "http://localhost:3000/api/awin/lookfantastic/feed?advertiserId=12345&locale=en_GB&vertical=retail"
+```
+
+## 4) Save Lookfantastic Product Route
+
+`POST /api/awin/lookfantastic/save`
+
+Purpose:
+
+- Takes a selected product from the Lookfantastic AWIN feed.
+- Normalizes key fields.
+- Inserts a row into `public.products`.
+
+Required body fields:
+
+- `practitioner_id` (string, uuid)
+- `awinProduct` (object) or `product` (object)
+
+Optional override body fields:
+
+- `product_id`, `title`, `name`, `category`, `sku`, `price`, `description`, `notes`, `data`
+
+Normalization behavior:
+
+- `name` is inferred from override values first, then AWIN payload fields.
+- `title` defaults to `name`.
+- `price` is validated as a number `>= 0` when provided.
+- AWIN metadata is persisted into `data`, including source fields and full original product payload.
+
+Example:
+
+```bash
+curl -X POST "http://localhost:3000/api/awin/lookfantastic/save" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "practitioner_id": "00000000-0000-0000-0000-000000000000",
+    "awinProduct": {
+      "id": "LF-123",
+      "title": "Sample Product",
+      "description": "Example from AWIN feed",
+      "search_price": 24.99,
+      "aw_deep_link": "https://www.lookfantastic.com/..."
+    }
+  }'
 ```
 
 ## Error Handling
