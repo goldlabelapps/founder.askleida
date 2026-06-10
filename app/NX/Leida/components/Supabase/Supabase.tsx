@@ -54,7 +54,7 @@ export default function Supabase() {
     React.useEffect(() => {
         if (dash && dash.title) {
             dispatch(setNXAdmin('header', {
-                title: 'Supabase Tables',
+                title: 'Supabase',
                 icon: 'supabase',
             }));
         }
@@ -85,12 +85,28 @@ export default function Supabase() {
                                             <Chip size="small" variant="outlined" label={`${constraints.length} keys`} />
                                         </Stack>
 
+                                        {constraints.length > 0 && (
+                                            <Box>
+                                                <Stack direction="row" spacing={0.75} sx={{ mt: 0.75, flexWrap: 'wrap', rowGap: 0.75 }}>
+                                                    {constraints.map((constraint, i) => {
+                                                        const label = `${constraint.constraint_type || 'constraint'}: ${constraint.column_name || 'column'}`;
+                                                        return (
+                                                            <Chip
+                                                                key={`${tableName}-constraint-${constraint.constraint_name || i}`}
+                                                                size="small"
+                                                                color="secondary"
+                                                                variant="outlined"
+                                                                label={label}
+                                                            />
+                                                        );
+                                                    })}
+                                                </Stack>
+                                            </Box>
+                                        )}
                                         <Divider />
 
                                         <Box>
-                                            <Typography variant="caption" color="text.secondary">
-                                                Columns
-                                            </Typography>
+                                            
                                             <Stack direction="row" spacing={0.75} sx={{ mt: 0.75, flexWrap: 'wrap', rowGap: 0.75 }}>
                                                 {columns.map((column, i) => {
                                                     const nullable = column.nullable ? 'NULL' : 'NOT NULL';
@@ -108,27 +124,6 @@ export default function Supabase() {
                                             </Stack>
                                         </Box>
 
-                                        {constraints.length > 0 && (
-                                            <Box>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    Constraints
-                                                </Typography>
-                                                <Stack direction="row" spacing={0.75} sx={{ mt: 0.75, flexWrap: 'wrap', rowGap: 0.75 }}>
-                                                    {constraints.map((constraint, i) => {
-                                                        const label = `${constraint.constraint_type || 'constraint'}: ${constraint.column_name || 'column'}`;
-                                                        return (
-                                                            <Chip
-                                                                key={`${tableName}-constraint-${constraint.constraint_name || i}`}
-                                                                size="small"
-                                                                color="secondary"
-                                                                variant="outlined"
-                                                                label={label}
-                                                            />
-                                                        );
-                                                    })}
-                                                </Stack>
-                                            </Box>
-                                        )}
                                     </Stack>
                                 </Paper>
                             </Grid>

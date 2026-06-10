@@ -1,6 +1,9 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../Uberedux';
-import { fetchLeida, setLeida } from '../../Leida';
+import { 
+    // fetchLeida, 
+    setLeida,
+} from '../../Leida';
 
 export const initLeida = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {
@@ -9,7 +12,7 @@ export const initLeida = (): any =>
             const leida = getState()?.redux?.leida || {};
             if (!leida.initted) {
                 await dispatch(setLeida('initted', true));
-                await dispatch(fetchLeida('/api/supabase'));
+                // await dispatch(fetchLeida('/api/supabase'));
             }
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);

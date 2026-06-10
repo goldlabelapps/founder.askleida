@@ -9,7 +9,6 @@ import {
     initDash, 
     useDash,
     README,
-    SupabaseDash,
 } from '../../../Leida';
 
 
@@ -43,7 +42,7 @@ export default function FounderDash() {
                     <Grid container spacing={2}>
                         
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <SupabaseDash />
+                            <README />
                         </Grid>
                     </Grid>
                 </Grid>

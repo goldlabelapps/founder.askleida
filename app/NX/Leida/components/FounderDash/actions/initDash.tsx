@@ -8,12 +8,6 @@ export const initDash = (): any =>
             const nxAdmin = getState()?.redux?.nxAdmin || {};
             if (!nxAdmin.dash) await dispatch(setNXAdmin('dash', {
                 title: 'NX° Admin',
-                hero: 'accounts',
-                panels: [
-                    'account',
-                    'accounts',
-                    'queue',
-                ],
             }));
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);
