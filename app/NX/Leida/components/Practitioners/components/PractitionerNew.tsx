@@ -105,7 +105,7 @@ const PractitionerNew = () => {
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Stack spacing={1.5}>
 						<Typography variant="body1" sx={{ flexShrink: 0 }}>
-							Create a Supabase Auth invite. User receives an email to set password and activate their account.
+							Invite practitioner. They receive an email to set password and activate their account
 						</Typography>
 						<Box sx={{ my: 1 }}>
 							{createError && <Alert severity="error">{createError}</Alert>}
