@@ -71,10 +71,10 @@ const Practitioner = ({
 						<Typography variant="body2" color="text.secondary">{email || 'No email'}</Typography>
 					</Stack>
 				</Stack>
-				<Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+				{/* <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
 					<Chip size="small" variant="outlined" label={`id: ${practitionerId}`} />
 					<Chip size="small" label={`updated: ${safeDateLabel(practitioner?.updated)}`} />
-				</Stack>
+				</Stack> */}
 			</Stack>
 		</Paper>
 	);

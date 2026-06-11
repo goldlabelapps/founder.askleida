@@ -5,6 +5,7 @@ import { useDispatch } from '../../../../Uberedux';
 import { initSupabase } from '../../Supabase/actions/initSupabase';
 import { fetchSupabaseRows } from '../../Supabase/actions/fetchSupabaseRows';
 import { useSupabase } from '../../Supabase/hooks/useSupabase';
+import { PractitionerNew } from '../../../../Leida';
 import Practitioner, { T_PractitionerRecord } from './Practitioner';
 
 const PRACTITIONERS_TABLE = 'practitioners';
@@ -31,9 +32,13 @@ const PractitionerDash = () => {
 	}, [dispatch, supabase?.initted]);
 
 	return (
+		<>
+			<PractitionerNew />
 		<Box sx={{ p: 2 }}>
 			<Stack spacing={1.5}>
-				<Typography variant="h6">Practitioners</Typography>
+				
+				
+
 				{rowsState?.loading && <CircularProgress size={20} />}
 				{rowsState?.error && <Alert severity="error">{rowsState.error}</Alert>}
 				{!rowsState?.loading && rows.length === 0 && (
@@ -47,6 +52,7 @@ const PractitionerDash = () => {
 				})}
 			</Stack>
 		</Box>
+		</>
 	);
 };
 
