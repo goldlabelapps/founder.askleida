@@ -1,9 +1,8 @@
 import React from 'react';
 import {
 	Box,
-	Button,
 	Card,
-	CardActions,
+	CardActionArea,
 	CardContent,
 	Typography,
 } from '@mui/material';
@@ -23,31 +22,22 @@ const DashCard = ({
     cta }: I_DashCard) => {
 	return (
 		<Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-			<CardContent sx={{ flexGrow: 1 }}>
-				<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-					<Box sx={{ display: 'flex', alignItems: 'center' }}>
-						<Icon icon={icon as any} />
+			<CardActionArea onClick={cta} sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+				<CardContent sx={{ flexGrow: 1 }}>
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+						<Box sx={{ display: 'flex', alignItems: 'center' }}>
+							<Icon icon={icon as any} />
+						</Box>
+						<Typography variant="h6" component="h3">
+							{title}
+						</Typography>
 					</Box>
-					<Typography variant="h6" component="h3">
-						{title}
+
+					<Typography variant="body2" color="text.secondary">
+						{description}
 					</Typography>
-				</Box>
-
-				<Typography variant="body2" color="text.secondary">
-					{description}
-				</Typography>
-			</CardContent>
-
-			<CardActions>
-				<Box sx={{ flexGrow: 1 }} />
-				<Button 
-					onClick={cta}
-                    endIcon={<Icon icon="right" />}
-                    variant="outlined"
-                >
-					Go
-				</Button>
-			</CardActions>
+				</CardContent>
+			</CardActionArea>
 		</Card>
 	);
 };

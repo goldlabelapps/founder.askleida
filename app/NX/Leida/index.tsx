@@ -16,6 +16,7 @@ import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
 import Supabase from './components/Supabase/Supabase';
 import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
+import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
 import SupabaseDash from './components/Supabase/components/SupabaseDash';
 import { getLeidaContextPrompt, testProduct } from './components/Claude/prompts';
 
@@ -51,6 +52,7 @@ export {
 	ClaudePopup,
 	Supabase,
 	SupabasePostgres,
+	SupabaseUsers,
 	SupabaseDash,
 	getLeidaContextPrompt,
 	testProduct,

@@ -6,6 +6,7 @@ import Claude from './components/Claude/Claude';
 import { FounderDash } from './components/FounderDash';
 import Supabase from './components/Supabase/Supabase';
 import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
+import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
 
 interface I_PageRouter {
   active: string | null;
@@ -18,6 +19,8 @@ export function PageRouter({ active }: I_PageRouter) {
       return <Supabase />;
     case 'supabase/postgres':
       return <SupabasePostgres />;
+    case 'supabase/users':
+      return <SupabaseUsers />;
     case 'awin':
       return <Awin />;
     case 'awin/search':

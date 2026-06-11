@@ -105,16 +105,28 @@ export default function DashNav({
               }}
             />
             {item.route === '/supabase' && (
-              <MiniListItem
-                open={open}
-                selected={isRouteActive(['/supabase/postgres'])}
-                onClick={navigateToRoute}
-                options={{
-                  label: 'Postgres',
-                  route: '/supabase/postgres',
-                  nested: true,
-                }}
-              />
+              <>
+                <MiniListItem
+                  open={open}
+                  selected={isRouteActive(['/supabase/users'])}
+                  onClick={navigateToRoute}
+                  options={{
+                    label: 'Users',
+                    route: '/supabase/users',
+                    nested: true,
+                  }}
+                />
+                <MiniListItem
+                  open={open}
+                  selected={isRouteActive(['/supabase/postgres'])}
+                  onClick={navigateToRoute}
+                  options={{
+                    label: 'Postgres',
+                    route: '/supabase/postgres',
+                    nested: true,
+                  }}
+                />
+              </>
             )}
             {item.route === '/awin' && (
               <>

@@ -21,11 +21,40 @@ type T_SaveSupabaseRecordArgs =
         email_confirm?: boolean;
         user_metadata?: Record<string, any>;
         app_metadata?: Record<string, any>;
+            }
+        | {
+                resource: 'practitioner-onboard';
+                email: string;
+                redirectTo?: string;
+                user_metadata?: Record<string, any>;
       };
 
 export const saveSupabaseRecord = (args: T_SaveSupabaseRecordArgs): any =>
     async (dispatch: Dispatch, getState: () => any) => {
         try {
+            if (args.resource === 'practitioner-onboard') {
+                const data = await requestSupabase<{ user?: Record<string, any>; practitioner?: Record<string, any> }>('/api/supabase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        resource: 'practitioner-onboard',
+                        email: args.email,
+                        redirectTo: args.redirectTo,
+                        user_metadata: args.user_metadata,
+                    }),
+                });
+
+                const supabase = getState()?.redux?.leida?.supabase || {};
+                await dispatch(fetchSupabaseAuthUsers({
+                    page: 1,
+                    perPage: typeof supabase?.authPerPage === 'number' ? supabase.authPerPage : 10,
+                }));
+                await dispatch(fetchSupabaseSchema());
+                return data;
+            }
+
             if (args.resource === 'auth-user') {
                 const method = args.userId ? 'PATCH' : 'POST';
                 await requestSupabase('/api/supabase', {
