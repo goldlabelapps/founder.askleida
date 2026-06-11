@@ -40,8 +40,7 @@ export default function FounderDash() {
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
                     <Grid container spacing={2}>
-                        
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{ xs: 12, md: 12 }}>
                             <README />
                         </Grid>
                     </Grid>

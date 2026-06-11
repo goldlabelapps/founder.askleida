@@ -12,6 +12,7 @@ import {
     Box,
     Toolbar,
     IconButton,
+    Container,
 } from '@mui/material';
 import { 
     Icon,
@@ -181,7 +182,9 @@ export default function DesktopLayout({ config }: { config: any }) {
             </Drawer>
             <Box component="main" sx={{ flexGrow: 1, p: 3}}>
                 <DrawerHeader />
-                <PageRouter active={active} />
+                <Container maxWidth={'md'} disableGutters sx={{ border: 0, ml: 0, mr: 'auto' }}>
+                    <PageRouter active={active} />
+                </Container>
             </Box>
         </Box>
     );
