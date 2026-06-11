@@ -8,6 +8,7 @@ import {
 	useDash,
 	setDash,
 	DashCard,
+	DashSurface,
 } from './components/FounderDash';
 import Awin from './components/Awin/Awin';
 import Claude from './components/Claude/Claude';
@@ -39,6 +40,7 @@ export {
 	README,
 	FounderDash,
 	DashCard,
+	DashSurface,
 	Awin,
 	Claude,
 	Supabase,

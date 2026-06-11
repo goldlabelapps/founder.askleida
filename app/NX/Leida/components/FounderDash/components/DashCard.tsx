@@ -39,11 +39,11 @@ const DashCard = ({
 			</CardContent>
 
 			<CardActions>
+				<Box sx={{ flexGrow: 1 }} />
 				<Button 
 					onClick={cta}
-                    fullWidth
                     endIcon={<Icon icon="right" />}
-                    variant="contained"
+                    variant="outlined"
                 >
 					Go
 				</Button>

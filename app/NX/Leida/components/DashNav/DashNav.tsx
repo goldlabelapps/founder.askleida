@@ -57,7 +57,7 @@ export default function DashNav({
 
   const navItems = [
     {
-      label: 'Founder Dash',
+      label: 'Founder',
       icon: 'leida',
       route: '/',
       activeRoutes: ['/'],

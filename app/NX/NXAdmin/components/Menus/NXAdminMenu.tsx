@@ -68,9 +68,17 @@ export default function NXAdminMenu() {
         onClose={handleMenuClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
-        <Box sx={{  }}>
-          <AccountCard />
-        </Box>
+
+
+        <MiniListItem
+          open
+          onClick={handleHome}
+          options={{
+            label: 'Home',
+            icon: 'home',
+          }}
+        />
+
         <MiniListItem
           open
           onClick={handleThemeModeToggle}

@@ -83,7 +83,7 @@ import DownIcon from '@mui/icons-material/ArrowDropDown';
 import ScooterIcon from '@mui/icons-material/Moped';
 import FoodIcon from '@mui/icons-material/Restaurant';
 import StarIcon from '@mui/icons-material/StarOutlined';
-import SettingsIcon from '@mui/icons-material/CrisisAlert';
+import SettingsIcon from '@mui/icons-material/Settings';  
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import FacebookIcon from '@mui/icons-material/FacebookOutlined';
 import TwitterIcon from '@mui/icons-material/Twitter';

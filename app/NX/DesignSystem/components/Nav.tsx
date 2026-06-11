@@ -67,8 +67,8 @@ const Nav: React.FC<I_Nav> = ({
     //         setDrawerOpen(false);
     // }
 
-    function handleGithubClick() {
-        dispatch(navigateTo(router, '/techstack/git'));
+    function handleHomeClick() {
+        dispatch(navigateTo(router, '/'));
         setDrawerOpen(false);
     }
 
@@ -93,7 +93,16 @@ const Nav: React.FC<I_Nav> = ({
                     filteredChildren = item.children!.filter(child => child.path !== item.path);
                 }
                 return (
-                    <Box key={key}>              
+                    <Box key={key}>    
+                        <ListItemButton
+                            onClick={handleHomeClick}
+                        >
+                            <ListItemIcon>
+                                <Icon icon={'home'} color="primary" />
+                            </ListItemIcon>
+                            <ListItemText primary={'Home'} />
+                        </ListItemButton>    
+
                         <ListItemButton
                             onClick={isRoutable ? (e) => {
                                 e.preventDefault();

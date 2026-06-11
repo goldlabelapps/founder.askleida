@@ -90,14 +90,9 @@ export default function NXAdmin({
               minHeight: '100vh',
             }}>
               <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Box>
+                <Grid size={{ xs: 12 }}>
+                  <Box sx={{ maxWidth: 300}}>
                     <SimpleSignIn config={config} /> 
-                  </Box>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Box sx={{ mx: 3, mt: 3}}>
-                    <README />
                   </Box>
                 </Grid>
               </Grid>            

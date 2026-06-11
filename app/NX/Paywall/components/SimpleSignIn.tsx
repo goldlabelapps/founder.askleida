@@ -38,24 +38,9 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
 
     return (
         <form onSubmit={handleSubmit}>
-
-            {config && (
-                <CardHeader
-                    sx={{ width: '100%' }}
-                    title={<Typography variant="h4" color="text.secondary">
-                        {config.siteName}
-                    </Typography>}
-                    // avatar={
-                    //     <Avatar
-                    //         src={config.favicon}
-                    //         alt={config.siteName} />
-                    // }
-                />
-            )}
-
-            <Box sx={{ mx: 3}}>
-
+            <Box sx={{}}>
                 <TextField
+                    autoFocus
                     label="Email"
                     variant='outlined'
                     type="email"
