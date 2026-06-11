@@ -47,7 +47,7 @@ const PractitionerNew = () => {
 
 		const email = inviteEmail.trim().toLowerCase();
 		if (!email) {
-			setCreateError('Email is required');
+			setCreateError('A practitioner must have an email');
 			return;
 		}
 
@@ -75,7 +75,7 @@ const PractitionerNew = () => {
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Stack spacing={1.5}>
 						<Typography variant="body1" sx={{ flexShrink: 0 }}>
-							Invite practitioner. They receive an email to set password and activate their account
+							Create practitioner. They receive an email link to set password and activate their account
 						</Typography>
 						<Box sx={{ my: 1 }}>
 							{createError && <Alert severity="warning">{createError}</Alert>}
@@ -91,12 +91,12 @@ const PractitionerNew = () => {
 							/>
 							<Button
 								variant="outlined"
-								endIcon={<Icon icon="send" />}
+								endIcon={<Icon icon="add" />}
 								onClick={handleCreatePractitioner}
 								disabled={createLoading}
 								size="large"
 							>
-								{createLoading ? 'Inviting...' : 'Send Invite'}
+								{createLoading ? 'Creating...' : 'Create'}
 							</Button>
 						</Stack>
 					</Stack>

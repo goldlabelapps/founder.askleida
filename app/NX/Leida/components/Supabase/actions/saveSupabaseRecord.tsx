@@ -34,6 +34,7 @@ export const saveSupabaseRecord = (args: T_SaveSupabaseRecordArgs): any =>
         try {
             if (args.resource === 'practitioner-onboard') {
                 const user_metadata = {
+                    onboarded: false,
                     avatar: 'https://app.askleida.com/shared/svg/guest.svg',
                     ...args.user_metadata,
                 };
@@ -45,6 +46,7 @@ export const saveSupabaseRecord = (args: T_SaveSupabaseRecordArgs): any =>
                     body: JSON.stringify({
                         resource: 'practitioner-onboard',
                         email: args.email,
+                        title: args.email,
                         redirectTo: args.redirectTo,
                         user_metadata,
                     }),

@@ -31,10 +31,12 @@ export const fetchSupabaseAuthUsers = ({ page = 1, perPage = 10 }: T_FetchSupaba
             await dispatch(setSupabase('authPage', typeof data?.page === 'number' ? data.page : page));
             await dispatch(setSupabase('authPerPage', typeof data?.perPage === 'number' ? data.perPage : perPage));
             await dispatch(setSupabase('authTotal', typeof data?.total === 'number' ? data.total : 0));
+            return data;
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);
             await dispatch(setSupabase('authError', msg));
             dispatch(setUbereduxKey({ key: 'error', value: msg }));
+            throw e;
         } finally {
             await dispatch(setSupabase('authLoading', false));
         }
