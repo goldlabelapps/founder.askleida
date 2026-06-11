@@ -4,7 +4,6 @@ import {
 	Alert,
 	Box,
 	Button,
-	Chip,
 	Paper,
 	Stack,
 	TextField,
@@ -13,8 +12,11 @@ import {
 import { Icon } from '../../../../DesignSystem';
 import { useDispatch } from '../../../../Uberedux';
 import { initSupabase } from '../../Supabase/actions/initSupabase';
+import { fetchSupabaseRows } from '../../Supabase/actions/fetchSupabaseRows';
 import { saveSupabaseRecord } from '../../Supabase/actions/saveSupabaseRecord';
 import { useSupabase } from '../../Supabase/hooks/useSupabase';
+
+const PRACTITIONERS_TABLE = 'practitioners';
 
 type T_PractitionerRecord = {
 	practitioner_id?: string;
@@ -28,48 +30,16 @@ type T_PractitionerRecord = {
 const PractitionerNew = () => {
 	const dispatch = useDispatch();
 	const supabase = useSupabase();
-	const [practitioners, setPractitioners] = React.useState<T_PractitionerRecord[]>([]);
-	const [practitionersLoading, setPractitionersLoading] = React.useState(false);
-	const [practitionersError, setPractitionersError] = React.useState<string | null>(null);
 	const [inviteEmail, setInviteEmail] = React.useState('');
 	const [createLoading, setCreateLoading] = React.useState(false);
 	const [createError, setCreateError] = React.useState<string | null>(null);
 	const [createSuccess, setCreateSuccess] = React.useState<string | null>(null);
-
-	const loadPractitioners = React.useCallback(async () => {
-		setPractitionersLoading(true);
-		setPractitionersError(null);
-		try {
-			const res = await fetch('/api/practitioners', {
-				method: 'GET',
-				headers: { Accept: 'application/json' },
-			});
-			const json = await res.json().catch(() => null);
-			if (!res.ok) {
-				const message = typeof json?.message === 'string'
-					? json.message
-					: `Failed to fetch practitioners (${res.status})`;
-				throw new Error(message);
-			}
-			const data = Array.isArray(json?.data) ? json.data : [];
-			setPractitioners(data as T_PractitionerRecord[]);
-		} catch (e: unknown) {
-			const msg = e instanceof Error ? e.message : String(e);
-			setPractitionersError(msg || 'Failed to fetch practitioners');
-		} finally {
-			setPractitionersLoading(false);
-		}
-	}, []);
 
 	React.useEffect(() => {
 		if (!supabase?.initted) {
 			dispatch(initSupabase());
 		}
 	}, [dispatch, supabase?.initted]);
-
-	React.useEffect(() => {
-		loadPractitioners();
-	}, [loadPractitioners]);
 
 	const handleCreatePractitioner = React.useCallback(async () => {
 		setCreateError(null);
@@ -88,8 +58,8 @@ const PractitionerNew = () => {
 				email,
 				user_metadata: { invited_from: 'leida-supabase-module' },
 			}));
-			await loadPractitioners();
-			setCreateSuccess(`Invited ${email} and created practitioner record.`);
+			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
+			setCreateSuccess(`Invited ${email} and refreshed practitioners.`);
 			setInviteEmail('');
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : String(e);
@@ -97,7 +67,7 @@ const PractitionerNew = () => {
 		} finally {
 			setCreateLoading(false);
 		}
-	}, [dispatch, inviteEmail, loadPractitioners]);
+	}, [dispatch, inviteEmail]);
 
 	return (
 		<Box sx={{ p: 2 }}>
@@ -108,8 +78,8 @@ const PractitionerNew = () => {
 							Invite practitioner. They receive an email to set password and activate their account
 						</Typography>
 						<Box sx={{ my: 1 }}>
-							{createError && <Alert severity="error">{createError}</Alert>}
-							{createSuccess && <Alert severity="success">{createSuccess}</Alert>}
+							{createError && <Alert severity="warning">{createError}</Alert>}
+							{createSuccess && <Alert severity="info">{createSuccess}</Alert>}
 						</Box>
 						<Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
 							<TextField
