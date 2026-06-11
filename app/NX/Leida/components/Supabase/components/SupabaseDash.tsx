@@ -39,7 +39,7 @@ export default function SupabaseDash() {
     }, [dispatch, supabase?.initted]);
 
     const handleNavigate = () => {
-        dispatch(navigateTo(router, '/supabase'));
+        dispatch(navigateTo(router, '/supabase/postgres'));
     };
 
     return (

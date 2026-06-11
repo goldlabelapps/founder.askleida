@@ -16,7 +16,7 @@ type T_AuthUsersResponse = {
     users?: T_SupabaseAuthUser[];
 };
 
-export const fetchSupabaseAuthUsers = ({ page = 1, perPage = 25 }: T_FetchSupabaseAuthUsersArgs = {}): any =>
+export const fetchSupabaseAuthUsers = ({ page = 1, perPage = 10 }: T_FetchSupabaseAuthUsersArgs = {}): any =>
     async (dispatch: Dispatch) => {
         try {
             await dispatch(setSupabase('authLoading', true));

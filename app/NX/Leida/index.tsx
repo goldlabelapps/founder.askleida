@@ -11,9 +11,15 @@ import {
 	DashSurface,
 } from './components/FounderDash';
 import Awin from './components/Awin/Awin';
+import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
+import ClaudePopup from './components/Claude/components/ClaudePopup';
+import { PractitionerDash, Practitioner, PractitionerNew, Practitioners } from './components/Practitioners';
 import Supabase from './components/Supabase/Supabase';
+import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
+import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
 import SupabaseDash from './components/Supabase/components/SupabaseDash';
+import { getLeidaContextPrompt, testProduct } from './components/Claude/prompts';
 
 // Hooks
 import { useLeida, useLeidaBus } from './hooks/useLeida';
@@ -42,9 +48,19 @@ export {
 	DashCard,
 	DashSurface,
 	Awin,
+	AwinSearch,
 	Claude,
+	ClaudePopup,
+	PractitionerDash,
+	Practitioner,
+	PractitionerNew,
+	Practitioners,
 	Supabase,
+	SupabasePostgres,
+	SupabaseUsers,
 	SupabaseDash,
+	getLeidaContextPrompt,
+	testProduct,
 	// Hooks
 	useLeida,
 	useLeidaBus,

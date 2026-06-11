@@ -1,0 +1,83 @@
+'use client';
+import * as React from 'react';
+import {
+	Avatar,
+	Chip,
+	Paper,
+	Stack,
+	Typography,
+} from '@mui/material';
+
+type T_PractitionerData = {
+	avatar?: string;
+	display_name?: string;
+	[key: string]: any;
+};
+
+export type T_PractitionerRecord = {
+	practitioner_id?: string;
+	title?: string;
+	created?: string;
+	updated?: string;
+	data?: unknown;
+	[key: string]: any;
+};
+
+function parsePractitionerData(value: unknown): T_PractitionerData {
+	if (!value) return {};
+	if (typeof value === 'object') {
+		return value as T_PractitionerData;
+	}
+	if (typeof value === 'string') {
+		try {
+			const parsed = JSON.parse(value);
+			if (parsed && typeof parsed === 'object') {
+				return parsed as T_PractitionerData;
+			}
+		} catch {
+			return {};
+		}
+	}
+	return {};
+}
+
+function safeDateLabel(value?: string): string {
+	if (!value) return 'N/A';
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return value;
+	return date.toLocaleString();
+}
+
+const Practitioner = ({
+	practitioner,
+}: {
+	practitioner: T_PractitionerRecord;
+}) => {
+	const parsedData = parsePractitionerData(practitioner?.data);
+	const email = typeof practitioner?.title === 'string' ? practitioner.title : '';
+	const displayName = typeof parsedData?.display_name === 'string' && parsedData.display_name.trim()
+		? parsedData.display_name.trim()
+		: (email || 'Unknown practitioner');
+	const avatar = typeof parsedData?.avatar === 'string' ? parsedData.avatar : '';
+	const practitionerId = typeof practitioner?.practitioner_id === 'string' ? practitioner.practitioner_id : 'N/A';
+
+	return (
+		<Paper variant="outlined" sx={{ p: 1.5 }}>
+			<Stack spacing={1}>
+				<Stack direction="row" spacing={1.5} alignItems="center">
+					<Avatar src={avatar || undefined} alt={displayName} />
+					<Stack spacing={0.25}>
+						<Typography variant="subtitle2">{displayName}</Typography>
+						<Typography variant="body2" color="text.secondary">{email || 'No email'}</Typography>
+					</Stack>
+				</Stack>
+				{/* <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+					<Chip size="small" variant="outlined" label={`id: ${practitionerId}`} />
+					<Chip size="small" label={`updated: ${safeDateLabel(practitioner?.updated)}`} />
+				</Stack> */}
+			</Stack>
+		</Paper>
+	);
+};
+
+export default Practitioner;

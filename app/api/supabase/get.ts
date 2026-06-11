@@ -11,24 +11,54 @@ import {
     toNumber,
 } from './lib/shared';
 
-async function getAuthDiagnostics() {
+const DEFAULT_AUTH_USERS_PAGE = 1;
+const DEFAULT_AUTH_USERS_PER_PAGE = 10;
+
+function mapAuthUsers(data: unknown) {
+    if (!Array.isArray(data)) return [];
+
+    return data.map((user: any) => ({
+        id: user?.id,
+        email: user?.email || null,
+        role: user?.role || null,
+        created_at: user?.created_at || null,
+        last_sign_in_at: user?.last_sign_in_at || null,
+        email_confirmed_at: user?.email_confirmed_at || null,
+        phone: user?.phone || null,
+        app_metadata: user?.app_metadata || {},
+        user_metadata: user?.user_metadata || {},
+        identities: Array.isArray(user?.identities) ? user.identities : [],
+    }));
+}
+
+async function getAuthSnapshot(page = DEFAULT_AUTH_USERS_PAGE, perPage = DEFAULT_AUTH_USERS_PER_PAGE) {
     try {
         const supabase = createAdminClient();
-        const { data, error } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1 });
+        const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
 
         if (error) {
             throw error;
         }
 
+        const users = mapAuthUsers(data?.users);
+
         return {
             available: true,
             user_count: toNumber(data?.total),
-            latest_signup: data?.users?.[0]?.created_at || null,
+            latest_signup: users[0]?.created_at || null,
+            page,
+            perPage,
+            total: toNumber(data?.total),
+            users,
         };
     } catch (error) {
         return {
             available: false,
             error: error instanceof Error ? error.message : 'Failed to fetch auth diagnostics',
+            page,
+            perPage,
+            total: 0,
+            users: [],
         };
     }
 }
@@ -47,7 +77,7 @@ async function handleSchema(req: Request) {
         const url = req?.url ? new URL(req.url) : null;
         const includeExactCounts = url?.searchParams.get('exactCounts') === 'true';
         const data = await getTableSchema(sql, undefined, includeExactCounts);
-        const auth = await getAuthDiagnostics();
+        const auth = await getAuthSnapshot();
         const res = makeRes({
             message: includeExactCounts
                 ? 'Fetched public schema diagnostics with exact row counts'
@@ -128,39 +158,22 @@ async function handleRows(req: Request) {
 async function handleAuthUsers(req: Request) {
     const url = req?.url ? new URL(req.url) : null;
     const page = parseInteger(url?.searchParams.get('page') || null, 1, { min: 1, max: 1000 });
-    const perPage = parseInteger(url?.searchParams.get('perPage') || null, 25, { min: 1, max: 100 });
+    const perPage = parseInteger(url?.searchParams.get('perPage') || null, DEFAULT_AUTH_USERS_PER_PAGE, { min: 1, max: 100 });
 
     try {
-        const supabase = createAdminClient();
-        const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
-
-        if (error) {
-            throw new Error(error.message);
+        const auth = await getAuthSnapshot(page, perPage);
+        if (!auth.available && auth.error) {
+            throw new Error(auth.error);
         }
-
-        const users = Array.isArray(data?.users)
-            ? data.users.map((user) => ({
-                id: user.id,
-                email: user.email || null,
-                role: user.role || null,
-                created_at: user.created_at || null,
-                last_sign_in_at: user.last_sign_in_at || null,
-                email_confirmed_at: user.email_confirmed_at || null,
-                phone: user.phone || null,
-                app_metadata: user.app_metadata || {},
-                user_metadata: user.user_metadata || {},
-                identities: Array.isArray(user.identities) ? user.identities : [],
-            }))
-            : [];
 
         const res = makeRes({
             message: 'Fetched auth users',
             severity: 'success',
             data: {
-                page,
-                perPage,
-                total: toNumber(data?.total),
-                users,
+                page: auth.page,
+                perPage: auth.perPage,
+                total: auth.total,
+                users: auth.users,
             },
         });
         return NextResponse.json(res);

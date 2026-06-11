@@ -23,7 +23,10 @@ type T_Props = {
     error?: string | null;
     users: T_SupabaseAuthUser[];
     total?: number;
+    page?: number;
+    perPage?: number;
     onRefresh: () => void;
+    onPageChange: (page: number) => void;
     onSave: (args: {
         userId?: string;
         email: string;
@@ -72,10 +75,18 @@ function parseJson(text: string, label: string): Record<string, any> {
     return parsed;
 }
 
-export default function SupabaseAuthPanel({ loading, error, users, total, onRefresh, onSave, onDelete }: T_Props) {
+export default function SupabaseAuthPanel({ loading, error, users, total, page, perPage, onRefresh, onPageChange, onSave, onDelete }: T_Props) {
     const [form, setForm] = React.useState<T_FormState>(EMPTY_FORM);
     const [localError, setLocalError] = React.useState<string | null>(null);
     const [saving, setSaving] = React.useState(false);
+    const currentPage = typeof page === 'number' && page > 0 ? page : 1;
+    const currentPerPage = typeof perPage === 'number' && perPage > 0 ? perPage : 10;
+    const totalUsers = typeof total === 'number' && total > 0 ? total : 0;
+    const totalPages = Math.max(1, Math.ceil(totalUsers / currentPerPage));
+    const canGoPrevious = currentPage > 1;
+    const canGoNext = currentPage < totalPages;
+    const rangeStart = totalUsers === 0 ? 0 : ((currentPage - 1) * currentPerPage) + 1;
+    const rangeEnd = totalUsers === 0 ? 0 : Math.min(currentPage * currentPerPage, totalUsers);
 
     const handleSelectUser = (user: T_SupabaseAuthUser) => {
         setForm({
@@ -161,7 +172,33 @@ export default function SupabaseAuthPanel({ loading, error, users, total, onRefr
                     </Stack>
                 </Stack>
 
-                <Chip size="small" label={`${total || 0} users`} sx={{ alignSelf: 'flex-start' }} />
+                <Stack direction="row" spacing={1} sx={{ alignSelf: 'flex-start', flexWrap: 'wrap', rowGap: 1 }}>
+                    <Chip size="small" label={`${totalUsers} users`} />
+                    <Chip size="small" variant="outlined" label={`Showing ${rangeStart}-${rangeEnd}`} />
+                    <Chip size="small" variant="outlined" label={`Page ${currentPage} of ${totalPages}`} />
+                </Stack>
+
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => onPageChange(currentPage - 1)}
+                        disabled={loading || !canGoPrevious}
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => onPageChange(currentPage + 1)}
+                        disabled={loading || !canGoNext}
+                    >
+                        Next
+                    </Button>
+                    <Typography variant="body2" color="text.secondary">
+                        10 per page
+                    </Typography>
+                </Stack>
 
                 {error && <Alert severity="error">{error}</Alert>}
                 {localError && <Alert severity="error">{localError}</Alert>}

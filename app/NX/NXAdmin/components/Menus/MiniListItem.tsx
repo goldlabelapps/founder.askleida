@@ -16,12 +16,13 @@ export default function MiniListItem({
     onClick, 
 }: { 
   open: boolean;
-        selected?: boolean;
+    selected?: boolean;
     onClick: (route?: string) => void;
   options: {
     label: string;
-    icon: string;
+        icon?: string;
     route?: string;
+        nested?: boolean;
   }
 }) {
 
@@ -29,6 +30,7 @@ export default function MiniListItem({
         icon,
         label = 'Dashboard',
         route,
+        nested = false,
     } = options;
 
   return (
@@ -38,21 +40,30 @@ export default function MiniListItem({
           <ListItemButton
               onClick={() => onClick(route)}
               sx={[
-                  { minHeight: 48, px: 2.5 },
+                  { minHeight: nested ? 40 : 48, px: 2.5, pl: nested ? 6 : 2.5 },
                   open ? { justifyContent: 'initial' } : { justifyContent: 'center' },
                   selected ? { bgcolor: 'action.selected' } : null,
               ]}
           >
-              <ListItemIcon
-                  sx={[
-                      { minWidth: 0, justifyContent: 'center' },
-                      open ? { mr: 3 } : { mr: 'auto' },
-                  ]}
-              >
-                  <Icon icon={icon as any} color={selected ? 'primary' : 'default'} />
-              </ListItemIcon>
+              {icon && (
+                  <ListItemIcon
+                      sx={[
+                          { minWidth: 0, justifyContent: 'center' },
+                          open ? { mr: 3 } : { mr: 'auto' },
+                      ]}
+                  >
+                      <Icon icon={icon as any} color={selected ? 'primary' : 'default'} />
+                  </ListItemIcon>
+              )}
               <ListItemText
-                  primary={<Typography color={selected ? 'text.primary' : 'text.secondary'}>{label}</Typography>}
+                  primary={
+                      <Typography
+                          color={selected ? 'text.primary' : 'text.secondary'}
+                          sx={{ ml: nested ? 5 : 0 }}
+                      >
+                          {label}
+                      </Typography>
+                  }
                   sx={[
                       open ? { opacity: 1 } : { opacity: 0 },
                   ]}
