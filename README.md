@@ -1,10 +1,8 @@
-## °Leida 
+## Founder d=Dashboard
 
-Founder dashboard
-
-- manage users
-- manage products
-    - awin afilliate 
+- Manage Practitioners
+- Manage Products
+    - Awin afilliate / Looksfantastic 
     
 ![NextJS](public/shared/png/python.png)  
 > Wei Zang's son
