@@ -41,10 +41,8 @@ export default function FounderDash() {
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
                     <Grid container spacing={2}>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <README />
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        
+                        <Grid size={{ xs: 12, sm: 12 }}>
                             <DashSurface />
                         </Grid>
 

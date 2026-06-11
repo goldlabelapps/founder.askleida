@@ -93,17 +93,44 @@ export default function DashNav({
   return (<>
         <Box sx={{ height: 24 }} />
         {navItems.map((item) => (
-          <MiniListItem
-            key={item.route}
-            open={open}
-            selected={isRouteActive(item.activeRoutes)}
-            onClick={navigateToRoute}
-            options={{
-              label: item.label,
-              icon: item.icon,
-              route: item.route,
-            }}
-          />
+          <React.Fragment key={item.route}>
+            <MiniListItem
+              open={open}
+              selected={isRouteActive(item.activeRoutes)}
+              onClick={navigateToRoute}
+              options={{
+                label: item.label,
+                icon: item.icon,
+                route: item.route,
+              }}
+            />
+            {item.route === '/supabase' && (
+              <MiniListItem
+                open={open}
+                selected={isRouteActive(['/supabase/postgres'])}
+                onClick={navigateToRoute}
+                options={{
+                  label: 'Postgres',
+                  route: '/supabase/postgres',
+                  nested: true,
+                }}
+              />
+            )}
+            {item.route === '/awin' && (
+              <>
+                <MiniListItem
+                  open={open}
+                  selected={isRouteActive(['/awin/search'])}
+                  onClick={navigateToRoute}
+                  options={{
+                    label: 'Search',
+                    route: '/awin/search',
+                    nested: true,
+                  }}
+                />
+              </>
+            )}
+          </React.Fragment>
         ))}
     {/*
         <MiniListItem

@@ -11,6 +11,7 @@ import {
 	DashSurface,
 } from './components/FounderDash';
 import Awin from './components/Awin/Awin';
+import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
 import Supabase from './components/Supabase/Supabase';
@@ -45,6 +46,7 @@ export {
 	DashCard,
 	DashSurface,
 	Awin,
+	AwinSearch,
 	Claude,
 	ClaudePopup,
 	Supabase,
