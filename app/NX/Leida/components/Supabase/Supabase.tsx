@@ -28,6 +28,15 @@ import { fetchSupabaseAuthUsers } from './actions/fetchSupabaseAuthUsers';
 import { useSupabase } from './hooks/useSupabase';
 import type { T_SupabaseAuthUser } from './types';
 
+type T_PractitionerRecord = {
+    practitioner_id?: string;
+    name?: string;
+    title?: string;
+    updated?: string;
+    created?: string;
+    [key: string]: any;
+};
+
 
 export default function Supabase() {
 
@@ -43,12 +52,65 @@ export default function Supabase() {
     const canGoPrevious = currentPage > 1;
     const canGoNext = currentPage < totalPages;
     const authUsers = (Array.isArray(supabase?.authUsers) ? supabase.authUsers : []) as T_SupabaseAuthUser[];
+    const [practitioners, setPractitioners] = React.useState<T_PractitionerRecord[]>([]);
+    const [practitionersLoading, setPractitionersLoading] = React.useState(false);
+    const [practitionersError, setPractitionersError] = React.useState<string | null>(null);
+
+    const authUuidSet = React.useMemo(() => {
+        const uuids = authUsers
+            .map((user) => (typeof user?.id === 'string' ? user.id : null))
+            .filter((value): value is string => Boolean(value));
+        return new Set(uuids);
+    }, [authUsers]);
+
+    const matchedPractitioners = React.useMemo(() => {
+        return practitioners.filter((record) => {
+            const practitionerId = typeof record?.practitioner_id === 'string' ? record.practitioner_id : '';
+            return practitionerId ? authUuidSet.has(practitionerId) : false;
+        }).length;
+    }, [authUuidSet, practitioners]);
+
+    const unmatchedPractitioners = practitioners.length - matchedPractitioners;
+
+    const loadPractitioners = React.useCallback(async () => {
+        setPractitionersLoading(true);
+        setPractitionersError(null);
+
+        try {
+            const res = await fetch('/api/practitioners', {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                },
+            });
+
+            const json = await res.json().catch(() => null);
+            if (!res.ok) {
+                const message = typeof json?.message === 'string'
+                    ? json.message
+                    : `Failed to fetch practitioners (${res.status})`;
+                throw new Error(message);
+            }
+
+            const data = Array.isArray(json?.data) ? json.data : [];
+            setPractitioners(data as T_PractitionerRecord[]);
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : String(e);
+            setPractitionersError(msg || 'Failed to fetch practitioners');
+        } finally {
+            setPractitionersLoading(false);
+        }
+    }, []);
 
     React.useEffect(() => {
         if (!supabase?.initted) {
             dispatch(initSupabase());
         }
     }, [dispatch, supabase?.initted]);
+
+    React.useEffect(() => {
+        loadPractitioners();
+    }, [loadPractitioners]);
 
     React.useEffect(() => {
         if (dash && dash.title) {
@@ -69,7 +131,8 @@ export default function Supabase() {
 
     const handleRefresh = React.useCallback(() => {
         dispatch(fetchSupabaseAuthUsers({ page: currentPage, perPage }));
-    }, [currentPage, dispatch, perPage]);
+        loadPractitioners();
+    }, [currentPage, dispatch, loadPractitioners, perPage]);
 
     const handlePageChange = React.useCallback((page: number) => {
         dispatch(fetchSupabaseAuthUsers({ page, perPage }));
@@ -153,22 +216,78 @@ export default function Supabase() {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Email</TableCell>
-                                        <TableCell>Role</TableCell>
-                                        <TableCell>Created</TableCell>
+                                        <TableCell>UUID</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {authUsers.map((user) => (
                                         <TableRow key={user.id || user.email} hover>
                                             <TableCell>{user.email || user.id || 'Unknown'}</TableCell>
-                                            <TableCell>{user.role || 'user'}</TableCell>
-                                            <TableCell>{user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}</TableCell>
+                                            <TableCell>{user.id || 'N/A'}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
                         </Box>
 
+                    </Stack>
+                </Paper>
+
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                    <Stack spacing={1.5}>
+                        <Typography variant="h6">Practitioner records</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Key rule: practitioner_id must equal Supabase Auth uid.
+                        </Typography>
+                        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+                            <Chip size="small" label={`${practitioners.length} practitioners`} />
+                            <Chip size="small" variant="outlined" color="success" label={`${matchedPractitioners} matched`} />
+                            <Chip size="small" variant="outlined" color={unmatchedPractitioners > 0 ? 'warning' : 'default'} label={`${unmatchedPractitioners} unmatched`} />
+                        </Stack>
+
+                        {practitionersError && <Alert severity="error">{practitionersError}</Alert>}
+
+                        <Box sx={{ overflowX: 'auto', maxHeight: 360, overflowY: 'auto' }}>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Practitioner ID</TableCell>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Auth link</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {practitioners.map((record, index) => {
+                                        const practitionerId = typeof record?.practitioner_id === 'string' ? record.practitioner_id : '';
+                                        const isLinked = practitionerId ? authUuidSet.has(practitionerId) : false;
+                                        const name = typeof record?.name === 'string'
+                                            ? record.name
+                                            : (typeof record?.title === 'string' ? record.title : 'N/A');
+
+                                        return (
+                                            <TableRow key={practitionerId || `practitioner-${index}`} hover>
+                                                <TableCell>{practitionerId || 'N/A'}</TableCell>
+                                                <TableCell>{name}</TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        size="small"
+                                                        label={isLinked ? 'matched uid' : 'missing auth user'}
+                                                        color={isLinked ? 'success' : 'warning'}
+                                                        variant="outlined"
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </Box>
+
+                        {practitionersLoading && (
+                            <Typography variant="caption" color="text.secondary">
+                                Loading practitioners...
+                            </Typography>
+                        )}
                     </Stack>
                 </Paper>
             </Stack>

@@ -8,24 +8,24 @@ import {
     Stack,
     Typography,
 } from '@mui/material';
-import { useDispatch } from '../../../Uberedux';
-import { setNXAdmin } from '../../../NXAdmin';
+import { useDispatch } from '../../../../Uberedux';
+import { setNXAdmin } from '../../../../NXAdmin';
 import {
     useDash,
-} from '../../../Leida';
-import { initSupabase } from './actions/initSupabase';
-import { fetchSupabaseSchema } from './actions/fetchSupabaseSchema';
-import { fetchSupabaseRows } from './actions/fetchSupabaseRows';
-import { fetchSupabaseAuthUsers } from './actions/fetchSupabaseAuthUsers';
-import { saveSupabaseRecord } from './actions/saveSupabaseRecord';
-import { deleteSupabaseRecord } from './actions/deleteSupabaseRecord';
-import { setSupabase } from './actions/setSupabase';
-import { useSupabase } from './hooks/useSupabase';
-import type { T_SupabaseTable } from './types';
-import SupabaseSchemaPanel from './components/SupabaseSchemaPanel';
-import SupabaseRowsPanel from './components/SupabaseRowsPanel';
-import SupabaseAuthPanel from './components/SupabaseAuthPanel';
-import SupabaseSettingsPanel from './components/SupabaseSettingsPanel';
+} from '../../../../Leida';
+import { initSupabase } from '../actions/initSupabase';
+import { fetchSupabaseSchema } from '../actions/fetchSupabaseSchema';
+import { fetchSupabaseRows } from '../actions/fetchSupabaseRows';
+import { fetchSupabaseAuthUsers } from '../actions/fetchSupabaseAuthUsers';
+import { saveSupabaseRecord } from '../actions/saveSupabaseRecord';
+import { deleteSupabaseRecord } from '../actions/deleteSupabaseRecord';
+import { setSupabase } from '../actions/setSupabase';
+import { useSupabase } from '../hooks/useSupabase';
+import type { T_SupabaseTable } from '../types';
+import SupabaseSchemaPanel from './SupabaseSchemaPanel';
+import SupabaseRowsPanel from './SupabaseRowsPanel';
+import SupabaseAuthPanel from './SupabaseAuthPanel';
+import SupabaseSettingsPanel from './SupabaseSettingsPanel';
 
 function formatEstimatedRows(value?: number): string {
     if (typeof value !== 'number') return 'N/A';

@@ -5,7 +5,7 @@ import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
 import { FounderDash } from './components/FounderDash';
 import Supabase from './components/Supabase/Supabase';
-import SupabasePostgres from './components/Supabase/SupabasePostgres';
+import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
 
 interface I_PageRouter {
   active: string | null;

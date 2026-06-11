@@ -15,7 +15,7 @@ import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
 import Supabase from './components/Supabase/Supabase';
-import SupabasePostgres from './components/Supabase/SupabasePostgres';
+import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
 import SupabaseDash from './components/Supabase/components/SupabaseDash';
 import { getLeidaContextPrompt, testProduct } from './components/Claude/prompts';
 
