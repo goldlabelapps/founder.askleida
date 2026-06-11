@@ -1,20 +1,7 @@
 'use client';
 import * as React from 'react';
 import {
-    Alert,
-    Box,
-    Button,
-    Chip,
-    Paper,
-    Stack,
-    Table,
     Grid,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    TextField,
-    Typography,
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import { setNXAdmin, useNXAdmin } from '../../../NXAdmin';
@@ -22,6 +9,7 @@ import {
     initDash, 
     useDash,
     DashSurface,
+    PractitionerDash,
 } from '../../../Leida';
 
 
@@ -54,7 +42,7 @@ export default function FounderDash() {
                 <Grid size={{ xs: 12 }}>
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, sm: 8 }}>
-                            Practitioners. new & list
+                            <PractitionerDash />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 4 }}>
                             <DashSurface />

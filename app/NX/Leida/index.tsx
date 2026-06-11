@@ -14,6 +14,7 @@ import Awin from './components/Awin/Awin';
 import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
+import { PractitionerDash, Practitioner, Practitioners } from './components/Practitioners';
 import Supabase from './components/Supabase/Supabase';
 import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
 import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
@@ -50,6 +51,9 @@ export {
 	AwinSearch,
 	Claude,
 	ClaudePopup,
+	PractitionerDash,
+	Practitioner,
+	Practitioners,
 	Supabase,
 	SupabasePostgres,
 	SupabaseUsers,
