@@ -172,6 +172,7 @@ export default function MobileLayout(props: Props) {
                         right: 16,
                         bottom: 16,
                         zIndex: (theme) => theme.zIndex.modal + 1,
+                        
                     }}
                 >
                     <Fab
@@ -180,9 +181,13 @@ export default function MobileLayout(props: Props) {
                         onClick={handleMenuClick}
                         sx={{
                             boxShadow: 0,
+                            backgroundColor: 'background.paper',
+                            '&:hover': {
+                                backgroundColor: 'background.paper',
+                            },
                         }}
                     >
-                        <Icon icon={open ? 'close' : 'menu'} />
+                        <Icon icon={open ? 'close' : 'menu'} color="primary"/>
                     </Fab>
                 </Box>
             )}

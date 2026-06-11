@@ -9,6 +9,7 @@ import {
     initDash, 
     useDash,
     README,
+    DashSurface,
 } from '../../../Leida';
 
 
@@ -29,7 +30,7 @@ export default function FounderDash() {
     React.useEffect(() => {
         if (dash && dash.title) {
             dispatch(setNXAdmin('header', {
-                title: 'Founder Dash',
+                title: 'Dashboard',
                 icon: 'leida',
             }));
         }
@@ -40,10 +41,13 @@ export default function FounderDash() {
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
                     <Grid container spacing={2}>
-                        
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <README />
                         </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <DashSurface />
+                        </Grid>
+
                     </Grid>
                 </Grid>
             </Grid>

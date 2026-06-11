@@ -1,59 +1,38 @@
 "use client";
 import React from 'react';
-import Image from 'next/image';
+import {useRouter} from 'next/navigation';
 import { 
   Typography,
-  Box,
+  Grid,
 } from '@mui/material';
-import { useLeida, useLeidaBus } from '../../Leida';
+import { navigateTo, Icon } from '../../DesignSystem';
+import { useDispatch } from '../../Uberedux';
+import { DashCard } from '../../Leida';
 
 
 const README = () => {
-  const bus = useLeidaBus('/api/supabase') || [];
-  const imgSrc = 'https://live.staticflickr.com/65535/55111661741_6844b1cc48_b.jpg';
-  const OG_WIDTH = 1200;
-  const OG_HEIGHT = 630;
 
-  return (
-    <Box sx={{  }}>
-      {/* <pre>
-        bus: {JSON.stringify(bus, null, 2)}
-      </pre> */}
-      
-      <Box
-        sx={{
-          mb: 2,
-          width: '100%',
-          aspectRatio: `${OG_WIDTH} / ${OG_HEIGHT}`,
-          position: 'relative',
-          overflow: 'hidden',
-          borderRadius: 2,
-        }}
-      >
-        <Image
-          src={imgSrc}
-          alt="NX°"
-          fill
-          sizes="100vw"
-          priority
-          style={{
-            objectFit: 'cover',
-          }}
-        />
-      </Box>
-    </Box>
-  );
+
+  
+  return (<>
+    
+    <Typography component="span" variant="h6" sx={{ mb: 1 }}>
+      <ul>
+        <li>NX° <Icon icon="tick" /></li>
+        <ul>
+          <li>Design System <Icon icon="tick"  /></li>
+        </ul>
+
+        <li>Supabase <Icon icon="tick" /></li>
+        <ul>
+          <li>Authentication <Icon icon="tick" /></li>
+          <li>Postgres Database <Icon icon="tick" /></li>
+        </ul>
+        <li>Anthropic <Icon icon="tick" /></li>
+        <li>Awin <Icon icon="close" color="warning" /></li>
+      </ul>
+    </Typography>
+  </>);
 };
 
 export default README;
-
-/* 
-
-
-
-      <Typography variant="h6" sx={{mb:2}}>
-        Work In Progress
-      </Typography>
-
-
-*/

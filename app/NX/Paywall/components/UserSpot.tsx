@@ -51,7 +51,7 @@ export default function UserSpot({ onClick }: I_UserSpot) {
 
     return (
         <IconButton onClick={onClick} color="primary" >
-            <Icon icon="menu" />
+            <Icon icon="settings" />
         </IconButton>
     );
 }
