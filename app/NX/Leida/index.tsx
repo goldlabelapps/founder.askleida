@@ -12,8 +12,11 @@ import {
 } from './components/FounderDash';
 import Awin from './components/Awin/Awin';
 import Claude from './components/Claude/Claude';
+import ClaudePopup from './components/Claude/components/ClaudePopup';
 import Supabase from './components/Supabase/Supabase';
+import SupabasePostgres from './components/Supabase/SupabasePostgres';
 import SupabaseDash from './components/Supabase/components/SupabaseDash';
+import { getLeidaContextPrompt, testProduct } from './components/Claude/prompts';
 
 // Hooks
 import { useLeida, useLeidaBus } from './hooks/useLeida';
@@ -43,8 +46,12 @@ export {
 	DashSurface,
 	Awin,
 	Claude,
+	ClaudePopup,
 	Supabase,
+	SupabasePostgres,
 	SupabaseDash,
+	getLeidaContextPrompt,
+	testProduct,
 	// Hooks
 	useLeida,
 	useLeidaBus,

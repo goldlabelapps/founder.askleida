@@ -51,6 +51,10 @@ export type T_SupabaseSchemaData = {
         available?: boolean;
         user_count?: number;
         latest_signup?: string | null;
+        page?: number;
+        perPage?: number;
+        total?: number;
+        users?: T_SupabaseAuthUser[];
         error?: string;
     };
 };
@@ -92,6 +96,6 @@ export const EMPTY_SUPABASE_STATE: T_SupabaseState = {
     authError: null,
     authUsers: [],
     authPage: 1,
-    authPerPage: 25,
+    authPerPage: 10,
     authTotal: 0,
 };

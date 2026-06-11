@@ -20,6 +20,10 @@ export const fetchSupabaseSchema = (): any =>
 
             await dispatch(setSupabase('schema', data));
             await dispatch(setSupabase('activeTable', activeTableExists ? existingActiveTable : (writableTables[0]?.table_name || availableTables[0]?.table_name || null)));
+            await dispatch(setSupabase('authUsers', Array.isArray(data?.auth?.users) ? data.auth.users : []));
+            await dispatch(setSupabase('authPage', typeof data?.auth?.page === 'number' ? data.auth.page : 1));
+            await dispatch(setSupabase('authPerPage', typeof data?.auth?.perPage === 'number' ? data.auth.perPage : 10));
+            await dispatch(setSupabase('authTotal', typeof data?.auth?.total === 'number' ? data.auth.total : 0));
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);
             await dispatch(setSupabase('schemaError', msg));

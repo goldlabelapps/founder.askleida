@@ -6,6 +6,7 @@ import {
   Claude,
   FounderDash,
   Supabase,
+  SupabasePostgres,
 } from '../../Leida';
 
 export const NAV_ROUTES = new Set([
@@ -13,6 +14,7 @@ export const NAV_ROUTES = new Set([
   'practitioners',
   'products',
   'supabase',
+  'supabase/postgres',
   'awin',
   'claude',
 ]);
@@ -26,6 +28,9 @@ export const sanitizePath = (value: string) => {
 export const getActiveFromPathname = (pathname: string) => {
   const normalized = sanitizePath(pathname);
   if (normalized === '/') return null;
+  if (normalized === '/supabase/postgres' || normalized.startsWith('/supabase/postgres/')) {
+    return 'supabase/postgres';
+  }
   const [segment] = normalized.slice(1).split('/');
   if (!segment) return null;
   try {
@@ -41,13 +46,14 @@ interface I_PageRouter {
 }
 
 export default function PageRouter({ active }: I_PageRouter) {
-  // const pathname = usePathname() || '/';
-  // const segments = pathname.split('/').filter(Boolean);
+  const pathname = usePathname() || '/';
+  const normalizedPath = sanitizePath(pathname);
+  const isSupabasePostgres = normalizedPath === '/supabase/postgres' || normalizedPath.startsWith('/supabase/postgres/');
     
   if (!active) return <FounderDash />;
     switch (active) {
       case 'supabase':
-        return <Supabase />;
+        return isSupabasePostgres ? <SupabasePostgres /> : <Supabase />;
       case 'awin':
         return <Awin />;
       case 'claude':

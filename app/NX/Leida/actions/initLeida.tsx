@@ -8,6 +8,9 @@ export const initLeida = (): any =>
         try {
             console.log('Initializing Leida...');
             const leida = getState()?.redux?.leida || {};
+            if (typeof leida?.claudePopupOpen !== 'boolean') {
+                await dispatch(setLeida('claudePopupOpen', false));
+            }
             if (!leida.initted) {
                 await dispatch(setLeida('initted', true));
                 await dispatch(initSupabase());

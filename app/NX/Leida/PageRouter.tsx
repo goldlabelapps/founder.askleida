@@ -4,6 +4,7 @@ import Awin from './components/Awin/Awin';
 import Claude from './components/Claude/Claude';
 import { FounderDash } from './components/FounderDash';
 import Supabase from './components/Supabase/Supabase';
+import SupabasePostgres from './components/Supabase/SupabasePostgres';
 
 interface I_PageRouter {
   active: string | null;
@@ -14,6 +15,8 @@ export function PageRouter({ active }: I_PageRouter) {
   switch (active) {
     case 'supabase':
       return <Supabase />;
+    case 'supabase/postgres':
+      return <SupabasePostgres />;
     case 'awin':
       return <Awin />;
     case 'claude':

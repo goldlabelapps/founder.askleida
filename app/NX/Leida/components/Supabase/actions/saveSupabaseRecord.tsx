@@ -48,7 +48,7 @@ export const saveSupabaseRecord = (args: T_SaveSupabaseRecordArgs): any =>
                 const supabase = getState()?.redux?.leida?.supabase || {};
                 await dispatch(fetchSupabaseAuthUsers({
                     page: typeof supabase?.authPage === 'number' ? supabase.authPage : 1,
-                    perPage: typeof supabase?.authPerPage === 'number' ? supabase.authPerPage : 25,
+                    perPage: typeof supabase?.authPerPage === 'number' ? supabase.authPerPage : 10,
                 }));
                 await dispatch(fetchSupabaseSchema());
                 return;
