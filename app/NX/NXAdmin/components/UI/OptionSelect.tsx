@@ -17,6 +17,7 @@ export default function OptionSelect({
     label,
     options,
     value,
+    variant = 'standard',
     field,
     collection,
     onChange,
@@ -25,6 +26,7 @@ export default function OptionSelect({
     label: string;
     options: any[];
     value?: string | number;
+    variant?: 'standard' | 'outlined' | 'filled';
     field?: string;
     collection?: string;
     onChange?: (newValue: string) => void;
@@ -41,9 +43,10 @@ export default function OptionSelect({
     };
     
     return (
-        <FormControl margin="normal" variant="outlined">
+        <FormControl margin="normal" variant={variant} fullWidth>
             <InputLabel>{label}</InputLabel>
             <Select
+                variant={variant}
                 label={label}
                 value={value ?? ''}
                 onChange={e => onChange && onChange(String(e.target.value))}
