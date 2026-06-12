@@ -14,7 +14,7 @@ import {
 	saveSupabaseRecord,
 	useSupabase,
 } from '../../../../Leida';
-import { Editable } from '../../../../NXAdmin';
+import { Editable, setNXAdmin } from '../../../../NXAdmin';
 
 const PRACTITIONERS_TABLE = 'practitioners';
 
@@ -38,6 +38,13 @@ const PractitionerNew = () => {
 		}
 	}, [dispatch, supabase?.initted]);
 
+	React.useEffect(() => {
+		dispatch(setNXAdmin('header', {
+			title: 'New Practitioner',
+			icon: 'practitioner',
+		}));
+	}, [dispatch]);
+		
 	const handleCreatePractitioner = React.useCallback(async () => {
 		setCreateError(null);
 		setCreateSuccess(null);
