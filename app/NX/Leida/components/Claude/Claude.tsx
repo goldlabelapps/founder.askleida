@@ -122,7 +122,7 @@ export default function Claude() {
                     </Typography>
 
                     <ClaudePromptAccordion
-                        title="Actual prompt"
+                        title="What we send"
                         content={getLeidaContextPrompt(prompt)}
                     />
 

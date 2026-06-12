@@ -28,7 +28,6 @@ const Practitioners = () => {
 	}, [dispatch]);
 
 	return <>
-		<PractitionerNew />
 		<PractitionerDash />
 	</>;
 };
