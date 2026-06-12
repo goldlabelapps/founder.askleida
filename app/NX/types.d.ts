@@ -465,6 +465,8 @@ export type I_Icon = {
         | 'supabase'
         | 'awin'
         | 'claude'
+        | 'practitioner'
+        | 'practitioner-add'
         | 'bouncer';
     color?: any;
 };

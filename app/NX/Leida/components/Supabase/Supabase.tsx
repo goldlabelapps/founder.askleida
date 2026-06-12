@@ -1,17 +1,15 @@
 'use client';
 import * as React from 'react';
 import {
-    AppBar,
     Box,
     Button,
-    Stack,
-    Toolbar,
+    Grid,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { Icon, navigateTo } from '../../../DesignSystem';
 import { useDispatch } from '../../../Uberedux';
 import { setNXAdmin } from '../../../NXAdmin';
-import { useDash } from '../../../Leida';
+import { useDash, DashCard } from '../../../Leida';
 
 export default function Supabase() {
     const dispatch = useDispatch();
@@ -19,40 +17,42 @@ export default function Supabase() {
     const dash = useDash();
 
     React.useEffect(() => {
-        if (dash && dash.title) {
-            dispatch(setNXAdmin('header', {
-                title: 'Supabase',
-                icon: 'supabase',
-            }));
-        }
+        dispatch(setNXAdmin('header', {
+            title: 'Supabase',
+            icon: 'supabase',
+        }));
     }, [dispatch, dash?.title]);
 
-    const handleGoToUsers = React.useCallback(() => {
-        dispatch(navigateTo(router, '/supabase/users'));
-    }, [dispatch, router]);
+    const handleCardClick = (route: string) => {
+        dispatch(navigateTo(router, route));
+    };
 
-    const handleGoToPostgres = React.useCallback(() => {
-        dispatch(navigateTo(router, '/supabase/postgres'));
-    }, [dispatch, router]);
+    return (<>
 
-    return (
-        <Box sx={{ p: 2 }} gap={2} display="flex" flexDirection="column">
-            <Button
-                fullWidth
-                variant="contained"
-                endIcon={<Icon icon="right" />}
-                onClick={handleGoToUsers}
-            >
-                Users
-            </Button>
-            <Button
-                fullWidth
-                variant="contained"
-                endIcon={<Icon icon="right" />}
-                onClick={handleGoToPostgres}
-            >
-                Postgres
-            </Button>
-        </Box>
+        <Grid container spacing={2} alignItems="stretch">
+            <Grid size={{ xs: 12, md: 4 }}>
+                <DashCard
+                    title="Authentication"
+                    icon={'supabase'}
+                    cta={() => handleCardClick('/supabase/users')}
+                />
+            </Grid>
+            <Grid size={{ xs: 12, md: 4 }}>
+                <DashCard
+                    title="Postgres"
+                    icon={'supabase'}
+                    cta={() => handleCardClick('/supabase/postgres')}
+                />
+            </Grid>
+            <Grid size={{ xs: 12, md: 4 }}>
+                <DashCard
+                    title="Storage"
+                    icon={'supabase'}
+                    cta={() => handleCardClick('/supabase/storage')}
+                />
+            </Grid>
+        </Grid>
+
+    </>
     );
 }

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Box,
+  Divider,
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import { logout } from '../../../Paywall';
@@ -63,6 +64,12 @@ export default function DashNav({
       activeRoutes: ['/'],
     },
     {
+      label: 'Practitioners',
+      icon: 'practitioner',
+      route: '/practitioners',
+      activeRoutes: ['/practitioners'],
+    },
+    {
       label: 'Supabase',
       icon: 'supabase',
       route: '/supabase',
@@ -104,58 +111,7 @@ export default function DashNav({
                 route: item.route,
               }}
             />
-            {item.route === '/supabase' && (
-              <>
-                <MiniListItem
-                  open={open}
-                  selected={isRouteActive(['/supabase/users'])}
-                  onClick={navigateToRoute}
-                  options={{
-                    label: 'Users',
-                    route: '/supabase/users',
-                    nested: true,
-                  }}
-                />
-                <MiniListItem
-                  open={open}
-                  selected={isRouteActive(['/supabase/postgres'])}
-                  onClick={navigateToRoute}
-                  options={{
-                    label: 'Postgres',
-                    route: '/supabase/postgres',
-                    nested: true,
-                  }}
-                />
-              </>
-            )}
-            {item.route === '/' && (
-              <>
-                <MiniListItem
-                  open={open}
-                  selected={isRouteActive(['/practitioners'])}
-                  onClick={navigateToRoute}
-                  options={{
-                    label: 'Practitioners',
-                    route: '/practitioners',
-                    nested: true,
-                  }}
-                />
-              </>
-            )}
-            {item.route === '/awin' && (
-              <>
-                <MiniListItem
-                  open={open}
-                  selected={isRouteActive(['/awin/search'])}
-                  onClick={navigateToRoute}
-                  options={{
-                    label: 'Search',
-                    route: '/awin/search',
-                    nested: true,
-                  }}
-                />
-              </>
-            )}
+            <Divider />
           </React.Fragment>
         ))}
     {/*

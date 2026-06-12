@@ -28,6 +28,28 @@ export async function DELETE(req: Request) {
     return NextResponse.json(res, { status: 400 });
   }
 
+  // Get the practitioner record to find associated auth user
+  const { data: practitionerData, error: fetchError } = await supabase
+    .from('practitioners')
+    .select('*')
+    .eq('practitioner_id', practitioner_id)
+    .single();
+
+  if (fetchError || !practitionerData) {
+    const res = makeRes({ tenant, message: 'Practitioner not found', severity: 'error' });
+    return NextResponse.json(res, { status: 404 });
+  }
+
+  // Delete the Supabase auth user if available
+  if (practitionerData.practitioner_id) {
+    const { error: authError } = await supabase.auth.admin.deleteUser(practitioner_id);
+    // Note: We don't fail if auth user deletion fails, as the user may not exist in auth
+    if (authError && authError.message !== 'User not found') {
+      console.error('Error deleting auth user:', authError);
+    }
+  }
+
+  // Delete the practitioner record from Postgres
   const { data, error } = await supabase
     .from('practitioners')
     .delete()
