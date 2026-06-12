@@ -58,7 +58,7 @@ export default function AvatarUpload({
             formData.append('file', file);
             formData.append('practitioner_id', practitionerId);
 
-            const res = await fetch('/api/practitioner/avatar', {
+            const res = await fetch('/api/practitioners/avatar', {
                 method: 'POST',
                 body: formData,
             });
@@ -66,7 +66,7 @@ export default function AvatarUpload({
             const json = await res.json();
 
             if (!res.ok) {
-                setError(json?.meta?.message || 'Upload failed.');
+                setError(json?.message || 'Upload failed.');
             } else {
                 const avatarUrl = json?.data?.avatar_url as string;
                 setPreview(avatarUrl);

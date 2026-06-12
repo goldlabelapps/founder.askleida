@@ -4,28 +4,18 @@ import {
 	Alert,
 	Box,
 	Button,
-	Paper,
-	Stack,
-	TextField,
-	Typography,
 } from '@mui/material';
 import { Icon } from '../../../../DesignSystem';
 import { useDispatch } from '../../../../Uberedux';
-import { initSupabase } from '../../Supabase/actions/initSupabase';
-import { fetchSupabaseRows } from '../../Supabase/actions/fetchSupabaseRows';
-import { saveSupabaseRecord } from '../../Supabase/actions/saveSupabaseRecord';
-import { useSupabase } from '../../Supabase/hooks/useSupabase';
+import {
+	initSupabase,
+	fetchSupabaseRows,
+	saveSupabaseRecord,
+	useSupabase,
+} from '../../../../Leida';
+import { Editable } from '../../../../NXAdmin';
 
 const PRACTITIONERS_TABLE = 'practitioners';
-
-type T_PractitionerRecord = {
-	practitioner_id?: string;
-	name?: string;
-	title?: string;
-	updated?: string;
-	created?: string;
-	[key: string]: any;
-};
 
 const PractitionerNew = () => {
 	const dispatch = useDispatch();
@@ -34,6 +24,11 @@ const PractitionerNew = () => {
 	const [createLoading, setCreateLoading] = React.useState(false);
 	const [createError, setCreateError] = React.useState<string | null>(null);
 	const [createSuccess, setCreateSuccess] = React.useState<string | null>(null);
+	const [emailFocusKey, setEmailFocusKey] = React.useState(0);
+
+	const focusEmailField = React.useCallback(() => {
+		setEmailFocusKey((value) => value + 1);
+	}, []);
 
 	React.useEffect(() => {
 		if (!supabase?.initted) {
@@ -48,6 +43,7 @@ const PractitionerNew = () => {
 		const email = inviteEmail.trim().toLowerCase();
 		if (!email) {
 			setCreateError('A practitioner must have an email');
+			focusEmailField();
 			return;
 		}
 
@@ -64,46 +60,41 @@ const PractitionerNew = () => {
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : String(e);
 			setCreateError(msg || 'Failed to create practitioner');
+			focusEmailField();
 		} finally {
 			setCreateLoading(false);
 		}
-	}, [dispatch, inviteEmail]);
+	}, [dispatch, focusEmailField, inviteEmail]);
 
 	return (
-		<Box sx={{ p: 2 }}>
-			<Stack spacing={2}>
-				<Paper variant="outlined" sx={{ p: 2 }}>
-					<Stack spacing={1.5}>
-						<Typography variant="body1" sx={{ flexShrink: 0 }}>
-							Create practitioner. They receive an email link to set password and activate their account
-						</Typography>
-						<Box sx={{ my: 1 }}>
-							{createError && <Alert severity="warning">{createError}</Alert>}
-							{createSuccess && <Alert severity="info">{createSuccess}</Alert>}
-						</Box>
-						<Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-							<TextField
-								label="Email"
-								type="email"
-								value={inviteEmail}
-								onChange={(event) => setInviteEmail(event.target.value)}
-								disabled={createLoading}
-							/>
-							<Button
-								variant="outlined"
-								endIcon={<Icon icon="add" />}
-								onClick={handleCreatePractitioner}
-								disabled={createLoading}
-								size="large"
-							>
-								{createLoading ? 'Creating...' : 'Create'}
-							</Button>
-						</Stack>
-					</Stack>
-				</Paper>
+		<Box sx={{  mx: 2 }}>
 
-				
-			</Stack>
+			{createError || createSuccess ? (
+				<Box sx={{ mb: 2 }}>
+					{createError && <Alert severity="error">{createError}</Alert>}
+					{createSuccess && <Alert severity="success">{createSuccess}</Alert>}
+				</Box>
+			) : null}
+
+			<Editable
+				key={`invite-email-${emailFocusKey}`}
+				label="Email"
+				variant="standard"
+				value={inviteEmail}
+				onChange={setInviteEmail}
+				disabled={createLoading}
+				autoFocus
+				placeholder="name@example.com"
+			/>
+			<Button
+				sx={{my: 3}}
+				variant="contained"
+				endIcon={<Icon icon="practitioner-add" />}
+				onClick={handleCreatePractitioner}
+				disabled={createLoading}
+			>
+				{createLoading ? 'Adding...' : 'Add Practitioner'}
+			</Button>
 		</Box>
 	);
 };

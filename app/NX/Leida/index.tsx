@@ -10,6 +10,7 @@ import {
 	DashCard,
 	DashSurface,
 } from './components/FounderDash';
+import DashAuth from './components/FounderDash/components/DashAuth';
 import Awin from './components/Awin/Awin';
 import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
@@ -33,11 +34,15 @@ import { setLeida } from './actions/setLeida';
 import { deletePractitioner } from './actions/deletePractitioner';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
+import { initSupabase } from './components/Supabase/actions/initSupabase';
+import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRows';
+import { saveSupabaseRecord } from './components/Supabase/actions/saveSupabaseRecord';
 import { initAwin } from './components/Awin/actions/initAwin';
 import { setAwin } from './components/Awin/actions/setAwin';
 import { initClaude } from './components/Claude/actions/initClaude';
 import { setClaude } from './components/Claude/actions/setClaude';
 import { submitClaudePrompt } from './components/Claude/actions/submitClaudePrompt';
+import { useSupabase } from './components/Supabase/hooks/useSupabase';
 
 // Lib
 import { normalizeLeidaRouteKey } from './lib/normalizeLeidaRouteKey';
@@ -48,6 +53,7 @@ export {
 	DashNav,
 	README,
 	FounderDash,
+	DashAuth,
 	DashCard,
 	DashSurface,
 	Awin,
@@ -71,15 +77,19 @@ export {
 	useAwin,
 	useClaude,
 	useDash,
+	useSupabase,
 	// Actions
 	initLeida,
 	initDash,
+	initSupabase,
 	initAwin,
 	initClaude,
 	fetchLeida,
+	fetchSupabaseRows,
 	setLeida,
 	setAwin,
 	setClaude,
+	saveSupabaseRecord,
 	submitClaudePrompt,
 	deletePractitioner,
 	updateAvatar,

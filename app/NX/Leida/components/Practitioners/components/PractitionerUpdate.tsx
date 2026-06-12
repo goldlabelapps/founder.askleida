@@ -3,11 +3,13 @@ import * as React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
 	Paper, 
+	Grid,
 	Stack,
 	LinearProgress,
 	Typography,
 	Button,
 	IconButton,
+	Box,
 } from '@mui/material';
 import { useDispatch } from '../../../../Uberedux';
 import { Icon, ConfirmAction } from '../../../../DesignSystem';
@@ -16,7 +18,7 @@ import {
 	useLeidaBus,
 	deletePractitioner,
 } from '../../../../Leida';
-import { setNXAdmin, Editable } from '../../../../NXAdmin';
+import { setNXAdmin, Editable, AvatarUpload } from '../../../../NXAdmin';
 
 const PractitionerUpdate = () => {
 
@@ -26,11 +28,15 @@ const PractitionerUpdate = () => {
 	const route = uuid ? `practitioners/${uuid}` : '';
 	const { loading, error, data } = useLeidaBus(route);
 	const practitioner = data?.[0]?.data;
+	const currentAvatar = typeof practitioner?.avatar === 'string' ? practitioner.avatar : undefined;
 	const currentDisplayName = typeof practitioner?.display_name === 'string' ? practitioner.display_name : '';
 	const [displayName, setDisplayName] = React.useState(currentDisplayName);
+	const [avatarChanged, setAvatarChanged] = React.useState(false);
 	const [savingDisplayName, setSavingDisplayName] = React.useState(false);
 	const [displayNameError, setDisplayNameError] = React.useState<string | null>(null);
 	const [confirmOpen, setConfirmOpen] = React.useState(false);
+	const hasDisplayNameChanges = displayName.trim() !== currentDisplayName;
+	const canSave = hasDisplayNameChanges || avatarChanged;
 
 	React.useEffect(() => {
 		setDisplayName(currentDisplayName);
@@ -63,6 +69,12 @@ const PractitionerUpdate = () => {
 
 	const handleSaveDisplayName = async () => {
 		if (!uuid) return;
+		if (!canSave) return;
+
+		if (!hasDisplayNameChanges && avatarChanged) {
+			setAvatarChanged(false);
+			return;
+		}
 
 		setDisplayNameError(null);
 		setSavingDisplayName(true);
@@ -94,12 +106,18 @@ const PractitionerUpdate = () => {
 			}
 
 			dispatch(fetchLeida(route));
+			setAvatarChanged(false);
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : String(e);
 			setDisplayNameError(msg);
 		} finally {
 			setSavingDisplayName(false);
 		}
+	};
+
+	const handleAvatarSuccess = () => {
+		setAvatarChanged(true);
+		dispatch(fetchLeida(route));
 	};
 
 
@@ -151,22 +169,50 @@ const PractitionerUpdate = () => {
 						{error && <Typography variant="body2" color="error">Error: {error}</Typography>}
 						{!loading && !error && (
 							<>
-								<Editable
-									label="Name"
-									value={displayName}
-									variant="standard"
-									onChange={setDisplayName}
-								/>
-								<Button
-									variant="contained"
-									startIcon={<Icon icon="save" />}
-									color="primary"
-									sx={{my: 2}}
-									onClick={handleSaveDisplayName}
-									disabled={savingDisplayName || displayName.trim() === currentDisplayName}
-								>
-									{savingDisplayName ? 'Saving...' : 'Save'}
-								</Button>
+							<Grid container spacing={2} alignItems="center">
+								<Grid size={{
+									xs: 12,
+									sm: 6,
+								}}>
+									<AvatarUpload
+										practitionerId={uuid}
+										currentAvatar={currentAvatar}
+										displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
+										onSuccess={handleAvatarSuccess}
+									/>
+								</Grid>
+								<Grid size={{
+									xs: 12,
+									sm: 6,
+								}}>
+									<Editable
+										label="Name"
+										value={displayName}
+										variant="standard"
+										onChange={setDisplayName}
+									/>
+								</Grid>
+								<Grid size={{
+									xs: 12,
+								}}>
+									<Box sx={{
+										display: 'flex',
+										justifyContent: 'flex-end',
+									}}>
+										<Button
+											variant="contained"
+											startIcon={<Icon icon="save" />}
+											color="primary"
+											sx={{ my: 2 }}
+											onClick={handleSaveDisplayName}
+											disabled={savingDisplayName || !canSave}
+										>
+											{savingDisplayName ? 'Saving...' : 'Save'}
+										</Button>
+									</Box>
+								</Grid>
+							</Grid>
+								
 								{displayNameError ? (
 									<Typography variant="body2" color="error">{displayNameError}</Typography>
 								) : null}
