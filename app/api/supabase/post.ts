@@ -116,6 +116,28 @@ export async function POST(req: Request) {
                 return NextResponse.json(res, { status: 400 });
             }
 
+            const shouldInvite = body.send_invite === true;
+            if (shouldInvite) {
+                const redirectTo = typeof body.redirectTo === 'string' && body.redirectTo.trim()
+                    ? body.redirectTo.trim()
+                    : makeInviteRedirectUrl(process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || undefined);
+
+                const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
+                    data: normalizeOptionalObject(body.user_metadata, 'user_metadata') || {},
+                    ...(redirectTo ? { redirectTo } : {}),
+                });
+
+                if (error) {
+                    const message = error.message || 'Failed to invite user';
+                    const isDuplicate = /already|exists|registered|taken/i.test(message);
+                    const res = makeRes({ message, severity: 'error', data: null });
+                    return NextResponse.json(res, { status: isDuplicate ? 409 : 500 });
+                }
+
+                const res = makeRes({ message: `Invited auth user ${email}`, severity: 'success', data: data?.user || null });
+                return NextResponse.json(res);
+            }
+
             const { data, error } = await supabase.auth.admin.createUser({
                 email,
                 password: typeof body.password === 'string' && body.password.trim() ? body.password : undefined,

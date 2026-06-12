@@ -41,38 +41,6 @@ export default function DashAuth({ onClick }: I_UserSpot) {
         .map((part: string) => part.charAt(0).toUpperCase())
         .join('');
 
-    // Not used right now: disabling these prevents 404s against missing
-    // Supabase `accounts` and `avatars` tables.
-    // React.useEffect(() => {
-    //     if (!uid) {
-    //         attemptedAccountUIDRef.current = null;
-    //         return;
-    //     }
-    //
-    //     if (account) {
-    //         attemptedAccountUIDRef.current = uid;
-    //         return;
-    //     }
-    //
-    //     if (accountSubscribing) return;
-    //
-    //     if (attemptedAccountUIDRef.current === uid) return;
-    //
-    //     attemptedAccountUIDRef.current = uid;
-    //
-    //     if (uid && !account && !accountSubscribing) {
-    //         dispatch(setPaywall('accountSubscribing', true));
-    //         dispatch(subscribeAccount());
-    //     }
-    // }, [uid, account, accountSubscribing, dispatch]);
-    //
-    // React.useEffect(() => {
-    //     if (uid && !avatarsFetching) {
-    //         dispatch(setPaywall('avatarsFetching', true));
-    //         dispatch(avatarsByUID());
-    //     }
-    // }, [uid, avatarsFetching, dispatch]);
-
     if (!uid) return null;
 
     return (
@@ -80,9 +48,8 @@ export default function DashAuth({ onClick }: I_UserSpot) {
             <Avatar
                 src={avatarUrl || undefined}
                 alt={displayName}
-                sx={{ width: 32, height: 32 }}
             >
-                {initials || 'U'}
+                {initials || 'L'}
             </Avatar>
         </IconButton>
     );

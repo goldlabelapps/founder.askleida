@@ -97,16 +97,24 @@ const PractitionerCard = ({
 			<Paper variant="outlined" sx={{ p: 1.5, width: '100%' }}>
 				<Stack direction="row" spacing={1.5} alignItems="center">
 					<Avatar src={avatar || 'https://app.askleida.com/shared/svg/guest.svg'} alt={displayName} />
-					<Stack spacing={0.25}>
-						<Typography variant="subtitle2">{displayName}</Typography>
-						<Typography variant="body2" color="text.secondary">{email || 'No email'}</Typography>
+					<Stack>
+						<Typography variant="subtitle2">
+							{displayName}
+						</Typography>
+						
+						<Typography variant="body2">
+							{email || 'No email'}
+						</Typography>
+
+						{accessLevelLabel ? (
+							<Chip
+								size="small"
+								variant="outlined"
+								label={`${accessLevelLabel}`} />
+						) : null}
+
 					</Stack>
-					{accessLevelLabel ? (
-						<Chip
-							size="small"
-							variant="outlined"
-							label={`${accessLevelLabel}`} />
-					) : null}
+					
 				</Stack>
 			</Paper>
 		</ButtonBase>

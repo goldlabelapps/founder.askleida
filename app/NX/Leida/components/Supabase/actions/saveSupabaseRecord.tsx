@@ -73,6 +73,7 @@ export const saveSupabaseRecord = (args: T_SaveSupabaseRecordArgs): any =>
                         email: args.email,
                         password: args.password,
                         phone: args.phone,
+                        send_invite: !args.userId,
                         email_confirm: args.email_confirm,
                         user_metadata: args.user_metadata,
                         app_metadata: args.app_metadata,

@@ -64,6 +64,12 @@ export default function DashNav({
       activeRoutes: ['/'],
     },
     {
+      label: 'Add Practitioner',
+      icon: 'practitioner-add',
+      route: '/practitioners/new',
+      activeRoutes: ['/practitioners/new'],
+    },
+    {
       label: 'Practitioners',
       icon: 'practitioner',
       route: '/practitioners',
@@ -114,27 +120,7 @@ export default function DashNav({
             <Divider />
           </React.Fragment>
         ))}
-    {/*
-        <MiniListItem
-          open={open}
-          onClick={navigateToRoute}
-          options={{
-            label: 'Awin',
-            icon: 'awin',
-            route: '/awin',
-          }}
-        />
 
-        
-        <MiniListItem
-          open={open}
-          onClick={navigateToRoute}
-          options={{
-            label: 'Claude',
-            icon: 'claude',
-            route: '/claude',
-          }}
-        /> */}
         <Box sx={{ height: 50 }} />
 
         <ConfirmAction
