@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import {useRouter} from 'next/navigation';
 import {
     Alert,
     Box,
@@ -17,6 +18,7 @@ import {
 } from '@mui/material';
 import { Icon } from '../../../../DesignSystem';
 import { useDispatch } from '../../../../Uberedux';
+import { navigateTo } from '../../../../DesignSystem';
 import { setNXAdmin } from '../../../../NXAdmin';
 import { useDash } from '../../../../Leida';
 import { initSupabase } from '../actions/initSupabase';
@@ -38,6 +40,7 @@ export default function SupabaseUsers() {
     const dispatch = useDispatch();
     const dash = useDash();
     const supabase = useSupabase();
+    const router = useRouter();
 
     const currentPage = typeof supabase?.authPage === 'number' && supabase.authPage > 0 ? supabase.authPage : 1;
     const perPage = typeof supabase?.authPerPage === 'number' && supabase.authPerPage > 0 ? supabase.authPerPage : 10;
@@ -155,49 +158,67 @@ export default function SupabaseUsers() {
     return (
         <Box sx={{ p: 2 }}>
 
-
-            <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
-
-
-                <Typography variant="body1" sx={{ flexShrink: 0 }}>
-                    Create a Supabase Auth invite. User receives an email to set password and activate their account.
-                </Typography>
-                <Box sx={{
-                    my: 2
-                }}>
-                    {createError && <Alert severity="error">{createError}</Alert>}
-                    {createSuccess && <Alert severity="success">{createSuccess}</Alert>}
-                </Box>
-
-                <TextField
-                    size="small"
-                    label="Email"
-                    type="email"
-                    value={inviteEmail}
-                    onChange={(event) => setInviteEmail(event.target.value)}
-                    disabled={createLoading}
-                />
-                <Button
-                    variant="outlined"
-                    endIcon={<Icon icon="new" />}
-                    onClick={handleCreatePractitioner}
-                    disabled={createLoading}
-                    size="large"
-                >
-                    {createLoading ? 'Creating...' : 'Create Practitioner'}
-                </Button>
-            </Paper>
-
-
             <Stack spacing={2}>
+
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                    <Stack spacing={1.5}>
+                        <Typography variant="h6">Practitioner table</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Key rule: practitioner_id must equal Supabase Auth uid.
+                        </Typography>
+                        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+                            <Chip size="small" label={`${practitioners.length} practitioners`} />
+                            <Chip size="small" variant="outlined" color="success" label={`${matchedPractitioners} matched`} />
+                            <Chip size="small" variant="outlined" color={unmatchedPractitioners > 0 ? 'warning' : 'default'} label={`${unmatchedPractitioners} unmatched`} />
+                        </Stack>
+
+                        {practitionersError && <Alert severity="error">{practitionersError}</Alert>}
+
+                        <Box sx={{ overflowX: 'auto', maxHeight: 360, overflowY: 'auto' }}>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>practitioner_id</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {practitioners.map((record, index) => {
+                                        const practitionerId = typeof record?.practitioner_id === 'string' ? record.practitioner_id : '';
+                                        const isLinked = practitionerId ? authUuidSet.has(practitionerId) : false;
+                                        const name = typeof record?.name === 'string'
+                                            ? record.name
+                                            : (typeof record?.title === 'string' ? record.title : 'N/A');
+                                        return (
+                                            <TableRow
+                                                key={practitionerId || `practitioner-${index}`}
+                                                hover
+                                                onClick={() => {
+                                                    if (practitionerId) dispatch(navigateTo(router, `/practitioners/${practitionerId}`));
+                                                }}
+                                                sx={{ cursor: practitionerId ? 'pointer' : 'default' }}
+                                            >
+                                                <TableCell>{name}</TableCell>
+                                                <TableCell>{practitionerId || 'N/A'}</TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </Box>
+
+                        {practitionersLoading && (
+                            <Typography variant="caption" color="text.secondary">
+                                Loading practitioners...
+                            </Typography>
+                        )}
+                    </Stack>
+                </Paper>
 
                 
                 <Paper variant="outlined" sx={{ p: 2 }}>
                     <Stack spacing={1.5}>
-                        <Typography variant="h6">Supabase users</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Authenticated users list from Supabase Auth.
-                        </Typography>
+                        <Typography variant="h6">Authenticated users list from Supabase Auth.</Typography>
                         <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
                             <Chip size="small" label={`${total} users`} />
                             <Chip size="small" variant="outlined" label={`Page ${currentPage} of ${totalPages}`} />
@@ -252,62 +273,7 @@ export default function SupabaseUsers() {
                     </Stack>
                 </Paper>
 
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                    <Stack spacing={1.5}>
-                        <Typography variant="h6">Practitioner table</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Key rule: practitioner_id must equal Supabase Auth uid.
-                        </Typography>
-                        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
-                            <Chip size="small" label={`${practitioners.length} practitioners`} />
-                            <Chip size="small" variant="outlined" color="success" label={`${matchedPractitioners} matched`} />
-                            <Chip size="small" variant="outlined" color={unmatchedPractitioners > 0 ? 'warning' : 'default'} label={`${unmatchedPractitioners} unmatched`} />
-                        </Stack>
-
-                        {practitionersError && <Alert severity="error">{practitionersError}</Alert>}
-
-                        <Box sx={{ overflowX: 'auto', maxHeight: 360, overflowY: 'auto' }}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>practitioner_id</TableCell>
-                                        <TableCell>Auth link</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {practitioners.map((record, index) => {
-                                        const practitionerId = typeof record?.practitioner_id === 'string' ? record.practitioner_id : '';
-                                        const isLinked = practitionerId ? authUuidSet.has(practitionerId) : false;
-                                        const name = typeof record?.name === 'string'
-                                            ? record.name
-                                            : (typeof record?.title === 'string' ? record.title : 'N/A');
-                                        return (
-                                            <TableRow key={practitionerId || `practitioner-${index}`} hover>
-                                                <TableCell>{name}</TableCell>
-                                                <TableCell>{practitionerId || 'N/A'}</TableCell>
-                                                <TableCell>
-                                                    <Chip
-                                                        size="small"
-                                                        label={isLinked ? 'matched uid' : 'missing auth user'}
-                                                        color={isLinked ? 'success' : 'warning'}
-                                                        variant="outlined"
-                                                    />
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-                                </TableBody>
-                            </Table>
-                        </Box>
-
-                        {practitionersLoading && (
-                            <Typography variant="caption" color="text.secondary">
-                                Loading practitioners...
-                            </Typography>
-                        )}
-                    </Stack>
-                </Paper>
+                
             </Stack>
         </Box>
     );

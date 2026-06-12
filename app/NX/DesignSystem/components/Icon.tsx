@@ -199,7 +199,8 @@ import BellIcon from '@mui/icons-material/Notifications';
 import StopIcon from '@mui/icons-material/Stop';
 import FlagIcon from '@mui/icons-material/Flag';
 import RandomIcon from '@mui/icons-material/Shuffle';
-// magic wand = AutoFixHigh
+import PractitionerIcon from '@mui/icons-material/Face6';
+import PractitionerAddIcon from '@mui/icons-material/FaceRetouchingNatural';
 
 export default function Icon({ icon, color }: I_Icon) {
   if (!color) color = 'inherit';
@@ -212,8 +213,12 @@ export default function Icon({ icon, color }: I_Icon) {
     case 'claude':
       iconFragment = <ClaudeIcon color={color} />;
       break;
-
-
+    case 'practitioner':
+      iconFragment = <PractitionerIcon color={color} />;
+      break;
+    case 'practitioner-add':
+      iconFragment = <PractitionerAddIcon color={color} />;
+      break;
     case 'python':
       iconFragment = <PythonIcon color={color} />;
       break;

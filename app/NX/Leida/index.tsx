@@ -30,6 +30,7 @@ import { useClaude } from './components/Claude/hooks/useClaude';
 import { initLeida } from './actions/initLeida';
 import { fetchLeida } from './actions/fetchLeida';
 import { setLeida } from './actions/setLeida';
+import { deletePractitioner } from './actions/deletePractitioner';
 import { initAwin } from './components/Awin/actions/initAwin';
 import { setAwin } from './components/Awin/actions/setAwin';
 import { initClaude } from './components/Claude/actions/initClaude';
@@ -78,6 +79,7 @@ export {
 	setAwin,
 	setClaude,
 	submitClaudePrompt,
+	deletePractitioner,
 	setDash,
 	// Lib
 	normalizeLeidaRouteKey,

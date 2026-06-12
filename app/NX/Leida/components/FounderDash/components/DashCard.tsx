@@ -10,7 +10,7 @@ import { Icon } from '../../../../DesignSystem'
 
 type I_DashCard = {
 	title: string;
-	description: string;
+	description?: string;
 	icon: string;
 	cta: () => void;
 };
@@ -21,21 +21,25 @@ const DashCard = ({
     icon, 
     cta }: I_DashCard) => {
 	return (
-		<Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+		<Card 
+			variant='outlined' 
+			sx={{ 
+				height: '100%', 
+				display: 'flex', 
+				flexDirection: 'column' 
+			}}>
 			<CardActionArea onClick={cta} sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
 				<CardContent sx={{ flexGrow: 1 }}>
-					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
 							<Icon icon={icon as any} />
 						</Box>
-						<Typography variant="h6" component="h3">
+						<Typography variant="h6">
 							{title}
 						</Typography>
 					</Box>
 
-					<Typography variant="body2" color="text.secondary">
-						{description}
-					</Typography>
+					{description && <Typography variant="body2" color="text.secondary">{description}</Typography>}
 				</CardContent>
 			</CardActionArea>
 		</Card>
