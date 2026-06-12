@@ -221,31 +221,27 @@ const PractitionerUpdate = () => {
 									xs: 12,
 									sm: 6,
 								}}>
-									<Box sx={{ my: 1 }}>
+									<Stack spacing={2}>
 										<Editable
 											label="Name"
 											value={displayName}
 											variant="standard"
 											onChange={setDisplayName}
 										/>
-									</Box>
-									<Box sx={{ my: 1 }}>
 										<Editable
 											label="Clinic"
 											value={clinic}
 											variant="standard"
 											onChange={setClinic}
 										/>
-									</Box>
-											<Box sx={{ my: 1 }}>
-												<OptionSelect
-													label="Access Level"
-													options={ACCESS_LEVEL_OPTIONS}
-													value={accessLevel}
-													onChange={setAccessLevel}
-													disabled={savingDisplayName}
-												/>
-											</Box>
+										<OptionSelect
+											label="Access Level"
+											options={ACCESS_LEVEL_OPTIONS}
+											value={accessLevel}
+											onChange={setAccessLevel}
+											disabled={savingDisplayName}
+										/>
+									</Stack>
 									
 								</Grid>
 

@@ -1,14 +1,19 @@
 'use client';
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
-import Awin from './components/Awin/Awin';
-import AwinSearch from './components/Awin/components/AwinSearch';
-import Claude from './components/Claude/Claude';
-import { FounderDash } from './components/FounderDash';
-import { PractitionerUpdate, Practitioners } from './components/Practitioners';
-import Supabase from './components/Supabase/Supabase';
-import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
-import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
+
+import {
+  Supabase,
+  SupabaseUsers,
+  SupabasePostgres,
+  PractitionerUpdate, 
+  Practitioners,
+  FounderDash,
+  Claude,
+  AwinSearch,
+  Awin,
+  PractitionerNew,
+} from '../Leida';
 
 interface I_PageRouter {
   active: string | null;
@@ -19,8 +24,14 @@ export function PageRouter({ active }: I_PageRouter) {
   const normalizedRoute = (pathname || active || '').trim().replace(/^\/+|\/+$/g, '');
   if (!normalizedRoute) return <FounderDash />;
 
+  if (normalizedRoute === 'practitioners/new') return <PractitionerNew />;
+
   const practitionerDetailMatch = normalizedRoute.match(/^(practitioners|pracitioners|paractitioners)\/([^/]+)$/);
-  if (practitionerDetailMatch) return <PractitionerUpdate />;
+  if (practitionerDetailMatch) {
+    const practitionerId = practitionerDetailMatch[2]?.toLowerCase();
+    if (practitionerId === 'new') return <PractitionerNew />;
+    return <PractitionerUpdate />;
+  }
 
   if (['practitioners', 'pracitioners', 'paractitioners'].includes(normalizedRoute)) return <Practitioners />;
 
