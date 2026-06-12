@@ -46,7 +46,7 @@ export default function OptionSelect({
             <Select
                 label={label}
                 value={value ?? ''}
-                onChange={e => onChange && onChange(e.target.value)}
+                onChange={e => onChange && onChange(String(e.target.value))}
                 disabled={disabled}
             >
                 {options.map((opt, idx) => {
