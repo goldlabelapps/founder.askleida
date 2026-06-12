@@ -33,6 +33,15 @@ export async function POST(req: Request) {
                 return NextResponse.json(res, { status: 400 });
             }
 
+            const rawAccessLevel = body.user_metadata && typeof body.user_metadata === 'object'
+                ? (body.user_metadata as Record<string, unknown>).access_level
+                : undefined;
+            const accessLevel = typeof rawAccessLevel === 'number'
+                ? rawAccessLevel
+                : typeof rawAccessLevel === 'string' && /^[0-5]$/.test(rawAccessLevel.trim())
+                    ? Number(rawAccessLevel.trim())
+                    : undefined;
+
             const defaultRedirect = makeInviteRedirectUrl(
                 process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || undefined,
             );
@@ -68,6 +77,7 @@ export async function POST(req: Request) {
                 
             const placeholderData = {
                 display_name: displayName,
+                ...(typeof accessLevel === 'number' ? { access_level: accessLevel } : {}),
                 onboarding: {
                     status: 'invited',
                     invited_email: email,

@@ -17,12 +17,14 @@ import {
 import { Editable, setNXAdmin } from '../../../../NXAdmin';
 
 const PRACTITIONERS_TABLE = 'practitioners';
+const ACCESS_LEVEL_OPTIONS = ['3', '2', '1'] as const;
 
 const PractitionerNew = () => {
 	const dispatch = useDispatch();
 	const router = useRouter();
 	const supabase = useSupabase();
 	const [inviteEmail, setInviteEmail] = React.useState('');
+	const [accessLevel, setAccessLevel] = React.useState('2');
 	const [createLoading, setCreateLoading] = React.useState(false);
 	const [createError, setCreateError] = React.useState<string | null>(null);
 	const [createSuccess, setCreateSuccess] = React.useState<string | null>(null);
@@ -56,12 +58,21 @@ const PractitionerNew = () => {
 			return;
 		}
 
+		const parsedAccessLevel = Number(accessLevel);
+		if (!Number.isInteger(parsedAccessLevel) || parsedAccessLevel < 0 || parsedAccessLevel > 5) {
+			setCreateError('Access level is required');
+			return;
+		}
+
 		setCreateLoading(true);
 		try {
 			const response = await dispatch(saveSupabaseRecord({
 				resource: 'practitioner-onboard',
 				email,
-				user_metadata: { invited_from: 'leida-supabase-module' },
+				user_metadata: {
+					invited_from: 'leida-supabase-module',
+					access_level: parsedAccessLevel,
+				},
 			}));
 			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
 			
@@ -82,7 +93,7 @@ const PractitionerNew = () => {
 		} finally {
 			setCreateLoading(false);
 		}
-	}, [dispatch, router, focusEmailField, inviteEmail]);
+	}, [accessLevel, dispatch, router, focusEmailField, inviteEmail]);
 
 	return (
 		<Box sx={{  mx: 2 }}>
@@ -103,6 +114,15 @@ const PractitionerNew = () => {
 				disabled={createLoading}
 				autoFocus
 				placeholder="name@example.com"
+			/>
+			<Editable
+				label="Access Level"
+				variant="standard"
+				editableType="select"
+				value={accessLevel}
+				onChange={setAccessLevel}
+				options={ACCESS_LEVEL_OPTIONS}
+				placeholder="Select access level"
 			/>
 			<Button
 				sx={{my: 3}}
