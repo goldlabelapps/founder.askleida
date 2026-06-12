@@ -32,7 +32,7 @@ export function useSupabaseAuthListener(
             isAnonymous: false,
             providerData: [],
             displayName: user.user_metadata?.display_name ?? null,
-            photoURL: user.user_metadata?.avatar_url ?? null,
+            photoURL: user.user_metadata?.avatar_url ?? user.user_metadata?.avatar ?? null,
           }
         : null;
 

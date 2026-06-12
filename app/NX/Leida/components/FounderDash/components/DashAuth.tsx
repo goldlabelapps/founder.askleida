@@ -18,22 +18,29 @@ export default function DashAuth({ onClick }: I_UserSpot) {
     const dispatch = useDispatch();
     const paywall = usePaywall();
     const uid = paywall ? paywall.uid : null;
-    const route = uid ? `practitioners/${uid}` : '';
-    const { data } = useLeidaBus(route);
+    const user = paywall?.user || null;
+    const { data } = useLeidaBus('practitioners');
 
     React.useEffect(() => {
-        if (!route) return;
-        dispatch(fetchLeida(route));
-    }, [dispatch, route]);
+        if (!uid) return;
+        dispatch(fetchLeida('practitioners'));
+    }, [dispatch, uid]);
 
-    const practitionerRecord = Array.isArray(data) && data.length > 0 ? data[0] : null;
+    const practitionerRecord = React.useMemo(() => {
+        if (!uid || !Array.isArray(data)) return null;
+        return data.find((item: any) => item?.practitioner_id === uid) || null;
+    }, [data, uid]);
     const practitionerData = practitionerRecord?.data && typeof practitionerRecord.data === 'object'
         ? practitionerRecord.data as Record<string, unknown>
         : {};
-    const avatarUrl = typeof practitionerData.avatar === 'string' ? practitionerData.avatar : '';
+    const avatarUrl = typeof practitionerData.avatar === 'string'
+        ? practitionerData.avatar
+        : (typeof user?.photoURL === 'string' ? user.photoURL : '');
     const displayName = typeof practitionerData.display_name === 'string' && practitionerData.display_name.trim()
         ? practitionerData.display_name.trim()
-        : (typeof practitionerRecord?.title === 'string' ? practitionerRecord.title : 'User');
+        : (typeof user?.displayName === 'string' && user.displayName.trim()
+            ? user.displayName.trim()
+            : (typeof user?.email === 'string' && user.email.trim() ? user.email.trim() : 'User'));
     const initials = displayName
         .split(/\s+/)
         .filter(Boolean)

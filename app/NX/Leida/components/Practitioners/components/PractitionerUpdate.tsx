@@ -190,7 +190,7 @@ const PractitionerUpdate = () => {
 					sx={{ mb: 1 }}
 				>
 					<Typography variant="caption">
-						{data?.[0]?.title || 'email'}
+						{``}
 					</Typography>
 
 					<IconButton 
