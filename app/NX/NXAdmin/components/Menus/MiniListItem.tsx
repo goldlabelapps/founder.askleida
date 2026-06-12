@@ -58,8 +58,9 @@ export default function MiniListItem({
               <ListItemText
                   primary={
                       <Typography
+                            variant="body2"
                           color={selected ? 'text.primary' : 'text.secondary'}
-                          sx={{ ml: nested ? 5 : 0 }}
+                          sx={{ ml: nested ? 3 : 0 }}
                       >
                           {label}
                       </Typography>

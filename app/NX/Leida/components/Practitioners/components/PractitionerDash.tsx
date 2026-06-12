@@ -6,7 +6,7 @@ import { initSupabase } from '../../Supabase/actions/initSupabase';
 import { fetchSupabaseRows } from '../../Supabase/actions/fetchSupabaseRows';
 import { useSupabase } from '../../Supabase/hooks/useSupabase';
 import { PractitionerNew } from '../../../../Leida';
-import Practitioner, { T_PractitionerRecord } from './Practitioner';
+import PractitionerCard, { T_PractitionerRecord } from './PractitionerCard';
 
 const PRACTITIONERS_TABLE = 'practitioners';
 
@@ -33,12 +33,9 @@ const PractitionerDash = () => {
 
 	return (
 		<>
-			<PractitionerNew />
+		{/* <PractitionerNew /> */}
 		<Box sx={{ p: 2 }}>
 			<Stack spacing={1.5}>
-				
-				
-
 				{rowsState?.loading && <CircularProgress size={20} />}
 				{rowsState?.error && <Alert severity="error">{rowsState.error}</Alert>}
 				{!rowsState?.loading && rows.length === 0 && (
@@ -48,7 +45,7 @@ const PractitionerDash = () => {
 					const key = typeof row?.practitioner_id === 'string' && row.practitioner_id
 						? row.practitioner_id
 						: `practitioner-${index}`;
-					return <Practitioner key={key} practitioner={row} />;
+					return <PractitionerCard key={key} practitioner={row} />;
 				})}
 			</Stack>
 		</Box>

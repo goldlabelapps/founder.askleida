@@ -128,6 +128,20 @@ export default function DashNav({
                 />
               </>
             )}
+            {item.route === '/' && (
+              <>
+                <MiniListItem
+                  open={open}
+                  selected={isRouteActive(['/practitioners'])}
+                  onClick={navigateToRoute}
+                  options={{
+                    label: 'Practitioners',
+                    route: '/practitioners',
+                    nested: true,
+                  }}
+                />
+              </>
+            )}
             {item.route === '/awin' && (
               <>
                 <MiniListItem
