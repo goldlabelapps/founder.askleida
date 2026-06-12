@@ -1,8 +1,8 @@
-
 import React from 'react';
-
 import { usePathname } from 'next/navigation';
-import { Paper, Stack } from '@mui/material';
+import { 
+	Grid,
+} from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import {
 	PractitionerNew,
@@ -28,7 +28,21 @@ const Practitioners = () => {
 	}, [dispatch]);
 
 	return <>
-		<PractitionerDash />
+		<Grid container spacing={2} sx={{ mb: 2 }}>
+			<Grid size={{
+				xs: 12,
+				md: 6,
+			}}>
+				<PractitionerNew />
+			</Grid>
+			<Grid size={{
+				xs: 12,
+				md: 6,
+			}}>
+				<PractitionerDash />
+			</Grid>
+		</Grid>
+		
 	</>;
 };
 

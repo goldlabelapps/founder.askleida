@@ -12,7 +12,7 @@ import {
 	Box,
 } from '@mui/material';
 import { useDispatch } from '../../../../Uberedux';
-import { Icon, ConfirmAction } from '../../../../DesignSystem';
+import { Icon, ConfirmAction, navigateTo } from '../../../../DesignSystem';
 import { 
 	fetchLeida,
 	useLeidaBus,
@@ -84,6 +84,10 @@ const PractitionerUpdate = () => {
 		setConfirmOpen(true);
 	};
 
+	const handleBack = () => {
+		dispatch(navigateTo(router, '/practitioners'));
+	};
+
 	const router = useRouter();
 	const [deleting, setDeleting] = React.useState(false);
 
@@ -151,8 +155,8 @@ const PractitionerUpdate = () => {
 				throw new Error(json?.message || `Failed to update display name (${res.status})`);
 			}
 
-			dispatch(fetchLeida(route));
 			setAvatarChanged(false);
+			dispatch(navigateTo(router, '/practitioners'));
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : String(e);
 			setDisplayNameError(msg);
@@ -189,9 +193,13 @@ const PractitionerUpdate = () => {
 					alignItems="center"
 					sx={{ mb: 1 }}
 				>
-					<Typography variant="caption">
-						{``}
-					</Typography>
+					<IconButton
+						color="primary"
+						disabled={deleting}
+						onClick={handleBack}
+					>
+						<Icon icon="left" />
+					</IconButton>
 
 					<IconButton 
 						color="primary"
@@ -217,6 +225,22 @@ const PractitionerUpdate = () => {
 							<>
 							<Grid container spacing={2} alignItems="center">
 								
+
+										<Grid size={{
+											xs: 12,
+											sm: 6,
+										}} sx={{ alignSelf: 'flex-start' }}>
+											<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', height: '100%' }}>
+												<AvatarUpload
+													size={200}
+													practitionerId={uuid}
+													currentAvatar={currentAvatar}
+													displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
+													onSuccess={handleAvatarSuccess}
+												/>
+											</Box>
+										</Grid>
+
 								<Grid size={{
 									xs: 12,
 									sm: 6,
@@ -229,7 +253,7 @@ const PractitionerUpdate = () => {
 											onChange={setDisplayName}
 										/>
 										<Editable
-											label="Clinic"
+											label="Clinic Name"
 											value={clinic}
 											variant="standard"
 											onChange={setClinic}
@@ -245,19 +269,7 @@ const PractitionerUpdate = () => {
 									
 								</Grid>
 
-								<Grid size={{
-									xs: 12,
-									sm: 6,
-								}} sx={{ alignSelf: 'flex-start' }}>
-									<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', height: '100%' }}>
-										<AvatarUpload
-											practitionerId={uuid}
-											currentAvatar={currentAvatar}
-											displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
-											onSuccess={handleAvatarSuccess}
-										/>
-									</Box>
-								</Grid>
+								
 
 
 								<Grid size={{

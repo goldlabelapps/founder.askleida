@@ -27,17 +27,17 @@
                     "secondary": "#364450",
                     "background": "#F7F7F4",
                     "paper": "#FFF",
-                    "border": "#D4D4D4",
+                    "border": "#364450",
                     "text": "#2C2C2A"
                 },
                 "dark": {
                     "mode": "dark",
                     "primary": "#F7F5F2",
                     "secondary": "#F7F5F2",
+                    "text": "#F7F7F4",
                     "background": "#2C2C2A",
-                    "paper": "#2C2C2A",
-                    "text": "#FFF",
-                    "border": "#F7F5F2"
+                    "paper": "#131311",
+                    "border": "#111110"
                 }
             }
         }

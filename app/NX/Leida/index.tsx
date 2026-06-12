@@ -16,6 +16,11 @@ import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
 import { PractitionerDash, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners } from './components/Practitioners';
+import Products from './components/Products/Products';
+import ProductDash from './components/Products/components/ProductDash';
+import ProductCard from './components/Products/components/ProductCard';
+import ProductNew from './components/Products/components/ProductNew';
+import ProductUpdate from './components/Products/components/ProductUpdate';
 import Supabase from './components/Supabase/Supabase';
 import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
 import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
@@ -32,6 +37,8 @@ import { initLeida } from './actions/initLeida';
 import { fetchLeida } from './actions/fetchLeida';
 import { setLeida } from './actions/setLeida';
 import { deletePractitioner } from './actions/deletePractitioner';
+import { deleteProduct } from './actions/deleteProduct';
+import { updateProduct } from './actions/updateProduct';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
 import { initSupabase } from './components/Supabase/actions/initSupabase';
@@ -65,6 +72,11 @@ export {
 	PractitionerNew,
 	PractitionerUpdate,
 	Practitioners,
+	ProductDash,
+	ProductCard,
+	ProductNew,
+	ProductUpdate,
+	Products,
 	Supabase,
 	SupabasePostgres,
 	SupabaseUsers,
@@ -92,8 +104,10 @@ export {
 	saveSupabaseRecord,
 	submitClaudePrompt,
 	deletePractitioner,
+	deleteProduct,
 	updateAvatar,
 	updatePractitioner,
+	updateProduct,
 	setDash,
 	// Lib
 	normalizeLeidaRouteKey,

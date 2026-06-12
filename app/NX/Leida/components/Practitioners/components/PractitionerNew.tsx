@@ -12,19 +12,20 @@ import {
 	initSupabase,
 	fetchSupabaseRows,
 	saveSupabaseRecord,
+	updatePractitioner,
 	useSupabase,
 } from '../../../../Leida';
 import { Editable, setNXAdmin } from '../../../../NXAdmin';
 
 const PRACTITIONERS_TABLE = 'practitioners';
-const ACCESS_LEVEL_OPTIONS = ['3', '2', '1'] as const;
+const ACCESS_LEVEL = 2;
+const DEFAULT_AVATAR_URL = 'https://app.askleida.com/shared/svg/guest.svg';
 
 const PractitionerNew = () => {
 	const dispatch = useDispatch();
 	const router = useRouter();
 	const supabase = useSupabase();
 	const [inviteEmail, setInviteEmail] = React.useState('');
-	const [accessLevel, setAccessLevel] = React.useState('2');
 	const [createLoading, setCreateLoading] = React.useState(false);
 	const [createError, setCreateError] = React.useState<string | null>(null);
 	const [createSuccess, setCreateSuccess] = React.useState<string | null>(null);
@@ -58,12 +59,6 @@ const PractitionerNew = () => {
 			return;
 		}
 
-		const parsedAccessLevel = Number(accessLevel);
-		if (!Number.isInteger(parsedAccessLevel) || parsedAccessLevel < 0 || parsedAccessLevel > 5) {
-			setCreateError('Access level is required');
-			return;
-		}
-
 		setCreateLoading(true);
 		try {
 			const response = await dispatch(saveSupabaseRecord({
@@ -71,12 +66,22 @@ const PractitionerNew = () => {
 				email,
 				user_metadata: {
 					invited_from: 'leida-supabase-module',
-					access_level: parsedAccessLevel,
+					access_level: ACCESS_LEVEL,
+					avatar: DEFAULT_AVATAR_URL,
 				},
 			}));
-			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
 			
 			const practitionerId = response?.data?.practitioner?.practitioner_id;
+			if (practitionerId) {
+				await dispatch(updatePractitioner({
+					practitioner_id: practitionerId,
+					key: 'avatar',
+					value: DEFAULT_AVATAR_URL,
+				}));
+			}
+
+			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
+
 			if (practitionerId) {
 				setCreateSuccess(`Invited ${email}. Navigating to practitioner profile...`);
 				setTimeout(() => {
@@ -93,21 +98,23 @@ const PractitionerNew = () => {
 		} finally {
 			setCreateLoading(false);
 		}
-	}, [accessLevel, dispatch, router, focusEmailField, inviteEmail]);
+	}, [dispatch, router, focusEmailField, inviteEmail]);
 
 	return (
-		<Box sx={{  mx: 2 }}>
-
+		<>
 			{createError || createSuccess ? (
 				<Box sx={{ mb: 2 }}>
 					{createError && <Alert severity="error">{createError}</Alert>}
 					{createSuccess && <Alert severity="success">{createSuccess}</Alert>}
 				</Box>
 			) : null}
+		<Box sx={{ display: 'flex', mx: 2 }}>
+
+			
 
 			<Editable
 				key={`invite-email-${emailFocusKey}`}
-				label="Email"
+				label="New Practitioner"
 				variant="standard"
 				value={inviteEmail}
 				onChange={setInviteEmail}
@@ -115,25 +122,17 @@ const PractitionerNew = () => {
 				autoFocus
 				placeholder="name@example.com"
 			/>
-			<Editable
-				label="Access Level"
-				variant="standard"
-				editableType="select"
-				value={accessLevel}
-				onChange={setAccessLevel}
-				options={ACCESS_LEVEL_OPTIONS}
-				placeholder="Select access level"
-			/>
 			<Button
 				sx={{my: 3}}
-				variant="contained"
+				variant="text"
 				endIcon={<Icon icon="practitioner-add" />}
 				onClick={handleCreatePractitioner}
 				disabled={createLoading}
 			>
-				{createLoading ? 'Adding...' : 'Add Practitioner'}
+				{createLoading ? 'Adding...' : 'Add'}
 			</Button>
 		</Box>
+		</>
 	);
 };
 
