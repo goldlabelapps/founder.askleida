@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { 
     Box,
+    Collapse,
     IconButton,
     Button, 
     TextField, 
@@ -38,6 +39,11 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
 
     return (
         <form onSubmit={handleSubmit}>
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <img src={`/nxadmin/svg/logo-${currentThemeMode === 'dark' ? 'light' : 'dark'}.svg`} alt="Logo" style={{ height: 48 }} />
+            </Box>
+            
             <Box sx={{}}>
                 <TextField
                     autoFocus
@@ -78,19 +84,20 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
                         }
                     }}
                 />
-                <Box sx={{my:2}}>
-                    <Button
-                        type="submit"
-                        fullWidth
-                        endIcon={<Icon icon="signin" color="primary" />}
-                        variant={"contained"}
-                        sx={{ mt: 0 }}
-                        disabled={!isFormValid}
-                        onClick={handleSubmit}
-                    >
-                        Sign In
-                    </Button>
-                </Box>
+                <Collapse in={isFormValid}>
+                    <Box sx={{my:2}}>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            endIcon={<Icon icon="signin" />}
+                            variant={"contained"}
+                            sx={{ mt: 0 }}
+                            onClick={handleSubmit}
+                        >
+                            Sign In
+                        </Button>
+                    </Box>
+                </Collapse>
             </Box>
 
             <Typography sx={{ my: 1 }} color="primary">
