@@ -20,7 +20,7 @@ export default function ClaudePromptAccordion({
     defaultExpanded = false,
 }: I_ClaudePromptAccordion) {
     return (
-        <Accordion defaultExpanded={defaultExpanded}>
+        <Accordion variant="outlined" defaultExpanded={defaultExpanded}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h6">{title}</Typography>
             </AccordionSummary>

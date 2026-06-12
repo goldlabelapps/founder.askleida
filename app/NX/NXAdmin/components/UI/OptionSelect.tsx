@@ -16,6 +16,7 @@ import { Icon } from '../../../../NX/DesignSystem';
 export default function OptionSelect({
     label,
     options,
+    value,
     field,
     collection,
     onChange,
@@ -23,6 +24,7 @@ export default function OptionSelect({
 }: {
     label: string;
     options: any[];
+    value?: string | number;
     field?: string;
     collection?: string;
     onChange?: (newValue: string) => void;
@@ -43,8 +45,8 @@ export default function OptionSelect({
             <InputLabel>{label}</InputLabel>
             <Select
                 label={label}
-                onChange={e => onChange && onChange(e.target.value)}
-                defaultValue=""
+                value={value ?? ''}
+                onChange={e => onChange && onChange(String(e.target.value))}
                 disabled={disabled}
             >
                 {options.map((opt, idx) => {

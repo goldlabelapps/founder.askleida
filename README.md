@@ -1,4 +1,4 @@
-## Founder d=Dashboard
+## Founder Dashboard
 
 - Manage Practitioners
 - Manage Products

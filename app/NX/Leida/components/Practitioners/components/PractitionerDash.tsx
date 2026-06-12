@@ -36,7 +36,6 @@ const PractitionerDash = () => {
 		{/* <PractitionerNew /> */}
 		<Box sx={{ p: 2 }}>
 			<Stack spacing={1.5}>
-				{rowsState?.loading && <CircularProgress size={20} />}
 				{rowsState?.error && <Alert severity="error">{rowsState.error}</Alert>}
 				{!rowsState?.loading && rows.length === 0 && (
 					<Alert severity="info">No practitioners found.</Alert>

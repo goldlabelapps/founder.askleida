@@ -1,6 +1,6 @@
 {
   "name": "nx-admin",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "scripts": {
     "dev": "yarn kill && yarn install && rm -rf .next && next dev -p 2005 --webpack",
     "build": "next build --webpack",

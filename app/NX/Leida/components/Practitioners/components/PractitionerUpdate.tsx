@@ -3,10 +3,13 @@ import * as React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
 	Paper, 
+	Grid,
 	Stack,
 	LinearProgress,
 	Typography,
+	Button,
 	IconButton,
+	Box,
 } from '@mui/material';
 import { useDispatch } from '../../../../Uberedux';
 import { Icon, ConfirmAction } from '../../../../DesignSystem';
@@ -14,8 +17,20 @@ import {
 	fetchLeida,
 	useLeidaBus,
 	deletePractitioner,
+	
 } from '../../../../Leida';
-import { setNXAdmin } from '../../../../NXAdmin';
+import { 
+	OptionSelect,
+	setNXAdmin, 
+	Editable, 
+	AvatarUpload,
+} from '../../../../NXAdmin';
+
+const ACCESS_LEVEL_OPTIONS = [
+	{ index: 3, label: 'Founder' },
+	{ index: 2, label: 'Practitioner' },
+	{ index: 1, label: 'Client' }
+];
 
 const PractitionerUpdate = () => {
 
@@ -24,7 +39,46 @@ const PractitionerUpdate = () => {
 	const uuid = pathname?.split('/').pop() ?? '';
 	const route = uuid ? `practitioners/${uuid}` : '';
 	const { loading, error, data } = useLeidaBus(route);
+	const practitioner = data?.[0]?.data;
+	const currentAvatar = typeof practitioner?.avatar === 'string' ? practitioner.avatar : undefined;
+	const currentDisplayName = typeof practitioner?.display_name === 'string' ? practitioner.display_name : '';
+	const currentClinic = typeof practitioner?.clinic === 'string' ? practitioner.clinic : '';
+	const currentAccessLevel = (() => {
+		const value = practitioner?.access_level;
+		if (typeof value === 'number' && value >= 0 && value <= 5) {
+			return String(value);
+		}
+		if (typeof value === 'string') {
+			const trimmed = value.trim();
+			if (/^[0-5]$/.test(trimmed)) {
+				return trimmed;
+			}
+		}
+		return '';
+	})();
+	const [displayName, setDisplayName] = React.useState(currentDisplayName);
+	const [clinic, setClinic] = React.useState(currentClinic);
+	const [accessLevel, setAccessLevel] = React.useState(currentAccessLevel);
+	const [avatarChanged, setAvatarChanged] = React.useState(false);
+	const [savingDisplayName, setSavingDisplayName] = React.useState(false);
+	const [displayNameError, setDisplayNameError] = React.useState<string | null>(null);
 	const [confirmOpen, setConfirmOpen] = React.useState(false);
+	const hasDisplayNameChanges = displayName.trim() !== currentDisplayName;
+	const hasClinicChanges = clinic.trim() !== currentClinic;
+	const hasAccessLevelChanges = accessLevel !== currentAccessLevel;
+	const canSave = hasDisplayNameChanges || hasClinicChanges || hasAccessLevelChanges || avatarChanged;
+
+	React.useEffect(() => {
+		setDisplayName(currentDisplayName);
+	}, [currentDisplayName]);
+
+	React.useEffect(() => {
+		setClinic(currentClinic);
+	}, [currentClinic]);
+
+	React.useEffect(() => {
+		setAccessLevel(currentAccessLevel);
+	}, [currentAccessLevel]);
 
 	const handleDelete = () => {
 		setConfirmOpen(true);
@@ -51,6 +105,67 @@ const PractitionerUpdate = () => {
 		setConfirmOpen(false);
 	};
 
+	const handleSaveDisplayName = async () => {
+		if (!uuid) return;
+		if (!canSave) return;
+
+		if (!hasDisplayNameChanges && avatarChanged) {
+			setAvatarChanged(false);
+			return;
+		}
+
+		setDisplayNameError(null);
+		setSavingDisplayName(true);
+
+		if (!accessLevel) {
+			setDisplayNameError('Access Level is required.');
+			setSavingDisplayName(false);
+			return;
+		}
+
+		try {
+			const res = await fetch('/api/practitioners', {
+				method: 'PATCH',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					practitioner_id: uuid,
+					data: {
+						display_name: displayName.trim(),
+						clinic: clinic.trim(),
+						access_level: Number(accessLevel),
+					},
+				}),
+			});
+
+			let json: any = null;
+			try {
+				json = await res.json();
+			} catch {
+				json = null;
+			}
+
+			if (!res.ok) {
+				throw new Error(json?.message || `Failed to update display name (${res.status})`);
+			}
+
+			dispatch(fetchLeida(route));
+			setAvatarChanged(false);
+		} catch (e: unknown) {
+			const msg = e instanceof Error ? e.message : String(e);
+			setDisplayNameError(msg);
+		} finally {
+			setSavingDisplayName(false);
+		}
+	};
+
+	const handleAvatarSuccess = () => {
+		setAvatarChanged(true);
+		dispatch(fetchLeida(route));
+	};
+
 
 	React.useEffect(() => {
 		if (!route) return;
@@ -59,14 +174,14 @@ const PractitionerUpdate = () => {
 
 	React.useEffect(() => {
 		dispatch(setNXAdmin('header', {
-			title: data?.[0]?.title || 'Practitioner',
+			title: data?.[0]?.data?.display_name || 'Practitioner',
 			icon: 'practitioner',
 		}));
 	}, [dispatch, data]);
 
 	return (
 		<Paper variant="outlined" sx={{ p: 1.5 }}>
-			<Stack spacing={1}>
+			<>
 				{/* Header with delete button */}
 				<Stack
 					direction="row"
@@ -74,7 +189,10 @@ const PractitionerUpdate = () => {
 					alignItems="center"
 					sx={{ mb: 1 }}
 				>
-					<h3 style={{ margin: 0 }}>{data?.[0]?.title || 'Practitioner Details'}</h3>
+					<Typography variant="caption">
+						{data?.[0]?.title || 'email'}
+					</Typography>
+
 					<IconButton 
 						color="primary"
 						disabled={deleting}
@@ -92,13 +210,88 @@ const PractitionerUpdate = () => {
 						</Typography>
 					</Stack>
 				) : (
-					<pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-						{loading && 'Loading...'}
-						{error && `Error: ${error}`}
-						{!loading && !error && JSON.stringify(data, null, 2)}
-					</pre>
+					<>
+						{loading && <Typography variant="body2">Loading...</Typography>}
+						{error && <Typography variant="body2" color="error">Error: {error}</Typography>}
+						{!loading && !error && (
+							<>
+							<Grid container spacing={2} alignItems="center">
+								
+								<Grid size={{
+									xs: 12,
+									sm: 6,
+								}}>
+									<Box sx={{ my: 1 }}>
+										<Editable
+											label="Name"
+											value={displayName}
+											variant="filled"
+											onChange={setDisplayName}
+										/>
+									</Box>
+									<Box sx={{ my: 1 }}>
+										<Editable
+											label="Clinic"
+											value={clinic}
+											variant="filled"
+											onChange={setClinic}
+										/>
+									</Box>
+									<Box sx={{ my: 1 }}>
+										<OptionSelect
+											label="Access Level"
+											options={ACCESS_LEVEL_OPTIONS}
+											value={accessLevel}
+											onChange={setAccessLevel}
+											disabled={savingDisplayName}
+										/>
+									</Box>
+								</Grid>
+
+								<Grid size={{
+									xs: 12,
+									sm: 6,
+								}}>
+									<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', height: '100%' }}>
+										<AvatarUpload
+											practitionerId={uuid}
+											currentAvatar={currentAvatar}
+											displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
+											onSuccess={handleAvatarSuccess}
+										/>
+									</Box>
+								</Grid>
+
+
+								<Grid size={{
+									xs: 12,
+								}}>
+									<Box sx={{
+										display: 'flex',
+										justifyContent: 'flex-end',
+									}}>
+										<Button
+											variant="contained"
+											startIcon={<Icon icon="save" />}
+											color="primary"
+											sx={{ my: 2 }}
+											onClick={handleSaveDisplayName}
+											disabled={savingDisplayName || !canSave}
+										>
+											{savingDisplayName ? 'Saving...' : 'Save'}
+										</Button>
+									</Box>
+								</Grid>
+							</Grid>
+								
+								{displayNameError ? (
+									<Typography variant="body2" color="error">{displayNameError}</Typography>
+								) : null}
+							</>
+						)}
+					</>
 				)}
-			</Stack>
+			</>
 
 			{/* Confirm Delete Dialog */}
 			<ConfirmAction

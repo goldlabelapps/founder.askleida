@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Paper, Stack } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import {
-	fetchLeida,
+	PractitionerNew,
 	useLeidaBus,
 	PractitionerDash,
 } from '../../../Leida';
@@ -27,7 +27,9 @@ const Practitioners = () => {
 		}));
 	}, [dispatch]);
 
-	return <PractitionerDash />;
+	return <>
+		<PractitionerDash />
+	</>;
 };
 
 export default Practitioners;
