@@ -1,12 +1,15 @@
 'use client';
 import * as React from 'react';
+import {useRouter} from 'next/navigation';
 import {
 	Avatar,
-	Chip,
+	ButtonBase,
 	Paper,
 	Stack,
 	Typography,
 } from '@mui/material';
+import { navigateTo } from '../../../../DesignSystem';
+import { useDispatch } from '../../../../Uberedux';
 
 type T_PractitionerData = {
 	avatar?: string;
@@ -41,18 +44,13 @@ function parsePractitionerData(value: unknown): T_PractitionerData {
 	return {};
 }
 
-function safeDateLabel(value?: string): string {
-	if (!value) return 'N/A';
-	const date = new Date(value);
-	if (Number.isNaN(date.getTime())) return value;
-	return date.toLocaleString();
-}
-
-const Practitioner = ({
+const PractitionerCard = ({
 	practitioner,
 }: {
 	practitioner: T_PractitionerRecord;
 }) => {
+	const dispatch = useDispatch();
+	const router = useRouter();
 	const parsedData = parsePractitionerData(practitioner?.data);
 	const email = typeof practitioner?.title === 'string' ? practitioner.title : '';
 	const displayName = typeof parsedData?.display_name === 'string' && parsedData.display_name.trim()
@@ -60,24 +58,30 @@ const Practitioner = ({
 		: (email || 'Unknown practitioner');
 	const avatar = typeof parsedData?.avatar === 'string' ? parsedData.avatar : '';
 	const practitionerId = typeof practitioner?.practitioner_id === 'string' ? practitioner.practitioner_id : 'N/A';
+	const canEdit = practitionerId !== 'N/A';
+
+	const handleEdit = () => {
+		if (!canEdit) return;
+		dispatch(navigateTo(router, `/practitioners/${practitionerId}`));
+	};
 
 	return (
-		<Paper variant="outlined" sx={{ p: 1.5 }}>
-			<Stack spacing={1}>
+		<ButtonBase
+			onClick={handleEdit}
+			disabled={!canEdit}
+			sx={{ display: 'block', width: '100%', textAlign: 'left', borderRadius: 1 }}
+		>
+			<Paper variant="outlined" sx={{ p: 1.5, width: '100%' }}>
 				<Stack direction="row" spacing={1.5} alignItems="center">
-					<Avatar src={avatar || undefined} alt={displayName} />
+					<Avatar src={avatar || 'https://app.askleida.com/shared/svg/guest.svg'} alt={displayName} />
 					<Stack spacing={0.25}>
 						<Typography variant="subtitle2">{displayName}</Typography>
 						<Typography variant="body2" color="text.secondary">{email || 'No email'}</Typography>
 					</Stack>
 				</Stack>
-				{/* <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
-					<Chip size="small" variant="outlined" label={`id: ${practitionerId}`} />
-					<Chip size="small" label={`updated: ${safeDateLabel(practitioner?.updated)}`} />
-				</Stack> */}
-			</Stack>
-		</Paper>
+			</Paper>
+		</ButtonBase>
 	);
 };
 
-export default Practitioner;
+export default PractitionerCard;

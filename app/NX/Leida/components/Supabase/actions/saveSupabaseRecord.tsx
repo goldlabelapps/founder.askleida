@@ -33,6 +33,11 @@ export const saveSupabaseRecord = (args: T_SaveSupabaseRecordArgs): any =>
     async (dispatch: Dispatch, getState: () => any) => {
         try {
             if (args.resource === 'practitioner-onboard') {
+                const user_metadata = {
+                    onboarded: false,
+                    avatar: 'https://app.askleida.com/shared/svg/guest.svg',
+                    ...args.user_metadata,
+                };
                 const data = await requestSupabase<{ user?: Record<string, any>; practitioner?: Record<string, any> }>('/api/supabase', {
                     method: 'POST',
                     headers: {
@@ -41,8 +46,9 @@ export const saveSupabaseRecord = (args: T_SaveSupabaseRecordArgs): any =>
                     body: JSON.stringify({
                         resource: 'practitioner-onboard',
                         email: args.email,
+                        title: args.email,
                         redirectTo: args.redirectTo,
-                        user_metadata: args.user_metadata,
+                        user_metadata,
                     }),
                 });
 

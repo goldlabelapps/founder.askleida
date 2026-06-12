@@ -1,9 +1,11 @@
 'use client';
 import * as React from 'react';
+import { usePathname } from 'next/navigation';
 import Awin from './components/Awin/Awin';
 import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
 import { FounderDash } from './components/FounderDash';
+import { PractitionerUpdate, Practitioners } from './components/Practitioners';
 import Supabase from './components/Supabase/Supabase';
 import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
 import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
@@ -13,8 +15,16 @@ interface I_PageRouter {
 }
 
 export function PageRouter({ active }: I_PageRouter) {
-  if (!active) return <FounderDash />;
-  switch (active) {
+  const pathname = usePathname();
+  const normalizedRoute = (pathname || active || '').trim().replace(/^\/+|\/+$/g, '');
+  if (!normalizedRoute) return <FounderDash />;
+
+  const practitionerDetailMatch = normalizedRoute.match(/^(practitioners|pracitioners|paractitioners)\/([^/]+)$/);
+  if (practitionerDetailMatch) return <PractitionerUpdate />;
+
+  if (['practitioners', 'pracitioners', 'paractitioners'].includes(normalizedRoute)) return <Practitioners />;
+
+  switch (normalizedRoute) {
     case 'supabase':
       return <Supabase />;
     case 'supabase/postgres':
