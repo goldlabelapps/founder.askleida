@@ -12,12 +12,14 @@ import { Practitioners } from './components/Practitioners';
 import { Products } from './components/Products';
 
 // UI components
-import OptionSelect from './components/UI/OptionSelect';
-import InputString from './components/UI/InputString';
-import JSONInput from './components/UI/JSONInput';
-import Editable from './components/UI/Editable';
-
-import SoundPlayer from './components/UI/SoundPlayer';
+import {
+    AvatarUpload,
+    OptionSelect,
+    InputString,
+    JSONInput,
+    Editable,
+    SoundPlayer,
+} from './components/UI';
 
 // Menu components
 import NXAdminBtn from './components/Menus/NXAdminBtn';
@@ -76,6 +78,7 @@ export {
     OptionSelect,
     JSONInput,
     Editable,
+    AvatarUpload,
     SoundPlayer,
 
     // Menu components

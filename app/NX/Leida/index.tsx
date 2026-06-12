@@ -31,6 +31,8 @@ import { initLeida } from './actions/initLeida';
 import { fetchLeida } from './actions/fetchLeida';
 import { setLeida } from './actions/setLeida';
 import { deletePractitioner } from './actions/deletePractitioner';
+import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
+import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
 import { initAwin } from './components/Awin/actions/initAwin';
 import { setAwin } from './components/Awin/actions/setAwin';
 import { initClaude } from './components/Claude/actions/initClaude';
@@ -80,6 +82,8 @@ export {
 	setClaude,
 	submitClaudePrompt,
 	deletePractitioner,
+	updateAvatar,
+	updatePractitioner,
 	setDash,
 	// Lib
 	normalizeLeidaRouteKey,
