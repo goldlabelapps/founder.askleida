@@ -8,6 +8,18 @@ import {
     parseJsonBody,
 } from './lib/shared';
 
+function makeInviteRedirectUrl(baseUrl?: string) {
+    if (!baseUrl) {
+        return undefined;
+    }
+
+    try {
+        return new URL('/invite', baseUrl).toString();
+    } catch {
+        return `${baseUrl.replace(/\/$/, '')}/invite`;
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const body = await parseJsonBody<Record<string, unknown>>(req);
@@ -21,9 +33,12 @@ export async function POST(req: Request) {
                 return NextResponse.json(res, { status: 400 });
             }
 
+            const defaultRedirect = makeInviteRedirectUrl(
+                process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || undefined,
+            );
             const redirectTo = typeof body.redirectTo === 'string' && body.redirectTo.trim()
                 ? body.redirectTo.trim()
-                : (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || undefined);
+                : defaultRedirect;
 
             const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
                 data: normalizeOptionalObject(body.user_metadata, 'user_metadata') || {},
@@ -50,7 +65,9 @@ export async function POST(req: Request) {
                 .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
                 .join(' ') || email;
 
+                
             const placeholderData = {
+                display_name: displayName,
                 onboarding: {
                     status: 'invited',
                     invited_email: email,
@@ -70,7 +87,7 @@ export async function POST(req: Request) {
                 .from('practitioners')
                 .insert([{
                     practitioner_id: practitionerId,
-                    title: displayName,
+                    title: email,
                     data: placeholderData,
                 }])
                 .select('*')

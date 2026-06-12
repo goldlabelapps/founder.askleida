@@ -17,8 +17,20 @@ import {
 	fetchLeida,
 	useLeidaBus,
 	deletePractitioner,
+	
 } from '../../../../Leida';
-import { setNXAdmin, Editable, AvatarUpload } from '../../../../NXAdmin';
+import { 
+	OptionSelect,
+	setNXAdmin, 
+	Editable, 
+	AvatarUpload,
+} from '../../../../NXAdmin';
+
+const ACCESS_LEVEL_OPTIONS = [
+	{ index: 3, label: 'Founder' },
+	{ index: 2, label: 'Practitioner' },
+	{ index: 1, label: 'Client' }
+];
 
 const PractitionerUpdate = () => {
 
@@ -30,17 +42,43 @@ const PractitionerUpdate = () => {
 	const practitioner = data?.[0]?.data;
 	const currentAvatar = typeof practitioner?.avatar === 'string' ? practitioner.avatar : undefined;
 	const currentDisplayName = typeof practitioner?.display_name === 'string' ? practitioner.display_name : '';
+	const currentClinic = typeof practitioner?.clinic === 'string' ? practitioner.clinic : '';
+	const currentAccessLevel = (() => {
+		const value = practitioner?.access_level;
+		if (typeof value === 'number' && value >= 0 && value <= 5) {
+			return String(value);
+		}
+		if (typeof value === 'string') {
+			const trimmed = value.trim();
+			if (/^[0-5]$/.test(trimmed)) {
+				return trimmed;
+			}
+		}
+		return '';
+	})();
 	const [displayName, setDisplayName] = React.useState(currentDisplayName);
+	const [clinic, setClinic] = React.useState(currentClinic);
+	const [accessLevel, setAccessLevel] = React.useState(currentAccessLevel);
 	const [avatarChanged, setAvatarChanged] = React.useState(false);
 	const [savingDisplayName, setSavingDisplayName] = React.useState(false);
 	const [displayNameError, setDisplayNameError] = React.useState<string | null>(null);
 	const [confirmOpen, setConfirmOpen] = React.useState(false);
 	const hasDisplayNameChanges = displayName.trim() !== currentDisplayName;
-	const canSave = hasDisplayNameChanges || avatarChanged;
+	const hasClinicChanges = clinic.trim() !== currentClinic;
+	const hasAccessLevelChanges = accessLevel !== currentAccessLevel;
+	const canSave = hasDisplayNameChanges || hasClinicChanges || hasAccessLevelChanges || avatarChanged;
 
 	React.useEffect(() => {
 		setDisplayName(currentDisplayName);
 	}, [currentDisplayName]);
+
+	React.useEffect(() => {
+		setClinic(currentClinic);
+	}, [currentClinic]);
+
+	React.useEffect(() => {
+		setAccessLevel(currentAccessLevel);
+	}, [currentAccessLevel]);
 
 	const handleDelete = () => {
 		setConfirmOpen(true);
@@ -79,6 +117,12 @@ const PractitionerUpdate = () => {
 		setDisplayNameError(null);
 		setSavingDisplayName(true);
 
+		if (!accessLevel) {
+			setDisplayNameError('Access Level is required.');
+			setSavingDisplayName(false);
+			return;
+		}
+
 		try {
 			const res = await fetch('/api/practitioners', {
 				method: 'PATCH',
@@ -90,6 +134,8 @@ const PractitionerUpdate = () => {
 					practitioner_id: uuid,
 					data: {
 						display_name: displayName.trim(),
+						clinic: clinic.trim(),
+						access_level: Number(accessLevel),
 					},
 				}),
 			});
@@ -170,28 +216,53 @@ const PractitionerUpdate = () => {
 						{!loading && !error && (
 							<>
 							<Grid container spacing={2} alignItems="center">
+								
 								<Grid size={{
 									xs: 12,
 									sm: 6,
 								}}>
-									<AvatarUpload
-										practitionerId={uuid}
-										currentAvatar={currentAvatar}
-										displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
-										onSuccess={handleAvatarSuccess}
-									/>
+									<Box sx={{ my: 1 }}>
+										<Editable
+											label="Name"
+											value={displayName}
+											variant="filled"
+											onChange={setDisplayName}
+										/>
+									</Box>
+									<Box sx={{ my: 1 }}>
+										<Editable
+											label="Clinic"
+											value={clinic}
+											variant="filled"
+											onChange={setClinic}
+										/>
+									</Box>
+									<Box sx={{ my: 1 }}>
+										<OptionSelect
+											label="Access Level"
+											options={ACCESS_LEVEL_OPTIONS}
+											value={accessLevel}
+											onChange={setAccessLevel}
+											disabled={savingDisplayName}
+										/>
+									</Box>
 								</Grid>
+
 								<Grid size={{
 									xs: 12,
 									sm: 6,
 								}}>
-									<Editable
-										label="Name"
-										value={displayName}
-										variant="standard"
-										onChange={setDisplayName}
-									/>
+									<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', height: '100%' }}>
+										<AvatarUpload
+											practitionerId={uuid}
+											currentAvatar={currentAvatar}
+											displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
+											onSuccess={handleAvatarSuccess}
+										/>
+									</Box>
 								</Grid>
+
+
 								<Grid size={{
 									xs: 12,
 								}}>

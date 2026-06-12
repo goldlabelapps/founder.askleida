@@ -1,11 +1,12 @@
 "use client";
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import {
 	Alert,
 	Box,
 	Button,
 } from '@mui/material';
-import { Icon } from '../../../../DesignSystem';
+import { Icon, navigateTo } from '../../../../DesignSystem';
 import { useDispatch } from '../../../../Uberedux';
 import {
 	initSupabase,
@@ -19,6 +20,7 @@ const PRACTITIONERS_TABLE = 'practitioners';
 
 const PractitionerNew = () => {
 	const dispatch = useDispatch();
+	const router = useRouter();
 	const supabase = useSupabase();
 	const [inviteEmail, setInviteEmail] = React.useState('');
 	const [createLoading, setCreateLoading] = React.useState(false);
@@ -49,14 +51,23 @@ const PractitionerNew = () => {
 
 		setCreateLoading(true);
 		try {
-			await dispatch(saveSupabaseRecord({
+			const response = await dispatch(saveSupabaseRecord({
 				resource: 'practitioner-onboard',
 				email,
 				user_metadata: { invited_from: 'leida-supabase-module' },
 			}));
 			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
-			setCreateSuccess(`Invited ${email} and refreshed practitioners.`);
-			setInviteEmail('');
+			
+			const practitionerId = response?.data?.practitioner?.practitioner_id;
+			if (practitionerId) {
+				setCreateSuccess(`Invited ${email}. Navigating to practitioner profile...`);
+				setTimeout(() => {
+					router.push(`/practitioners/${practitionerId}`);
+				}, 500);
+			} else {
+				setCreateSuccess(`Invited ${email} and refreshed practitioners.`);
+				setInviteEmail('');
+			}
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : String(e);
 			setCreateError(msg || 'Failed to create practitioner');
@@ -64,7 +75,7 @@ const PractitionerNew = () => {
 		} finally {
 			setCreateLoading(false);
 		}
-	}, [dispatch, focusEmailField, inviteEmail]);
+	}, [dispatch, router, focusEmailField, inviteEmail]);
 
 	return (
 		<Box sx={{  mx: 2 }}>

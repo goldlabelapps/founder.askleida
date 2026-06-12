@@ -8,11 +8,13 @@ export type T_Practitioner = {
   created?: string;
   updated?: string | null;
   data?: Record<string, unknown> | null;
+  display_name?: string | null;
   name?: string | null;
   category?: string | null;
   description?: string | null;
   notes?: string | null;
 };
+
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -47,6 +49,7 @@ export async function POST(req: Request) {
     ? { ...body.data }
     : {};
 
+  const displayName = normalizeText(body.display_name ?? dataObject.display_name);
   const name = normalizeText(body.name ?? dataObject.name);
   const category = normalizeText(body.category ?? dataObject.category);
   const description = normalizeText(body.description ?? dataObject.description);
@@ -62,6 +65,7 @@ export async function POST(req: Request) {
     title: normalizeText(body.title) || name,
     data: {
       ...dataObject,
+      display_name: displayName || name,
       name,
       category,
       description,

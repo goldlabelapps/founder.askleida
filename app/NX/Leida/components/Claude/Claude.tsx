@@ -113,11 +113,11 @@ export default function Claude() {
                     <Paper component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
 
                     <Typography variant="body1" sx={{my:2, }}>
-                        Paste a looksfantastic product description here. Here's an example you can use:<IconButton
+                        Paste a product description here. Example: <IconButton
                             color="primary"
                             onClick={() => dispatch(setLeida('claudePopupOpen', true))}
                         >
-                            <Icon icon="copy" />
+                            <Icon icon="doc" />
                         </IconButton>
                     </Typography>
 
