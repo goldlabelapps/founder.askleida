@@ -225,7 +225,7 @@ const PractitionerUpdate = () => {
 										<Editable
 											label="Name"
 											value={displayName}
-											variant="filled"
+											variant="standard"
 											onChange={setDisplayName}
 										/>
 									</Box>
@@ -233,25 +233,26 @@ const PractitionerUpdate = () => {
 										<Editable
 											label="Clinic"
 											value={clinic}
-											variant="filled"
+											variant="standard"
 											onChange={setClinic}
 										/>
 									</Box>
-									<Box sx={{ my: 1 }}>
-										<OptionSelect
-											label="Access Level"
-											options={ACCESS_LEVEL_OPTIONS}
-											value={accessLevel}
-											onChange={setAccessLevel}
-											disabled={savingDisplayName}
-										/>
-									</Box>
+											<Box sx={{ my: 1 }}>
+												<OptionSelect
+													label="Access Level"
+													options={ACCESS_LEVEL_OPTIONS}
+													value={accessLevel}
+													onChange={setAccessLevel}
+													disabled={savingDisplayName}
+												/>
+											</Box>
+									
 								</Grid>
 
 								<Grid size={{
 									xs: 12,
 									sm: 6,
-								}}>
+								}} sx={{ alignSelf: 'flex-start' }}>
 									<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', height: '100%' }}>
 										<AvatarUpload
 											practitionerId={uuid}
@@ -285,7 +286,8 @@ const PractitionerUpdate = () => {
 							</Grid>
 								
 								{displayNameError ? (
-									<Typography variant="body2" color="error">{displayNameError}</Typography>
+									<Typography variant="body2" color="error">	{displayNameError}
+									</Typography>
 								) : null}
 							</>
 						)}

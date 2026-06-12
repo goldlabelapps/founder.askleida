@@ -4,6 +4,7 @@ import {useRouter} from 'next/navigation';
 import {
 	Avatar,
 	ButtonBase,
+	Chip,
 	Paper,
 	Stack,
 	Typography,
@@ -57,6 +58,28 @@ const PractitionerCard = ({
 		? parsedData.display_name.trim()
 		: (email || 'Unknown practitioner');
 	const avatar = typeof parsedData?.avatar === 'string' ? parsedData.avatar : '';
+	const accessLevel = (() => {
+		const value = parsedData?.access_level;
+		if (typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 5) {
+			return value;
+		}
+		if (typeof value === 'string' && /^[0-5]$/.test(value.trim())) {
+			return Number(value.trim());
+		}
+		return null;
+	})();
+	const accessLevelLabel = (() => {
+		switch (accessLevel) {
+			case 3:
+				return 'Founder';
+			case 2:
+				return 'Practitioner';
+			case 1:
+				return 'Client';
+			default:
+				return null;
+		}
+	})();
 	const practitionerId = typeof practitioner?.practitioner_id === 'string' ? practitioner.practitioner_id : 'N/A';
 	const canEdit = practitionerId !== 'N/A';
 
@@ -78,6 +101,12 @@ const PractitionerCard = ({
 						<Typography variant="subtitle2">{displayName}</Typography>
 						<Typography variant="body2" color="text.secondary">{email || 'No email'}</Typography>
 					</Stack>
+					{accessLevelLabel ? (
+						<Chip
+							size="small"
+							variant="outlined"
+							label={`${accessLevelLabel}`} />
+					) : null}
 				</Stack>
 			</Paper>
 		</ButtonBase>

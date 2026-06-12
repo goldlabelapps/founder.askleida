@@ -13,8 +13,9 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import { Icon, setDesignSystem, navigateTo } from '../../../DesignSystem';
-import { logout, UserSpot, AccountCard } from '../../../Paywall';
+import { logout, UserSpot } from '../../../Paywall';
 import { MiniListItem } from '../../../NXAdmin';
+import { DashAuth } from '../../../Leida';
 
 export default function NXAdminMenu() {
 
@@ -61,14 +62,14 @@ export default function NXAdminMenu() {
 
   return (
     <>
-      <UserSpot onClick={handleMenuOpen} />
+      <DashAuth onClick={handleMenuOpen} />
+
       <Menu
         anchorEl={menuAnchorEl}
         open={menuOpen}
         onClose={handleMenuClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
-
 
         <MiniListItem
           open

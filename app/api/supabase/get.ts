@@ -119,8 +119,12 @@ async function handleRows(req: Request) {
 
         const supabase = createAdminClient();
         let query = supabase.from(safeTable).select('*', { count: 'exact' });
+        const columns = Array.isArray(tableSchema?.columns) ? tableSchema.columns : [];
+        const hasUpdatedColumn = columns.some((column: any) => column?.name === 'updated');
         const primaryKeys = Array.isArray(tableSchema?.primary_keys) ? tableSchema.primary_keys : [];
-        if (primaryKeys.length === 1) {
+        if (hasUpdatedColumn) {
+            query = query.order('updated', { ascending: false, nullsFirst: false });
+        } else if (primaryKeys.length === 1) {
             query = query.order(primaryKeys[0], { ascending: true });
         }
 
