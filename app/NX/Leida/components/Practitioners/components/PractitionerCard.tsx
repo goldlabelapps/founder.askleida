@@ -53,7 +53,15 @@ const PractitionerCard = ({
 	const dispatch = useDispatch();
 	const router = useRouter();
 	const parsedData = parsePractitionerData(practitioner?.data);
-	const email = typeof practitioner?.title === 'string' ? practitioner.title : '';
+	const email = (() => {
+		if (typeof parsedData?.email === 'string' && parsedData.email.trim()) {
+			return parsedData.email.trim();
+		}
+		if (typeof practitioner?.title === 'string') {
+			return practitioner.title;
+		}
+		return '';
+	})();
 	const displayName = typeof parsedData?.display_name === 'string' && parsedData.display_name.trim()
 		? parsedData.display_name.trim()
 		: (email || 'Unknown practitioner');
@@ -106,7 +114,7 @@ const PractitionerCard = ({
 							{displayName}
 						</Typography>
 						<Typography variant="body2">
-							{clinic || email}
+							{email}
 						</Typography>
 
 						{/* {accessLevelLabel ? (
