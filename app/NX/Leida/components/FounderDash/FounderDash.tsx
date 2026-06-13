@@ -8,9 +8,7 @@ import { setNXAdmin, useNXAdmin } from '../../../NXAdmin';
 import { 
     initDash, 
     useDash,
-    DashSurface,
-    Practitioners,
-    PractitionerNew,
+    DashNav,
 } from '../../../Leida';
 
 
@@ -32,7 +30,7 @@ export default function FounderDash() {
         if (dash && dash.title) {
             dispatch(setNXAdmin('header', {
                 title: 'Dashboard',
-                icon: 'leida',
+                icon: 'dashboard',
             }));
         }
     }, [dispatch, dash?.title]);
@@ -43,7 +41,7 @@ export default function FounderDash() {
                 <Grid size={{ xs: 12 }}>
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
-                            products
+                            <DashNav />
                         </Grid>
                     </Grid>
                 </Grid>

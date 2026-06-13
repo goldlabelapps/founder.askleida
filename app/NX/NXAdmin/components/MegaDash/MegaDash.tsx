@@ -28,7 +28,7 @@ export default function MegaDash() {
         if (dash && dash.title) {
             dispatch(setNXAdmin('header', {
                 title: 'Founder Dashboard',
-                icon: 'leida',
+                icon: 'dashboard',
             }));
         }
     }, [dispatch, dash?.title]);
@@ -38,7 +38,6 @@ export default function MegaDash() {
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
                     <Grid container spacing={2}>
-                        
                         <Grid size={{ xs: 12 }}>
                             Awin Dashboard
                         </Grid>

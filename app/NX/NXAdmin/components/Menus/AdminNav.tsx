@@ -57,7 +57,7 @@ export default function AdminNav({
             onClick={navigateToRoute}
             options={{
               label: 'Dashboard',
-              icon: 'leida',
+              icon: 'dashboard',
               route: '/',
             }}
         />

@@ -113,17 +113,7 @@ const PractitionerCard = ({
 						<Typography variant="body1">
 							{displayName}
 						</Typography>
-						<Typography variant="body2">
-							{email}
-						</Typography>
-
-						{/* {accessLevelLabel ? (
-							<Chip
-								size="small"
-								variant="outlined"
-								label={`${accessLevelLabel}`} />
-						) : null} */}
-
+						
 					</Stack>
 					
 				</Stack>

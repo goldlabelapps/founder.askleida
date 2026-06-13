@@ -59,7 +59,7 @@ export default function DashNav({
   const navItems = [
     {
       label: 'Dashboard',
-      icon: 'leida',
+      icon: 'dashboard',
       route: '/',
       activeRoutes: ['/'],
     },

@@ -7,7 +7,7 @@ import { useDispatch } from '../../../Uberedux';
 import {
 	PractitionerNew,
 	useLeidaBus,
-	PractitionerDash,
+	PractitionerList,
 } from '../../../Leida';
 import { setNXAdmin } from '../../../NXAdmin';
 
@@ -39,7 +39,7 @@ const Practitioners = () => {
 				xs: 12,
 				md: 6,
 			}}>
-				<PractitionerDash />
+				<PractitionerList />
 			</Grid>
 		</Grid>
 		

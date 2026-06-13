@@ -15,7 +15,7 @@ import Awin from './components/Awin/Awin';
 import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
-import { PractitionerDash, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners } from './components/Practitioners';
+import { PractitionerList, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners } from './components/Practitioners';
 import Products from './components/Products/Products';
 import ProductDash from './components/Products/components/ProductDash';
 import ProductCard from './components/Products/components/ProductCard';
@@ -67,7 +67,7 @@ export {
 	AwinSearch,
 	Claude,
 	ClaudePopup,
-	PractitionerDash,
+	PractitionerList,
 	PractitionerCard,
 	PractitionerNew,
 	PractitionerUpdate,
