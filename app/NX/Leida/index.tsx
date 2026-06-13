@@ -11,6 +11,7 @@ import {
 	DashSurface,
 } from './components/FounderDash';
 import DashAuth from './components/FounderDash/components/DashAuth';
+import { navItems } from './components/DashNav/navItems';
 import Awin from './components/Awin/Awin';
 import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
@@ -58,6 +59,7 @@ export {
 	// Components
 	PageRouter,
 	DashNav,
+	navItems,
 	README,
 	FounderDash,
 	DashAuth,

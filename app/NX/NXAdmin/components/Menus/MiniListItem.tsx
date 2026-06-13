@@ -52,7 +52,7 @@ export default function MiniListItem({
                           open ? { mr: 3 } : { mr: 'auto' },
                       ]}
                   >
-                      <Icon icon={icon as any} color={selected ? 'primary' : 'default'} />
+                      <Icon icon={icon as any} color={'primary'} />
                   </ListItemIcon>
               )}
               <ListItemText

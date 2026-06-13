@@ -43,7 +43,6 @@ const PractitionerList = () => {
 	return (
 		<>
 		{/* <PractitionerNew /> */}
-		<Box sx={{ p: 2 }}>
 			<Stack spacing={1.5}>
 				{rowsState?.error && <Alert severity="error">{rowsState.error}</Alert>}
 				{!rowsState?.loading && sortedRows.length === 0 && (
@@ -56,7 +55,6 @@ const PractitionerList = () => {
 					return <PractitionerCard key={key} practitioner={row} />;
 				})}
 			</Stack>
-		</Box>
 		</>
 	);
 };

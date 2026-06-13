@@ -31,13 +31,11 @@ const Practitioners = () => {
 		<Grid container spacing={2} sx={{ mb: 2 }}>
 			<Grid size={{
 				xs: 12,
-				md: 6,
 			}}>
 				<PractitionerNew />
 			</Grid>
 			<Grid size={{
 				xs: 12,
-				md: 6,
 			}}>
 				<PractitionerList />
 			</Grid>
