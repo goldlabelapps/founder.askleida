@@ -41,6 +41,7 @@ import { deletePractitioner } from './actions/deletePractitioner';
 import { deleteProduct } from './actions/deleteProduct';
 import { updateProduct } from './actions/updateProduct';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
+import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
 import { initSupabase } from './components/Supabase/actions/initSupabase';
 import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRows';
@@ -107,6 +108,7 @@ export {
 	submitClaudePrompt,
 	deletePractitioner,
 	deleteProduct,
+	createPractitioner,
 	updateAvatar,
 	updatePractitioner,
 	updateProduct,

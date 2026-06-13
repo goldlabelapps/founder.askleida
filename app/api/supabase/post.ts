@@ -8,16 +8,8 @@ import {
     parseJsonBody,
 } from './lib/shared';
 
-function makeInviteRedirectUrl(baseUrl?: string) {
-    if (!baseUrl) {
-        return undefined;
-    }
-
-    try {
-        return new URL('/invite', baseUrl).toString();
-    } catch {
-        return `${baseUrl.replace(/\/$/, '')}/invite`;
-    }
+function makeInviteRedirectUrl() {
+    return 'https://app.askleida.com/account/invite';
 }
 
 export async function POST(req: Request) {
@@ -42,9 +34,7 @@ export async function POST(req: Request) {
                     ? Number(rawAccessLevel.trim())
                     : undefined;
 
-            const defaultRedirect = makeInviteRedirectUrl(
-                process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || undefined,
-            );
+            const defaultRedirect = makeInviteRedirectUrl();
             const redirectTo = typeof body.redirectTo === 'string' && body.redirectTo.trim()
                 ? body.redirectTo.trim()
                 : defaultRedirect;
@@ -130,7 +120,7 @@ export async function POST(req: Request) {
             if (shouldInvite) {
                 const redirectTo = typeof body.redirectTo === 'string' && body.redirectTo.trim()
                     ? body.redirectTo.trim()
-                    : makeInviteRedirectUrl(process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || undefined);
+                    : makeInviteRedirectUrl();
 
                 const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
                     data: normalizeOptionalObject(body.user_metadata, 'user_metadata') || {},
