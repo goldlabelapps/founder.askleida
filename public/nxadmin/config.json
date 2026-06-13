@@ -25,9 +25,9 @@
                     "mode": "light",
                     "primary": "#2C2C2A",
                     "secondary": "#364450",
-                    "background": "#F7F7F4",
-                    "paper": "#FFF",
-                    "border": "#364450",
+                    "background": "#f6f6f6",
+                    "paper": "#ededed",
+                    "border": "#dcdcdc",
                     "text": "#2C2C2A"
                 },
                 "dark": {

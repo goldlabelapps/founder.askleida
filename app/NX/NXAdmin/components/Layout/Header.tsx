@@ -19,14 +19,27 @@ export default function Header() {
     const header = useHeader();
     const title = header?.title || '';
     const icon = header?.icon || null;
+    const showBack = true;
+
+    const handleBack = () => {
+        dispatch(navigateTo(router, '/'));
+    };
 
     return (<>
             <CardHeader
                 sx={{ width: '100%' }}
-                avatar={<>{icon ? 
-                        <Icon icon={icon as any} />
+                avatar={<>
+                {showBack ? <IconButton 
+                color="primary"
+                onClick={handleBack}>
+                    <Icon icon="leida" />
+                    </IconButton> : null }
+                
+                {icon ? <Box sx={{mt: 1 }}>
+                            <Icon icon={icon as any} />
+                        </Box>
                         : null}</>}
-                title={<Typography variant="h4" color="text.secondary">
+                title={<Typography variant="h5" color="text.secondary">
                     {title}
                 </Typography>}
                 subheader={header?.subheader || null}

@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { 
-  // useTheme, 
+  useTheme, 
   SvgIcon,
 } from '@mui/material';
 
 export default function ClaudeIcon(props: any) {
-  // const theme = useTheme();
-  // let color1 = theme.palette.primary.main;
-  const color1 = '#D97757';
+  const theme = useTheme();
+  let color1 = theme.palette.primary.main;
+  // const color1 = '#D97757';
   return (
     <SvgIcon {...props}>
       <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">

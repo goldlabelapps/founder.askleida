@@ -53,6 +53,7 @@ const PractitionerUpdate = () => {
 	})();
 	const currentDisplayName = typeof practitioner?.display_name === 'string' ? practitioner.display_name : '';
 	const currentClinic = typeof practitioner?.clinic === 'string' ? practitioner.clinic : '';
+	const currentWebsite = typeof practitioner?.website === 'string' ? practitioner.website : '';
 	const currentAccessLevel = (() => {
 		const value = practitioner?.access_level;
 		if (typeof value === 'number' && value >= 0 && value <= 5) {
@@ -69,6 +70,7 @@ const PractitionerUpdate = () => {
 	const [email, setEmail] = React.useState(currentEmail);
 	const [displayName, setDisplayName] = React.useState(currentDisplayName);
 	const [clinic, setClinic] = React.useState(currentClinic);
+	const [website, setWebsite] = React.useState(currentWebsite);
 	const [accessLevel, setAccessLevel] = React.useState(currentAccessLevel);
 	const [avatarChanged, setAvatarChanged] = React.useState(false);
 	const [savingDisplayName, setSavingDisplayName] = React.useState(false);
@@ -77,8 +79,9 @@ const PractitionerUpdate = () => {
 	const hasEmailChanges = email.trim() !== currentEmail;
 	const hasDisplayNameChanges = displayName.trim() !== currentDisplayName;
 	const hasClinicChanges = clinic.trim() !== currentClinic;
+	const hasWebsiteChanges = website.trim() !== currentWebsite;
 	const hasAccessLevelChanges = accessLevel !== currentAccessLevel;
-	const canSave = hasEmailChanges || hasDisplayNameChanges || hasClinicChanges || hasAccessLevelChanges || avatarChanged;
+	const canSave = hasEmailChanges || hasDisplayNameChanges || hasClinicChanges || hasWebsiteChanges || hasAccessLevelChanges || avatarChanged;
 
 	React.useEffect(() => {
 		setEmail(currentEmail);
@@ -91,6 +94,10 @@ const PractitionerUpdate = () => {
 	React.useEffect(() => {
 		setClinic(currentClinic);
 	}, [currentClinic]);
+
+	React.useEffect(() => {
+		setWebsite(currentWebsite);
+	}, [currentWebsite]);
 
 	React.useEffect(() => {
 		setAccessLevel(currentAccessLevel);
@@ -129,7 +136,7 @@ const PractitionerUpdate = () => {
 		if (!uuid) return;
 		if (!canSave) return;
 
-		if (!hasEmailChanges && !hasDisplayNameChanges && !hasClinicChanges && !hasAccessLevelChanges && avatarChanged) {
+		if (!hasEmailChanges && !hasDisplayNameChanges && !hasClinicChanges && !hasWebsiteChanges && !hasAccessLevelChanges && avatarChanged) {
 			setAvatarChanged(false);
 			return;
 		}
@@ -147,6 +154,7 @@ const PractitionerUpdate = () => {
 			const trimmedDisplayName = displayName.trim();
 			const trimmedEmail = email.trim();
 			const trimmedClinic = clinic.trim();
+			const trimmedWebsite = website.trim();
 			const res = await fetch('/api/practitioners', {
 				method: 'PATCH',
 				headers: {
@@ -161,6 +169,7 @@ const PractitionerUpdate = () => {
 						display_name: trimmedDisplayName || null,
 						name: trimmedDisplayName || null,
 						clinic: trimmedClinic || null,
+						website: trimmedWebsite || null,
 						access_level: Number(accessLevel),
 					},
 				}),
@@ -269,6 +278,14 @@ const PractitionerUpdate = () => {
 								}}>
 									<Stack spacing={2}>
 
+												<OptionSelect
+													label="Access Level"
+													options={ACCESS_LEVEL_OPTIONS}
+													value={accessLevel}
+													onChange={setAccessLevel}
+													disabled={savingDisplayName}
+												/>
+
 										<Editable
 											label="Email"
 											disabled
@@ -289,13 +306,13 @@ const PractitionerUpdate = () => {
 											variant="standard"
 											onChange={setClinic}
 										/>
-										<OptionSelect
-											label="Access Level"
-											options={ACCESS_LEVEL_OPTIONS}
-											value={accessLevel}
-											onChange={setAccessLevel}
-											disabled={savingDisplayName}
+										<Editable
+											label="Website"
+											value={website}
+											variant="standard"
+											onChange={setWebsite}
 										/>
+										
 									</Stack>
 									
 								</Grid>

@@ -5,6 +5,7 @@ import {
 	Alert,
 	Box,
 	Button,
+	Paper,
 } from '@mui/material';
 import { Icon, navigateTo } from '../../../../DesignSystem';
 import { useDispatch } from '../../../../Uberedux';
@@ -108,30 +109,31 @@ const PractitionerNew = () => {
 					{createSuccess && <Alert severity="success">{createSuccess}</Alert>}
 				</Box>
 			) : null}
-		<Box sx={{ display: 'flex', mx: 2 }}>
-
-			
-
-			<Editable
-				key={`invite-email-${emailFocusKey}`}
-				label="New Practitioner"
-				variant="standard"
-				value={inviteEmail}
-				onChange={setInviteEmail}
-				disabled={createLoading}
-				autoFocus
-				placeholder="name@example.com"
-			/>
-			<Button
-				sx={{my: 3}}
-				variant="text"
-				endIcon={<Icon icon="practitioner-add" />}
-				onClick={handleCreatePractitioner}
-				disabled={createLoading}
-			>
-				{createLoading ? 'Adding...' : 'Add'}
-			</Button>
-		</Box>
+		
+			<Paper variant="outlined" sx={{ p: 1.5, width: '100%' }}>
+				<Box sx={{ display: 'flex', mx: 2 }}>
+					<Editable
+						key={`invite-email-${emailFocusKey}`}
+						label="Add Practitioner"
+						variant="standard"
+						value={inviteEmail}
+						onChange={setInviteEmail}
+						disabled={createLoading}
+						autoFocus
+						placeholder="name@example.com"
+					/>
+					<Button
+						sx={{my: 2, ml: 3}}
+						variant="text"
+						endIcon={<Icon icon="tick" />}
+						onClick={handleCreatePractitioner}
+						disabled={createLoading}
+					>
+						{createLoading ? 'Adding...' : 'Add'}
+					</Button>
+				</Box>
+			</Paper>
+		
 		</>
 	);
 };

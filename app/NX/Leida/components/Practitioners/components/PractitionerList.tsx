@@ -10,13 +10,22 @@ import PractitionerCard, { T_PractitionerRecord } from './PractitionerCard';
 
 const PRACTITIONERS_TABLE = 'practitioners';
 
-const PractitionerDash = () => {
+const PractitionerList = () => {
 	const dispatch = useDispatch();
 	const supabase = useSupabase();
 	const didRequestRows = React.useRef(false);
 
 	const rowsState = supabase?.rowsByTable?.[PRACTITIONERS_TABLE] || null;
 	const rows = (Array.isArray(rowsState?.rows) ? rowsState.rows : []) as T_PractitionerRecord[];
+	const sortedRows = React.useMemo(() => {
+		return [...rows].sort((a, b) => {
+			const aTime = Date.parse(typeof a?.updated === 'string' ? a.updated : '');
+			const bTime = Date.parse(typeof b?.updated === 'string' ? b.updated : '');
+			const aValue = Number.isNaN(aTime) ? 0 : aTime;
+			const bValue = Number.isNaN(bTime) ? 0 : bTime;
+			return bValue - aValue;
+		});
+	}, [rows]);
 
 	React.useEffect(() => {
 		if (!supabase?.initted) {
@@ -34,22 +43,20 @@ const PractitionerDash = () => {
 	return (
 		<>
 		{/* <PractitionerNew /> */}
-		<Box sx={{ p: 2 }}>
 			<Stack spacing={1.5}>
 				{rowsState?.error && <Alert severity="error">{rowsState.error}</Alert>}
-				{!rowsState?.loading && rows.length === 0 && (
+				{!rowsState?.loading && sortedRows.length === 0 && (
 					<Alert severity="info">No practitioners found.</Alert>
 				)}
-				{rows.map((row, index) => {
+				{sortedRows.map((row, index) => {
 					const key = typeof row?.practitioner_id === 'string' && row.practitioner_id
 						? row.practitioner_id
 						: `practitioner-${index}`;
 					return <PractitionerCard key={key} practitioner={row} />;
 				})}
 			</Stack>
-		</Box>
 		</>
 	);
 };
 
-export default PractitionerDash;
+export default PractitionerList;

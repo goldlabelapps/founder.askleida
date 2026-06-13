@@ -8,6 +8,7 @@ import {
 import { useDispatch } from '../../../Uberedux';
 import { logout } from '../../../Paywall';
 import { ConfirmAction } from '../../../DesignSystem';
+import { navItems } from '../../../Leida';
 import { MiniListItem } from '../../../NXAdmin';
 
 export default function DashNav({
@@ -55,45 +56,6 @@ export default function DashNav({
     if (pathname.length > 1 && pathname.endsWith('/')) return pathname.slice(0, -1);
     return pathname;
   }, [pathname]);
-
-  const navItems = [
-    {
-      label: 'Dashboard',
-      icon: 'leida',
-      route: '/',
-      activeRoutes: ['/'],
-    },
-    {
-      label: 'Practitioners',
-      icon: 'practitioner',
-      route: '/practitioners',
-      activeRoutes: ['/practitioners'],
-    },
-    {
-      label: 'Products',
-      icon: 'products',
-      route: '/products',
-      activeRoutes: ['/products'],
-    },
-    // {
-    //   label: 'Supabase',
-    //   icon: 'supabase',
-    //   route: '/supabase',
-    //   activeRoutes: ['/supabase'],
-    // },
-    {
-      label: 'Awin',
-      icon: 'awin',
-      route: '/awin',
-      activeRoutes: ['/awin'],
-    },
-    {
-      label: 'Claude',
-      icon: 'claude',
-      route: '/claude',
-      activeRoutes: ['/claude'],
-    },
-  ];
 
   const isRouteActive = React.useCallback((activeRoutes?: string[]) => {
     if (!activeRoutes || activeRoutes.length === 0) return false;
