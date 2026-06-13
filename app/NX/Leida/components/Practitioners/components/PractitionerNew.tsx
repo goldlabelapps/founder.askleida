@@ -10,17 +10,11 @@ import {
 import { Icon, navigateTo } from '../../../../DesignSystem';
 import { useDispatch } from '../../../../Uberedux';
 import {
+	createPractitioner,
 	initSupabase,
-	fetchSupabaseRows,
-	saveSupabaseRecord,
-	updatePractitioner,
 	useSupabase,
 } from '../../../../Leida';
 import { Editable, setNXAdmin } from '../../../../NXAdmin';
-
-const PRACTITIONERS_TABLE = 'practitioners';
-const ACCESS_LEVEL = 2;
-const DEFAULT_AVATAR_URL = 'https://app.askleida.com/shared/svg/guest.svg';
 
 const PractitionerNew = () => {
 	const dispatch = useDispatch();
@@ -62,26 +56,8 @@ const PractitionerNew = () => {
 
 		setCreateLoading(true);
 		try {
-			const response = await dispatch(saveSupabaseRecord({
-				resource: 'practitioner-onboard',
-				email,
-				user_metadata: {
-					invited_from: 'leida-supabase-module',
-					access_level: ACCESS_LEVEL,
-					avatar: DEFAULT_AVATAR_URL,
-				},
-			}));
-			
-			const practitionerId = response?.data?.practitioner?.practitioner_id;
-			if (practitionerId) {
-				await dispatch(updatePractitioner({
-					practitioner_id: practitionerId,
-					key: 'avatar',
-					value: DEFAULT_AVATAR_URL,
-				}));
-			}
-
-			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
+			const response = await dispatch(createPractitioner({ email }));
+			const practitionerId = response?.practitionerId;
 
 			if (practitionerId) {
 				setCreateSuccess(`Invited ${email}. Navigating to practitioner profile...`);
