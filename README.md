@@ -1,7 +1,7 @@
-## Founder Dashboard
+## Leida Dashboard
 
-- Manage Practitioners
-- Manage Products
+- Practitioners
+- Products
     - Awin afilliate / Looksfantastic 
     
 ![NextJS](public/shared/png/python.png)  

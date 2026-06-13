@@ -39,8 +39,18 @@ const PractitionerUpdate = () => {
 	const uuid = pathname?.split('/').pop() ?? '';
 	const route = uuid ? `practitioners/${uuid}` : '';
 	const { loading, error, data } = useLeidaBus(route);
-	const practitioner = data?.[0]?.data;
+	const practitionerRecord = data?.[0];
+	const practitioner = practitionerRecord?.data;
 	const currentAvatar = typeof practitioner?.avatar === 'string' ? practitioner.avatar : undefined;
+	const currentEmail = (() => {
+		if (typeof practitioner?.email === 'string' && practitioner.email.trim()) {
+			return practitioner.email;
+		}
+		if (typeof practitionerRecord?.title === 'string' && practitionerRecord.title.trim()) {
+			return practitionerRecord.title;
+		}
+		return '';
+	})();
 	const currentDisplayName = typeof practitioner?.display_name === 'string' ? practitioner.display_name : '';
 	const currentClinic = typeof practitioner?.clinic === 'string' ? practitioner.clinic : '';
 	const currentAccessLevel = (() => {
@@ -56,6 +66,7 @@ const PractitionerUpdate = () => {
 		}
 		return '';
 	})();
+	const [email, setEmail] = React.useState(currentEmail);
 	const [displayName, setDisplayName] = React.useState(currentDisplayName);
 	const [clinic, setClinic] = React.useState(currentClinic);
 	const [accessLevel, setAccessLevel] = React.useState(currentAccessLevel);
@@ -63,10 +74,15 @@ const PractitionerUpdate = () => {
 	const [savingDisplayName, setSavingDisplayName] = React.useState(false);
 	const [displayNameError, setDisplayNameError] = React.useState<string | null>(null);
 	const [confirmOpen, setConfirmOpen] = React.useState(false);
+	const hasEmailChanges = email.trim() !== currentEmail;
 	const hasDisplayNameChanges = displayName.trim() !== currentDisplayName;
 	const hasClinicChanges = clinic.trim() !== currentClinic;
 	const hasAccessLevelChanges = accessLevel !== currentAccessLevel;
-	const canSave = hasDisplayNameChanges || hasClinicChanges || hasAccessLevelChanges || avatarChanged;
+	const canSave = hasEmailChanges || hasDisplayNameChanges || hasClinicChanges || hasAccessLevelChanges || avatarChanged;
+
+	React.useEffect(() => {
+		setEmail(currentEmail);
+	}, [currentEmail]);
 
 	React.useEffect(() => {
 		setDisplayName(currentDisplayName);
@@ -113,7 +129,7 @@ const PractitionerUpdate = () => {
 		if (!uuid) return;
 		if (!canSave) return;
 
-		if (!hasDisplayNameChanges && avatarChanged) {
+		if (!hasEmailChanges && !hasDisplayNameChanges && !hasClinicChanges && !hasAccessLevelChanges && avatarChanged) {
 			setAvatarChanged(false);
 			return;
 		}
@@ -128,6 +144,9 @@ const PractitionerUpdate = () => {
 		}
 
 		try {
+			const trimmedDisplayName = displayName.trim();
+			const trimmedEmail = email.trim();
+			const trimmedClinic = clinic.trim();
 			const res = await fetch('/api/practitioners', {
 				method: 'PATCH',
 				headers: {
@@ -136,9 +155,12 @@ const PractitionerUpdate = () => {
 				},
 				body: JSON.stringify({
 					practitioner_id: uuid,
+					title: trimmedEmail || trimmedDisplayName || null,
 					data: {
-						display_name: displayName.trim(),
-						clinic: clinic.trim(),
+						email: trimmedEmail || null,
+						display_name: trimmedDisplayName || null,
+						name: trimmedDisplayName || null,
+						clinic: trimmedClinic || null,
 						access_level: Number(accessLevel),
 					},
 				}),
@@ -246,6 +268,15 @@ const PractitionerUpdate = () => {
 									sm: 6,
 								}}>
 									<Stack spacing={2}>
+
+										<Editable
+											label="Email"
+											disabled
+											value={email}
+											variant="standard"
+											onChange={setEmail}
+										/>
+
 										<Editable
 											label="Name"
 											value={displayName}
@@ -312,6 +343,9 @@ const PractitionerUpdate = () => {
 				handleConfirm={handleConfirmDelete}
 				handleClose={handleCloseConfirm}
 			/>
+
+			{/* <pre>{JSON.stringify({ email, displayName, clinic, accessLevel }, null, 2)}</pre> */}
+		
 		</Paper>
 	);
 };
