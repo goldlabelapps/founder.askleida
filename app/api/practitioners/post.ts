@@ -13,6 +13,7 @@ export type T_Practitioner = {
   category?: string | null;
   description?: string | null;
   notes?: string | null;
+  access_level?: number | string | null;
 };
 
 
@@ -54,6 +55,12 @@ export async function POST(req: Request) {
   const category = normalizeText(body.category ?? dataObject.category);
   const description = normalizeText(body.description ?? dataObject.description);
   const notes = normalizeText(body.notes ?? dataObject.notes);
+  const rawAccessLevel = body.access_level ?? dataObject.access_level;
+  const accessLevel = typeof rawAccessLevel === 'number'
+    ? rawAccessLevel
+    : typeof rawAccessLevel === 'string' && /^[0-5]$/.test(rawAccessLevel.trim())
+      ? Number(rawAccessLevel.trim())
+      : undefined;
 
   if (!name) {
     const res = makeRes({ tenant, message: 'name is required', severity: 'error' });
@@ -70,6 +77,7 @@ export async function POST(req: Request) {
       category,
       description,
       notes,
+      ...(typeof accessLevel === 'number' ? { access_level: accessLevel } : {}),
     },
     ...(body.created ? { created: body.created } : {}),
     ...(body.updated ? { updated: body.updated } : {}),

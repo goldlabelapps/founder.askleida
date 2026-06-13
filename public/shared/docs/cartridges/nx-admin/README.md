@@ -63,6 +63,27 @@ NEXT_PUBLIC_SUPABASE_VAPID_KEY=   # Required for push notifications
 
 Copy `public/supabase-messaging-sw.js` to the root of your `public/` folder. This is the background service worker that handles push notifications when the app is not in focus.
 
+### 4. Supabase Auth email delivery (Resend SMTP)
+
+If Supabase Auth shows rate-limit warnings for invite, reset-password, or magic-link email flows, configure custom SMTP with Resend.
+
+1. In Resend:
+  - Verify your sending domain (SPF + DKIM).
+  - Create an API key.
+2. In Supabase Dashboard, open Authentication -> Email -> SMTP Settings.
+3. Enable custom SMTP and set:
+  - Host: `smtp.resend.com`
+  - Port: `587` (or `465` for SSL)
+  - Username: `resend`
+  - Password: your Resend API key
+  - Sender email: an address on your verified domain (example: `auth@yourdomain.com`)
+4. Save and send a test email in Supabase.
+5. Confirm Authentication -> URL Configuration has the correct Site URL and redirect URLs for your environment.
+
+Notes:
+- Supabase-managed auth emails are sent by Supabase using this SMTP configuration; no client-side mail code is required for auth invite/reset flows.
+- In this project, practitioner/auth invites are issued via Supabase Admin Auth APIs in `app/api/supabase/post.ts`.
+
 ---
 
 ## How It Works

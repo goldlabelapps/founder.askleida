@@ -57,6 +57,7 @@ const PractitionerCard = ({
 	const displayName = typeof parsedData?.display_name === 'string' && parsedData.display_name.trim()
 		? parsedData.display_name.trim()
 		: (email || 'Unknown practitioner');
+	const clinic = typeof parsedData?.clinic === 'string' ? parsedData.clinic : '';
 	const avatar = typeof parsedData?.avatar === 'string' ? parsedData.avatar : '';
 	const accessLevel = (() => {
 		const value = parsedData?.access_level;
@@ -96,22 +97,24 @@ const PractitionerCard = ({
 		>
 			<Paper variant="outlined" sx={{ p: 1.5, width: '100%' }}>
 				<Stack direction="row" spacing={1.5} alignItems="center">
-					<Avatar src={avatar || 'https://app.askleida.com/shared/svg/guest.svg'} alt={displayName} />
+					<Avatar 
+						src={avatar} 
+						alt={displayName} 
+					/>
 					<Stack>
-						<Typography variant="subtitle2">
+						<Typography variant="body1">
 							{displayName}
 						</Typography>
-						
 						<Typography variant="body2">
-							{email || 'No email'}
+							{clinic || email}
 						</Typography>
 
-						{accessLevelLabel ? (
+						{/* {accessLevelLabel ? (
 							<Chip
 								size="small"
 								variant="outlined"
 								label={`${accessLevelLabel}`} />
-						) : null}
+						) : null} */}
 
 					</Stack>
 					

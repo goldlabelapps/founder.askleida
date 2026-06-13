@@ -12,11 +12,14 @@ import {
 	initSupabase,
 	fetchSupabaseRows,
 	saveSupabaseRecord,
+	updatePractitioner,
 	useSupabase,
 } from '../../../../Leida';
-import { Editable } from '../../../../NXAdmin';
+import { Editable, setNXAdmin } from '../../../../NXAdmin';
 
 const PRACTITIONERS_TABLE = 'practitioners';
+const ACCESS_LEVEL = 2;
+const DEFAULT_AVATAR_URL = 'https://app.askleida.com/shared/svg/guest.svg';
 
 const PractitionerNew = () => {
 	const dispatch = useDispatch();
@@ -38,6 +41,13 @@ const PractitionerNew = () => {
 		}
 	}, [dispatch, supabase?.initted]);
 
+	React.useEffect(() => {
+		dispatch(setNXAdmin('header', {
+			title: 'New Practitioner',
+			icon: 'practitioner',
+		}));
+	}, [dispatch]);
+		
 	const handleCreatePractitioner = React.useCallback(async () => {
 		setCreateError(null);
 		setCreateSuccess(null);
@@ -54,11 +64,24 @@ const PractitionerNew = () => {
 			const response = await dispatch(saveSupabaseRecord({
 				resource: 'practitioner-onboard',
 				email,
-				user_metadata: { invited_from: 'leida-supabase-module' },
+				user_metadata: {
+					invited_from: 'leida-supabase-module',
+					access_level: ACCESS_LEVEL,
+					avatar: DEFAULT_AVATAR_URL,
+				},
 			}));
-			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
 			
 			const practitionerId = response?.data?.practitioner?.practitioner_id;
+			if (practitionerId) {
+				await dispatch(updatePractitioner({
+					practitioner_id: practitionerId,
+					key: 'avatar',
+					value: DEFAULT_AVATAR_URL,
+				}));
+			}
+
+			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
+
 			if (practitionerId) {
 				setCreateSuccess(`Invited ${email}. Navigating to practitioner profile...`);
 				setTimeout(() => {
@@ -78,18 +101,20 @@ const PractitionerNew = () => {
 	}, [dispatch, router, focusEmailField, inviteEmail]);
 
 	return (
-		<Box sx={{  mx: 2 }}>
-
+		<>
 			{createError || createSuccess ? (
 				<Box sx={{ mb: 2 }}>
 					{createError && <Alert severity="error">{createError}</Alert>}
 					{createSuccess && <Alert severity="success">{createSuccess}</Alert>}
 				</Box>
 			) : null}
+		<Box sx={{ display: 'flex', mx: 2 }}>
+
+			
 
 			<Editable
 				key={`invite-email-${emailFocusKey}`}
-				label="Email"
+				label="New Practitioner"
 				variant="standard"
 				value={inviteEmail}
 				onChange={setInviteEmail}
@@ -99,14 +124,15 @@ const PractitionerNew = () => {
 			/>
 			<Button
 				sx={{my: 3}}
-				variant="contained"
+				variant="text"
 				endIcon={<Icon icon="practitioner-add" />}
 				onClick={handleCreatePractitioner}
 				disabled={createLoading}
 			>
-				{createLoading ? 'Adding...' : 'Add Practitioner'}
+				{createLoading ? 'Adding...' : 'Add'}
 			</Button>
 		</Box>
+		</>
 	);
 };
 

@@ -110,7 +110,8 @@ export default function Claude() {
                 </Typography>
 
                 {!hasSubmittedPrompt ? (
-                    <Paper component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
+                    <Paper variant="outlined"
+                     component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
 
                     <Typography variant="body1" sx={{my:2, }}>
                         Paste a product description here. Example: <IconButton

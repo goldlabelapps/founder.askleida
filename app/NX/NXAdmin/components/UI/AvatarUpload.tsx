@@ -14,6 +14,7 @@ type AvatarUploadProps = {
     practitionerId: string;
     currentAvatar?: string;
     displayName?: string;
+    size?: number;
     onSuccess?: (avatarUrl: string) => void;
 };
 
@@ -21,6 +22,7 @@ export default function AvatarUpload({
     practitionerId,
     currentAvatar,
     displayName,
+    size = 75,
     onSuccess,
 }: AvatarUploadProps) {
     const inputRef = React.useRef<HTMLInputElement>(null);
@@ -88,7 +90,7 @@ export default function AvatarUpload({
                     <Avatar
                         src={preview}
                         alt={displayName ?? 'Avatar'}
-                        sx={{ width: 72, height: 72, cursor: uploading ? 'default' : 'pointer' }}
+                        sx={{ width: size, height: size, cursor: uploading ? 'default' : 'pointer' }}
                         onClick={handleClick}
                     >
                         {!preview ? <Icon icon="clients" color="primary" /> : null}
@@ -101,8 +103,8 @@ export default function AvatarUpload({
                         aria-label="Upload avatar"
                         sx={{
                             position: 'absolute',
-                            bottom: -4,
-                            right: -4,
+                            bottom: 12,
+                            right: 12,
                             bgcolor: 'background.paper',
                             border: '1px solid',
                             borderColor: 'divider',

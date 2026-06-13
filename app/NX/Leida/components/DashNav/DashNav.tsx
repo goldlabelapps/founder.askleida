@@ -58,16 +58,10 @@ export default function DashNav({
 
   const navItems = [
     {
-      label: 'Founder',
+      label: 'Dashboard',
       icon: 'leida',
       route: '/',
       activeRoutes: ['/'],
-    },
-    {
-      label: 'Add Practitioner',
-      icon: 'practitioner-add',
-      route: '/practitioners/new',
-      activeRoutes: ['/practitioners/new'],
     },
     {
       label: 'Practitioners',
@@ -76,11 +70,17 @@ export default function DashNav({
       activeRoutes: ['/practitioners'],
     },
     {
-      label: 'Supabase',
-      icon: 'supabase',
-      route: '/supabase',
-      activeRoutes: ['/supabase'],
+      label: 'Products',
+      icon: 'products',
+      route: '/products',
+      activeRoutes: ['/products'],
     },
+    // {
+    //   label: 'Supabase',
+    //   icon: 'supabase',
+    //   route: '/supabase',
+    //   activeRoutes: ['/supabase'],
+    // },
     {
       label: 'Awin',
       icon: 'awin',
