@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { Icon, navigateTo } from '../../../DesignSystem';
 import { useDispatch } from '../../../Uberedux';
-import { useHeader, NXAdminMenu } from '../../../NXAdmin';
+import { useHeader } from '../../../NXAdmin';
 
 export default function Header() {
 
@@ -43,9 +43,6 @@ export default function Header() {
                     {title}
                 </Typography>}
                 subheader={header?.subheader || null}
-                action={ <Box sx={{}}>
-                            <NXAdminMenu />
-                        </Box>}
             />
         </>
     );

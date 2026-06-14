@@ -73,7 +73,7 @@ function SwipeableEdgeDrawer(props: SwipeableEdgeDrawerProps) {
     return (
         <SwipeableDrawer
             container={container}
-            anchor="bottom"
+            anchor="top"
             open={open}
             onClose={onClose}
             onOpen={onOpen}
@@ -91,7 +91,7 @@ function SwipeableEdgeDrawer(props: SwipeableEdgeDrawerProps) {
             <Box
                 sx={{
                     position: 'absolute',
-                    top: -drawerBleeding,
+                    bottom: -drawerBleeding,
                     right: 0,
                     left: 0,
                     visibility: 'visible',
@@ -170,7 +170,7 @@ export default function MobileLayout(props: Props) {
                     sx={{
                         position: 'fixed',
                         right: 16,
-                        bottom: 16,
+                        top: 'calc(16px + env(safe-area-inset-top))',
                         zIndex: (theme) => theme.zIndex.modal + 1,
                         
                     }}
@@ -198,21 +198,21 @@ export default function MobileLayout(props: Props) {
                         position: 'fixed',
                         left: 0,
                         right: 0,
-                        bottom: 0,
+                        top: 0,
                         py: 1,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: 1,
                         backgroundColor: 'background.default',
-                        borderTop: 1,
+                        borderBottom: 1,
                         borderColor: 'divider',
                         zIndex: (theme) => theme.zIndex.modal + 1,
                         pointerEvents: 'none',
                     }}
                 >
                     <Icon icon="expand" color="primary" />
-                    <Box sx={{ color: 'text.secondary', fontSize: 12 }}>Swipe up for menu</Box>
+                    <Box sx={{ color: 'text.secondary', fontSize: 12 }}>Swipe down for menu</Box>
                 </Box>
             )}
 
@@ -228,13 +228,8 @@ export default function MobileLayout(props: Props) {
                 showPuller={false}
                 headerContent={isSwipeableDevice ? <Icon icon="expand" color="primary" /> : null}
             >
-                <Box sx={{ overflow: 'auto' }}>
-                    <Box sx={{ 
-                        // my: 4, mb: '70px' 
-                    }}>
-                        <DashNav onNavigate={closeDrawer} />
-
-                    </Box>
+                <Box sx={{ overflow: 'auto' }}>                    
+                    <DashNav onNavigate={closeDrawer} />
                 </Box>
             </SwipeableEdgeDrawer>
         </Root>
