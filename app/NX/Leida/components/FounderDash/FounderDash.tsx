@@ -9,6 +9,7 @@ import {
     initDash, 
     useDash,
     DashNav,
+    PractitionerNew,
 } from '../../../Leida';
 
 
@@ -41,6 +42,7 @@ export default function FounderDash() {
                 <Grid size={{ xs: 12 }}>
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
+                            <PractitionerNew />
                             <DashNav />
                         </Grid>
                     </Grid>
