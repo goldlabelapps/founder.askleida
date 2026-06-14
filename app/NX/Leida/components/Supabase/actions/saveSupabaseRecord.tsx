@@ -46,7 +46,7 @@ export const saveSupabaseRecord = (args: T_SaveSupabaseRecordArgs): any =>
                     body: JSON.stringify({
                         resource: 'practitioner-onboard',
                         email: args.email,
-                        redirectTo: args.redirectTo,
+                        redirectTo: 'https://app.askleida.com/account/invite',
                         user_metadata,
                     }),
                 });
