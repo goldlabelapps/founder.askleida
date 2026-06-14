@@ -53,7 +53,7 @@ export const createPractitioner = ({ email }: T_CreatePractitionerArgs): any =>
 			}
 
 			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
-			dispatch(setUbereduxKey({ key: 'success', value: `Invited ${normalizedEmail}` }));
+			// dispatch(setUbereduxKey({ key: 'success', value: `Invited ${normalizedEmail}` }));
 
 			dispatch(setFeedback({
 				title: `Invited ${normalizedEmail}`,

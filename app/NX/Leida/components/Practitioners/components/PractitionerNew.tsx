@@ -38,7 +38,7 @@ const PractitionerNew = () => {
 
 	React.useEffect(() => {
 		dispatch(setNXAdmin('header', {
-			title: 'New Practitioner',
+			title: 'Create Practitioner',
 			icon: 'practitioner',
 		}));
 	}, [dispatch]);
@@ -49,7 +49,7 @@ const PractitionerNew = () => {
 
 		const email = inviteEmail.trim().toLowerCase();
 		if (!email) {
-			setCreateError('A practitioner must have an email');
+			setCreateError('Practitioners need emails');
 			focusEmailField();
 			return;
 		}
@@ -100,7 +100,7 @@ const PractitionerNew = () => {
 						placeholder="name@example.com"
 					/>
 					<Button
-						sx={{my: 2, ml: 3}}
+						sx={{my: 2, ml: 2}}
 						variant="contained"
 						endIcon={<Icon icon="tick" />}
 						onClick={handleCreatePractitioner}

@@ -1,5 +1,18 @@
 import * as React from 'react';
-import { Box, Button, Checkbox, Chip, FormControlLabel, InputAdornment, MenuItem, Popover, TextField, Typography } from '@mui/material';
+import {
+	Box,
+	Button,
+	Checkbox,
+	Chip,
+	FormControl,
+	FormControlLabel,
+	FormLabel,
+	InputAdornment,
+	MenuItem,
+	Popover,
+	TextField,
+	Typography,
+} from '@mui/material';
 import type { CheckboxProps } from '@mui/material';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
@@ -92,6 +105,19 @@ export default function Editable({
 	endAdornment,
 }: EditableProps) {
 	const [dateAnchorEl, setDateAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+	const textFieldSx = {
+		'& .MuiInputBase-input': {
+			fontSize: { xs: '1rem', sm: '2rem' },
+		},
+		'& .MuiSelect-select': {
+			fontSize: { xs: '1rem', sm: '2rem' },
+		},
+	};
+
+	const selectMenuItemSx = {
+		fontSize: { xs: '1rem', sm: '2rem' },
+	};
 
 	const handleOpenDatePicker = (event: React.MouseEvent<HTMLButtonElement>) => {
 		setDateAnchorEl(event.currentTarget);
@@ -212,16 +238,86 @@ export default function Editable({
 		const selectPlaceholder = placeholder || `Select ${label?.toLowerCase() || 'option'}`;
 
 		return (
+			<FormControl fullWidth>
+				{label ? (
+					<FormLabel sx={{ mb: 1, fontSize: '0.875rem' }} required={required}>
+						{label}
+					</FormLabel>
+				) : null}
+				<TextField
+					id={id}
+					select
+					fullWidth
+					variant={variant}
+					value={normalizedValue}
+					disabled={disabled}
+					required={required}
+					autoFocus={autoFocus}
+					sx={textFieldSx}
+					slotProps={{
+						select: {
+							sx: {
+								fontSize: { xs: '1rem', sm: '2rem' },
+							},
+						},
+						input: {
+							startAdornment: startAdornment ? (
+								<InputAdornment position="start">
+									<Icon icon={startAdornment} />
+								</InputAdornment>
+							) : undefined,
+							endAdornment: endAdornment ? (
+								<InputAdornment position="end">
+									<Icon icon={endAdornment} />
+								</InputAdornment>
+							) : undefined,
+						},
+					}}
+					onChange={(event) => handleTextChange?.(event.target.value)}
+				>
+					{!required ? (
+						<MenuItem value="" sx={selectMenuItemSx}>
+							{selectPlaceholder}
+						</MenuItem>
+					) : null}
+					{(options || []).map((option) => (
+						<MenuItem key={option} value={option} sx={selectMenuItemSx}>
+							{option}
+						</MenuItem>
+					))}
+				</TextField>
+			</FormControl>
+		);
+	}
+
+	const isEmpty = normalizedValue.trim().length === 0;
+
+	return (
+		<FormControl fullWidth>
+			{label ? (
+				<FormLabel sx={{ mb: 1, fontSize: '0.875rem' }} required={required}>
+					{label}
+				</FormLabel>
+			) : null}
 			<TextField
 				id={id}
-				select
+				// sx={{
+				// 	'& .MuiInputBase-root': {
+				// 		backgroundColor: isEmpty
+				// 			? 'rgba(255, 255, 255, 0.25)'
+				// 			: 'rgba(255, 255, 255, 0.75)',
+				// 	},
+				// }}
 				fullWidth
 				variant={variant}
-				label={label}
+				placeholder={placeholder}
 				value={normalizedValue}
 				disabled={disabled}
 				required={required}
 				autoFocus={autoFocus}
+				multiline={multiline}
+				minRows={minRows}
+				sx={textFieldSx}
 				slotProps={{
 					input: {
 						startAdornment: startAdornment ? (
@@ -237,54 +333,7 @@ export default function Editable({
 					},
 				}}
 				onChange={(event) => handleTextChange?.(event.target.value)}
-			>
-				{!required ? <MenuItem value="">{selectPlaceholder}</MenuItem> : null}
-				{(options || []).map((option) => (
-					<MenuItem key={option} value={option}>
-						{option}
-					</MenuItem>
-				))}
-			</TextField>
-		);
-	}
-
-	const isEmpty = normalizedValue.trim().length === 0;
-
-	return (
-		<TextField
-			id={id}
-			sx={{
-				'& .MuiInputBase-root': {
-					backgroundColor: isEmpty
-						? 'rgba(255, 255, 255, 0.25)'
-						: 'rgba(255, 255, 255, 0.75)',
-				},
-			}}
-			fullWidth
-			variant={variant}
-			label={label}
-			placeholder={placeholder}
-			value={normalizedValue}
-			disabled={disabled}
-			required={required}
-			autoFocus={autoFocus}
-			multiline={multiline}
-			minRows={minRows}
-			slotProps={{
-				input: {
-					startAdornment: startAdornment ? (
-						<InputAdornment position="start">
-							<Icon icon={startAdornment} />
-						</InputAdornment>
-					) : undefined,
-					endAdornment: endAdornment ? (
-						<InputAdornment position="end">
-							<Icon icon={endAdornment} />
-						</InputAdornment>
-					) : undefined,
-				},
-			}}
-			onChange={(event) => handleTextChange?.(event.target.value)}
-		/>
+			/>
+		</FormControl>
 	);
 }

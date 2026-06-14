@@ -78,9 +78,12 @@ const PractitionerCard = ({
 		return null;
 	})();
 	const accessLevelLabel = (() => {
+		
 		switch (accessLevel) {
-			case 3:
+			case 4:
 				return 'Founder';
+			case 3:
+				return 'QA';
 			case 2:
 				return 'Practitioner';
 			case 1:
@@ -113,7 +116,9 @@ const PractitionerCard = ({
 						<Typography variant="body1">
 							{displayName}
 						</Typography>
-						
+						<Typography variant="body2" color="textSecondary">
+							{accessLevelLabel}
+						</Typography>
 					</Stack>
 					
 				</Stack>
