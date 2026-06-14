@@ -5,6 +5,9 @@ import {
   Box,
   Grid,
   Container,
+  Button,
+  CircularProgress,
+  Typography,
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -18,6 +21,7 @@ import {
   usePaywall, 
   SimpleSignIn, 
   useIsAuthed,
+  logout,
 } from '../Paywall';
 import {
   useDispatch,
@@ -28,7 +32,7 @@ import {
   README,
   requestNotifications,
 } from '../NXAdmin';
-import { initLeida, useLeida } from '../Leida';
+import { initLeida, useFounderAccess, useLeida } from '../Leida';
 
 export type { I_NXAdmin };
 
@@ -42,6 +46,7 @@ export default function NXAdmin({
   const paywall = usePaywall();
   const leida = useLeida();
   const isAuthed = useIsAuthed();
+  const { isAllowed: hasFounderAccess, isCheckingAccess } = useFounderAccess();
   const didInitLeida = React.useRef(false);
   const { authChecked } = paywall || {};
   const designSystem = useDesignSystem();
@@ -69,10 +74,10 @@ export default function NXAdmin({
 
 
   React.useEffect(() => {
-    if (isAuthed) {
+    if (isAuthed && hasFounderAccess) {
       dispatch(requestNotifications());
     }
-  }, [isAuthed, dispatch]);
+  }, [isAuthed, hasFounderAccess, dispatch]);
 
   if (!authChecked) return null;
 
@@ -98,6 +103,52 @@ export default function NXAdmin({
               </Grid>            
           </Container>
         </>
+        : isCheckingAccess
+          ? <Container
+              maxWidth="sm"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <CircularProgress size={20} />
+                <Typography variant="body2">Checking access level...</Typography>
+              </Box>
+            </Container>
+        : !hasFounderAccess
+          ? <Container
+              maxWidth="sm"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh',
+              }}
+            >
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant="h5">Access denied</Typography>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Founder app access is restricted to QA (3) and Founder (4) roles.
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      dispatch(logout());
+                    }}
+                  >
+                    Sign out
+                  </Button>
+                </Grid>
+              </Grid>
+            </Container>
         : isDesktopLayout
           ? <DesktopLayout config={config} />
           : <MobileLayout config={config} />}
