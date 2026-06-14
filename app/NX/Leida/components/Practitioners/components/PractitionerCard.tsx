@@ -6,7 +6,7 @@ import {
 	ButtonBase,
 	Chip,
 	Paper,
-	Stack,
+	Box,
 	Typography,
 } from '@mui/material';
 import { navigateTo } from '../../../../DesignSystem';
@@ -66,6 +66,7 @@ const PractitionerCard = ({
 		? parsedData.display_name.trim()
 		: (email || 'Unknown practitioner');
 	const clinic = typeof parsedData?.clinic === 'string' ? parsedData.clinic : '';
+	const website = typeof parsedData?.website === 'string' ? parsedData.website.trim() : '';
 	const avatar = typeof parsedData?.avatar === 'string' ? parsedData.avatar : '';
 	const accessLevel = (() => {
 		const value = parsedData?.access_level;
@@ -107,21 +108,33 @@ const PractitionerCard = ({
 			sx={{ display: 'block', width: '100%', textAlign: 'left', borderRadius: 1 }}
 		>
 			<Paper variant="outlined" sx={{ p: 1.5, width: '100%' }}>
-				<Stack direction="row" spacing={1.5} alignItems="center">
-					<Avatar 
-						src={avatar} 
-						alt={displayName} 
-					/>
-					<Stack>
+				
+				<Box sx={{
+					display: 'flex',
+				}}>
+					<Box>
+						<Avatar
+							src={avatar}
+							alt={displayName}
+							sx={{ alignSelf: 'flex-start' }}
+						/>
+					</Box>
+					<Box sx={{mx: 1}}>
 						<Typography variant="body1">
 							{displayName}
 						</Typography>
 						<Typography variant="body2" color="textSecondary">
-							{accessLevelLabel}
+							{email}
 						</Typography>
-					</Stack>
-					
-				</Stack>
+						<Chip 
+							sx={{ mt: 1 }}
+							size="small"
+							variant="outlined" 
+							label={accessLevelLabel} 
+						/>
+					</Box>
+				</Box>
+				
 			</Paper>
 		</ButtonBase>
 	);
