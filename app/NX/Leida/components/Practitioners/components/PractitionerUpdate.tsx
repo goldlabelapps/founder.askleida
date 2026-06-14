@@ -5,6 +5,7 @@ import {
 	Paper, 
 	Grid,
 	Stack,
+	Collapse,
 	LinearProgress,
 	Typography,
 	Button,
@@ -215,7 +216,10 @@ const PractitionerUpdate = () => {
 	}, [dispatch, data]);
 
 	return (
-		<Paper variant="outlined" sx={{ p: 1.5 }}>
+		<Box
+			id={`practitioner-update-${uuid}`}
+			sx={{ pb: 'calc(104px + env(safe-area-inset-bottom))' }}
+		>
 			<>
 				{/* Header with delete button */}
 				<Stack
@@ -256,35 +260,39 @@ const PractitionerUpdate = () => {
 							<>
 							<Grid container spacing={2} alignItems="center">
 								
-
-										<Grid size={{
-											xs: 12,
-											sm: 6,
-										}} sx={{ alignSelf: 'flex-start' }}>
-											<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', height: '100%' }}>
-												<AvatarUpload
-													size={200}
-													practitionerId={uuid}
-													currentAvatar={currentAvatar}
-													displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
-													onSuccess={handleAvatarSuccess}
-												/>
-											</Box>
-										</Grid>
+								<Grid size={{
+									xs: 12,
+									sm: 6,
+								}} sx={{ alignSelf: 'flex-start', order: { xs: 1, sm: 2 } }}>
+									<Box sx={{ 
+										display: 'flex', 
+										justifyContent: 'center', 
+										alignItems: 'flex-start', 
+										height: '100%',
+									 }}>
+										<AvatarUpload
+											size={200}
+											practitionerId={uuid}
+											currentAvatar={currentAvatar}
+											displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
+											onSuccess={handleAvatarSuccess}
+										/>
+									</Box>
+								</Grid>
 
 								<Grid size={{
 									xs: 12,
 									sm: 6,
-								}}>
+								}} sx={{ order: { xs: 2, sm: 1 } }}>
 									<Stack spacing={2}>
 
-												<OptionSelect
-													label="Access Level"
-													options={ACCESS_LEVEL_OPTIONS}
-													value={accessLevel}
-													onChange={setAccessLevel}
-													disabled={savingDisplayName}
-												/>
+										<OptionSelect
+											label="Access Level"
+											options={ACCESS_LEVEL_OPTIONS}
+											value={accessLevel}
+											onChange={setAccessLevel}
+											disabled={savingDisplayName}
+										/>
 
 										<Editable
 											label="Email"
@@ -317,28 +325,6 @@ const PractitionerUpdate = () => {
 									
 								</Grid>
 
-								
-
-
-								<Grid size={{
-									xs: 12,
-								}}>
-									<Box sx={{
-										display: 'flex',
-										justifyContent: 'flex-end',
-									}}>
-										<Button
-											variant="contained"
-											startIcon={<Icon icon="save" />}
-											color="primary"
-											sx={{ my: 2 }}
-											onClick={handleSaveDisplayName}
-											disabled={savingDisplayName || !canSave}
-										>
-											{savingDisplayName ? 'Saving...' : 'Save'}
-										</Button>
-									</Box>
-								</Grid>
 							</Grid>
 								
 								{displayNameError ? (
@@ -361,9 +347,49 @@ const PractitionerUpdate = () => {
 				handleClose={handleCloseConfirm}
 			/>
 
+			<Box
+				sx={{
+					position: 'fixed',
+					left: 0,
+					right: 0,
+					bottom: 0,
+					zIndex: (theme) => theme.zIndex.appBar,
+					borderTop: 1,
+					borderColor: 'divider',
+					backgroundColor: 'background.paper',
+					px: 2,
+					py: 1.5,
+					pb: 'calc(12px + env(safe-area-inset-bottom))',
+					pointerEvents: 'none',
+				}}
+			>
+				<Box
+					sx={{
+						maxWidth: 900,
+						ml: 'auto',
+						mr: 'auto',
+						display: 'flex',
+						justifyContent: 'flex-end',
+					}}
+				>
+					<Collapse in={canSave || savingDisplayName} orientation="vertical" unmountOnExit>
+						<Button
+							variant="contained"
+							startIcon={<Icon icon="save" />}
+							color="primary"
+							onClick={handleSaveDisplayName}
+							disabled={savingDisplayName || !canSave}
+							sx={{ pointerEvents: 'auto' }}
+						>
+							{savingDisplayName ? 'Saving...' : 'Save'}
+						</Button>
+					</Collapse>
+				</Box>
+			</Box>
+
 			{/* <pre>{JSON.stringify({ email, displayName, clinic, accessLevel }, null, 2)}</pre> */}
 		
-		</Paper>
+		</Box>
 	);
 };
 
