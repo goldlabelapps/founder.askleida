@@ -5,7 +5,6 @@ import { styled } from '@mui/material/styles';
 import {
     Box,
     Fab,
-    useMediaQuery,
 } from '@mui/material';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import { grey } from '@mui/material/colors';
@@ -21,7 +20,6 @@ import {
 import { DashNav, PageRouter } from '../../../Leida';
 import { NAV_ROUTES, sanitizePath, getActiveFromPathname } from '../PageRouter';
 
-const drawerBleeding = 25;
 const FALLBACK_ADMIN_BASE_PATH = '/';
 
 interface Props {
@@ -47,12 +45,7 @@ interface SwipeableEdgeDrawerProps {
     open: boolean;
     onClose: () => void;
     onOpen: () => void;
-    swipeAreaWidth: number;
-    disableSwipeToOpen: boolean;
     keepMounted?: boolean;
-    drawerBleeding: number;
-    showPuller?: boolean;
-    headerContent?: React.ReactNode;
 }
 
 function SwipeableEdgeDrawer(props: SwipeableEdgeDrawerProps) {
@@ -62,12 +55,7 @@ function SwipeableEdgeDrawer(props: SwipeableEdgeDrawerProps) {
         open,
         onClose,
         onOpen,
-        swipeAreaWidth,
-        disableSwipeToOpen,
         keepMounted = true,
-        drawerBleeding,
-        showPuller = true,
-        headerContent,
     } = props;
 
     return (
@@ -77,45 +65,17 @@ function SwipeableEdgeDrawer(props: SwipeableEdgeDrawerProps) {
             open={open}
             onClose={onClose}
             onOpen={onOpen}
-            swipeAreaWidth={swipeAreaWidth}
-            disableSwipeToOpen={disableSwipeToOpen}
+            swipeAreaWidth={0}
+            disableSwipeToOpen
             ModalProps={{ keepMounted }}
             PaperProps={{
                 sx: {
                     overflow: 'visible',
-                    borderTopLeftRadius: 16,
-                    borderTopRightRadius: 16,
+                    borderBottomLeftRadius: 16,
+                    borderBottomRightRadius: 16,
                 },
             }}
         >
-            <Box
-                sx={{
-                    position: 'absolute',
-                    bottom: -drawerBleeding,
-                    right: 0,
-                    left: 0,
-                    visibility: 'visible',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 1,
-                    px: 2,
-                    pt: 1,
-                }}
-            >
-                {showPuller && (
-                    <Box
-                        sx={{
-                            width: 30,
-                            height: 6,
-                            bgcolor: (theme) =>
-                                theme.palette.mode === 'light' ? grey[300] : grey[700],
-                            borderRadius: 3,
-                        }}
-                    />
-                )}
-                {headerContent}
-            </Box>
             <Box sx={{ px: 2, pb: 2, height: '100%', overflow: 'auto' }}>{children}</Box>
         </SwipeableDrawer>
     );
@@ -128,7 +88,6 @@ export default function MobileLayout(props: Props) {
     const nxAdmin = useNXAdmin();
     const { active } = nxAdmin;
     const [open, setOpen] = React.useState(false);
-    const isSwipeableDevice = useMediaQuery('(pointer: coarse)');
 
     const openDrawer = React.useCallback(() => setOpen(true), []);
     const closeDrawer = React.useCallback(() => setOpen(false), []);
@@ -165,68 +124,29 @@ export default function MobileLayout(props: Props) {
                     <PageRouter active={active} />
                 </Box>
             </Box>
-            {!isSwipeableDevice && (
-                <Box
-                    sx={{
-                        position: 'fixed',
-                        right: 16,
-                        top: 'calc(16px + env(safe-area-inset-top))',
-                        zIndex: (theme) => theme.zIndex.modal + 1,
-                        
-                    }}
+            <Box
+                sx={{
+                    position: 'fixed',
+                    right: 16,
+                    top: 'calc(8px + env(safe-area-inset-top))',
+                    zIndex: (theme) => theme.zIndex.modal + 1,
+                }}
+            >
+                <Fab
+                    color="primary"
+                    aria-label={open ? 'Close NX Admin navigation' : 'Open NX Admin navigation'}
+                    onClick={handleMenuClick}
                 >
-                    <Fab
-                        
-                        aria-label={open ? 'Close NX Admin navigation' : 'Open NX Admin navigation'}
-                        onClick={handleMenuClick}
-                        sx={{
-                            boxShadow: 0,
-                            backgroundColor: 'background.paper',
-                            '&:hover': {
-                                backgroundColor: 'background.paper',
-                            },
-                        }}
-                    >
-                        <Icon icon={open ? 'close' : 'menu'} color="primary"/>
-                    </Fab>
-                </Box>
-            )}
-
-            {isSwipeableDevice && !open && (
-                <Box
-                    sx={{
-                        position: 'fixed',
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        py: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 1,
-                        backgroundColor: 'background.default',
-                        borderBottom: 1,
-                        borderColor: 'divider',
-                        zIndex: (theme) => theme.zIndex.modal + 1,
-                        pointerEvents: 'none',
-                    }}
-                >
-                    <Icon icon="expand" color="primary" />
-                    <Box sx={{ color: 'text.secondary', fontSize: 12 }}>Swipe down for menu</Box>
-                </Box>
-            )}
+                    <Icon icon={open ? 'close' : 'menu'} />
+                </Fab>
+            </Box>
 
             <SwipeableEdgeDrawer
                 container={container}
                 open={open}
                 onClose={closeDrawer}
                 onOpen={openDrawer}
-                swipeAreaWidth={isSwipeableDevice ? drawerBleeding : 0}
-                disableSwipeToOpen={!isSwipeableDevice}
                 keepMounted
-                drawerBleeding={drawerBleeding}
-                showPuller={false}
-                headerContent={isSwipeableDevice ? <Icon icon="expand" color="primary" /> : null}
             >
                 <Box sx={{ overflow: 'auto' }}>                    
                     <DashNav onNavigate={closeDrawer} />

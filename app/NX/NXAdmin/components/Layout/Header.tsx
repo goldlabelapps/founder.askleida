@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import pJSON from '../../../../../package.json';
 import {usePathname, useRouter} from 'next/navigation';
 import {
     Box,
@@ -43,6 +44,12 @@ export default function Header() {
                     {title}
                 </Typography>}
                 subheader={header?.subheader || null}
+                // action={
+                //     <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
+                //         v{pJSON.version}
+                //     </Typography>
+                // }
+                
             />
         </>
     );

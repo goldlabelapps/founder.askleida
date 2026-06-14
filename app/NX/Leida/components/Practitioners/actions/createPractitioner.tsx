@@ -3,6 +3,7 @@ import { setUbereduxKey } from '../../../../Uberedux';
 import { fetchSupabaseRows } from '../../Supabase/actions/fetchSupabaseRows';
 import { saveSupabaseRecord } from '../../Supabase/actions/saveSupabaseRecord';
 import { updatePractitioner } from './updatePractitioner';
+import { setFeedback } from '../../../../DesignSystem'
 
 const PRACTITIONERS_TABLE = 'practitioners';
 const ACCESS_LEVEL = 2;
@@ -54,12 +55,18 @@ export const createPractitioner = ({ email }: T_CreatePractitionerArgs): any =>
 			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
 			dispatch(setUbereduxKey({ key: 'success', value: `Invited ${normalizedEmail}` }));
 
+			dispatch(setFeedback({
+				title: `Invited ${normalizedEmail}`,
+				severity: 'success',
+			}));
+
 			return {
 				email: normalizedEmail,
 				practitionerId,
 				practitioner,
 				user,
 			} as T_CreatePractitionerResult;
+			
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : String(e);
 			dispatch(setUbereduxKey({ key: 'error', value: msg }));
