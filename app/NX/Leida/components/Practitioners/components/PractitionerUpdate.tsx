@@ -28,7 +28,8 @@ import {
 } from '../../../../NXAdmin';
 
 const ACCESS_LEVEL_OPTIONS = [
-	{ index: 3, label: 'Founder' },
+	{ index: 4, label: 'Founder' },
+	{ index: 3, label: 'QA' },
 	{ index: 2, label: 'Practitioner' },
 	{ index: 1, label: 'Client' }
 ];
@@ -188,7 +189,7 @@ const PractitionerUpdate = () => {
 			}
 
 			setAvatarChanged(false);
-			dispatch(navigateTo(router, '/practitioners'));
+			dispatch(navigateTo(router, `/practitioners`));
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : String(e);
 			setDisplayNameError(msg);
@@ -200,6 +201,7 @@ const PractitionerUpdate = () => {
 	const handleAvatarSuccess = () => {
 		setAvatarChanged(true);
 		dispatch(fetchLeida(route));
+		dispatch(navigateTo(router, `/practitioners`));
 	};
 
 
@@ -249,12 +251,11 @@ const PractitionerUpdate = () => {
 					<Stack spacing={1} sx={{ pt: 0.5 }}>
 						<LinearProgress />
 						<Typography variant="body2" color="text.secondary">
-							Deleting practitioner and related account data...
+							Deleting Practitioner and related account data...
 						</Typography>
 					</Stack>
 				) : (
 					<>
-						{loading && <Typography variant="body2">Loading...</Typography>}
 						{error && <Typography variant="body2" color="error">Error: {error}</Typography>}
 						{!loading && !error && (
 							<>
@@ -363,17 +364,13 @@ const PractitionerUpdate = () => {
 					pointerEvents: 'none',
 				}}
 			>
-				<Box
-					sx={{
-						maxWidth: 900,
-						ml: 'auto',
-						mr: 'auto',
-						display: 'flex',
-						justifyContent: 'flex-end',
-					}}
-				>
-					<Collapse in={canSave || savingDisplayName} orientation="vertical" unmountOnExit>
+				
+					<Collapse 
+						in={canSave || savingDisplayName} 
+						orientation="vertical" 
+						unmountOnExit>
 						<Button
+							fullWidth
 							variant="contained"
 							startIcon={<Icon icon="save" />}
 							color="primary"
@@ -384,7 +381,6 @@ const PractitionerUpdate = () => {
 							{savingDisplayName ? 'Saving...' : 'Save'}
 						</Button>
 					</Collapse>
-				</Box>
 			</Box>
 
 			{/* <pre>{JSON.stringify({ email, displayName, clinic, accessLevel }, null, 2)}</pre> */}

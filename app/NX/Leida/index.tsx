@@ -30,6 +30,7 @@ import { getLeidaContextPrompt, testProduct } from './components/Claude/prompts'
 
 // Hooks
 import { useLeida, useLeidaBus } from './hooks/useLeida';
+import { useFounderAccess } from './hooks/useFounderAccess';
 import { useAwin } from './components/Awin/hooks/useAwin';
 import { useClaude } from './components/Claude/hooks/useClaude';
 
@@ -89,6 +90,7 @@ export {
 	// Hooks
 	useLeida,
 	useLeidaBus,
+	useFounderAccess,
 	useAwin,
 	useClaude,
 	useDash,
