@@ -90,7 +90,8 @@ const PractitionerNew = () => {
 				<Box sx={{ display: 'flex', mx: 2 }}>
 					<Editable
 						key={`invite-email-${emailFocusKey}`}
-						label="Add Practitioner"
+						label="Create Practitioner"
+						startAdornment={"email"}
 						variant="standard"
 						value={inviteEmail}
 						onChange={setInviteEmail}
@@ -100,7 +101,7 @@ const PractitionerNew = () => {
 					/>
 					<Button
 						sx={{my: 2, ml: 3}}
-						variant="text"
+						variant="contained"
 						endIcon={<Icon icon="tick" />}
 						onClick={handleCreatePractitioner}
 						disabled={createLoading}
