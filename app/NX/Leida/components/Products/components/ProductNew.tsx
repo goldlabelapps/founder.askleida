@@ -26,7 +26,11 @@ const ProductNew = () => {
 	const router = useRouter();
 	const supabase = useSupabase();
 	const leida = useLeida();
-	const pendingAwinProduct = leida?.products?.pendingAwinProduct || null;
+	const awinSearch = leida?.products?.awinSearch || {};
+	const selectedKey = typeof awinSearch?.selectedKey === 'string' ? awinSearch.selectedKey : '';
+	const selectedRow = Array.isArray(awinSearch?.rows)
+		? awinSearch.rows.find((row: Record<string, any>) => String(row?.unique_key) === selectedKey)
+		: null;
 	const [title, setTitle] = React.useState('');
 	const [description, setDescription] = React.useState('');
 	const [category, setCategory] = React.useState('');
@@ -49,19 +53,19 @@ const ProductNew = () => {
 	}, [dispatch]);
 
 	React.useEffect(() => {
-		if (!pendingAwinProduct) {
+		if (!selectedRow) {
 			return;
 		}
 
-		setTitle(String(pendingAwinProduct?.product_name || '').trim());
-		setDescription(String(pendingAwinProduct?.description || '').trim());
-		setCategory(String(pendingAwinProduct?.category_name || '').trim());
+		setTitle(String(selectedRow?.product_name || '').trim());
+		setDescription(String(selectedRow?.description || '').trim());
+		setCategory(String(selectedRow?.category_name || '').trim());
 		setPrice(
-			pendingAwinProduct?.search_price !== undefined && pendingAwinProduct?.search_price !== null
-				? String(pendingAwinProduct.search_price)
+			selectedRow?.search_price !== undefined && selectedRow?.search_price !== null
+				? String(selectedRow.search_price)
 				: ''
 		);
-	}, [pendingAwinProduct]);
+	}, [selectedRow]);
 
 	const handleCreateProduct = React.useCallback(async () => {
 		setCreateError(null);
@@ -90,8 +94,8 @@ const ProductNew = () => {
 						description: description.trim(),
 						category: category.trim(),
 						price: parsedPrice,
-						source: pendingAwinProduct ? 'awin_lookfantastic' : 'manual',
-						awinRow: pendingAwinProduct || null,
+						source: selectedRow ? 'awin_lookfantastic' : 'manual',
+						awinRow: selectedRow || null,
 					},
 				},
 			}));
@@ -118,7 +122,7 @@ const ProductNew = () => {
 		} finally {
 			setCreateLoading(false);
 		}
-	}, [category, description, dispatch, price, router, title]);
+	}, [category, description, dispatch, price, router, selectedRow, title]);
 
 	return (
 		<>

@@ -53,6 +53,7 @@ type T_SearchRow = {
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const query = (url.searchParams.get('q') || '').trim();
+  const category = (url.searchParams.get('category') || '').trim().toLowerCase();
   const limit = parseIntParam(url.searchParams.get('limit'), 25, 1, 100);
   const offset = parseIntParam(url.searchParams.get('offset'), 0, 0, 20000);
   const safeTable = assertSafeTableName(LOOKFANTASTIC_TABLE);
@@ -75,6 +76,12 @@ export async function GET(req: Request) {
         )`
       : sql`true`;
 
+    const categoryFilter = category
+      ? sql`lower(coalesce(category_name, '')) = ${category}`
+      : sql`true`;
+
+    const whereClause = sql`${filter} and ${categoryFilter}`;
+
     const [rows, countRows] = await Promise.all([
       sql<T_SearchRow[]>`
         select
@@ -91,7 +98,7 @@ export async function GET(req: Request) {
           created_at,
           data
         from public.${sql(safeTable)}
-        where ${filter}
+        where ${whereClause}
         order by id desc
         limit ${limit}
         offset ${offset}
@@ -99,7 +106,7 @@ export async function GET(req: Request) {
       sql<Array<{ count: number }>>`
         select count(*)::int as count
         from public.${sql(safeTable)}
-        where ${filter}
+        where ${whereClause}
       `,
     ]);
 
@@ -112,6 +119,7 @@ export async function GET(req: Request) {
       data: {
         table: safeTable,
         query,
+        category,
         limit,
         offset,
         count: total,

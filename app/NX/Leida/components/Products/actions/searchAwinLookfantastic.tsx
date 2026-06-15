@@ -3,24 +3,26 @@ import { setUbereduxKey } from '../../../../Uberedux';
 
 type T_SearchArgs = {
   query: string;
+  category?: string;
   limit?: number;
   offset?: number;
 };
 
-export const searchAwinLookfantastic = ({ query, limit = 25, offset = 0 }: T_SearchArgs): any =>
+export const searchAwinLookfantastic = ({ query, category = '', limit = 25, offset = 0 }: T_SearchArgs): any =>
   async (dispatch: Dispatch) => {
     try {
       dispatch(setUbereduxKey({ key: 'leida.products.awinSearch.loading', value: true }));
       dispatch(setUbereduxKey({ key: 'leida.products.awinSearch.error', value: null }));
       dispatch(setUbereduxKey({ key: 'leida.products.awinSearch.query', value: query }));
+      dispatch(setUbereduxKey({ key: 'leida.products.awinSearch.category', value: category }));
       dispatch(setUbereduxKey({ key: 'leida.products.awinSearch.limit', value: limit }));
       dispatch(setUbereduxKey({ key: 'leida.products.awinSearch.offset', value: offset }));
 
-      const params = new URLSearchParams({
-        q: query,
-        limit: String(limit),
-        offset: String(offset),
-      });
+      const params = new URLSearchParams();
+      if (query.trim()) params.set('q', query.trim());
+      if (category.trim()) params.set('category', category.trim());
+      params.set('limit', String(limit));
+      params.set('offset', String(offset));
 
       const response = await fetch(`/api/awin/lookfantastic/search?${params.toString()}`, {
         method: 'GET',

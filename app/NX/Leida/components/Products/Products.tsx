@@ -6,7 +6,6 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import { setNXAdmin } from '../../../NXAdmin';
-import AwinFeedMonitor from './components/AwinFeedMonitor';
 import AwinProductFinder from './components/AwinProductFinder';
 
 export default function Products() {
@@ -27,7 +26,6 @@ export default function Products() {
   return (
     <Grid container spacing={2} sx={{ mb: 2 }}>
       <Grid size={{ xs: 12 }}>
-        <AwinFeedMonitor />
         <AwinProductFinder />
 
       </Grid>
