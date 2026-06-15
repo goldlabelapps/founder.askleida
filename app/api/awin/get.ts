@@ -7,6 +7,8 @@ export async function GET() {
   const baseURL = getBaseurl();
   const hasToken = Boolean(process.env.AWIN_OAUTH_TOKEN);
   const hasPublisherId = Boolean(process.env.AWIN_PUBLISHER_ID);
+  const lookfantasticTable = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_lookfantastic';
+  const feedSyncTable = process.env.AWIN_FEED_SYNC_TABLE?.trim() || 'awin_feed_snapshots';
 
   const res = makeRes({
     tenant,
@@ -20,12 +22,17 @@ export async function GET() {
         hasToken,
         hasPublisherId,
         hasLookfantasticAdvertiserId: Boolean(process.env.AWIN_LOOKFANTASTIC_ADVERTISER_ID),
+        lookfantasticTable,
+        feedSyncTable,
       },
       routes: {
         programmes: `${baseURL}/awin/programmes`,
         lookfantasticProducts: `${baseURL}/awin/lookfantastic/products`,
         lookfantasticFeed: `${baseURL}/awin/lookfantastic/feed`,
         lookfantasticSave: `${baseURL}/awin/lookfantastic/save`,
+        lookfantasticSync: `${baseURL}/awin/lookfantastic/sync`,
+        lookfantasticIngest: `${baseURL}/awin/lookfantastic/ingest`,
+        lookfantasticSearch: `${baseURL}/awin/lookfantastic/search`,
       },
     },
   });

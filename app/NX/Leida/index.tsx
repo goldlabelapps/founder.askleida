@@ -41,6 +41,11 @@ import { setLeida } from './actions/setLeida';
 import { deletePractitioner } from './actions/deletePractitioner';
 import { deleteProduct } from './actions/deleteProduct';
 import { updateProduct } from './actions/updateProduct';
+import { awinCheckFeed } from './components/Products/actions/awinCheckFeed';
+import { awinIngestFeed } from './components/Products/actions/awinIngestFeed';
+import { awinSyncFeed } from './components/Products/actions/awinSyncFeed';
+import { searchAwinLookfantastic } from './components/Products/actions/searchAwinLookfantastic';
+import { setAwinLookfantasticSelection } from './components/Products/actions/setAwinLookfantasticSelection';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
@@ -110,6 +115,11 @@ export {
 	submitClaudePrompt,
 	deletePractitioner,
 	deleteProduct,
+	awinCheckFeed,
+	awinIngestFeed,
+	awinSyncFeed,
+	searchAwinLookfantastic,
+	setAwinLookfantasticSelection,
 	createPractitioner,
 	updateAvatar,
 	updatePractitioner,

@@ -11,6 +11,7 @@ import {
     DashNav,
     PractitionerNew,
 } from '../../../Leida';
+import AwinProductFinder from '../Products/components/AwinProductFinder';
 
 
 export default function FounderDash() {
@@ -43,7 +44,7 @@ export default function FounderDash() {
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
                             <PractitionerNew />
-                            <DashNav />
+                            <AwinProductFinder />
                         </Grid>
                     </Grid>
                 </Grid>

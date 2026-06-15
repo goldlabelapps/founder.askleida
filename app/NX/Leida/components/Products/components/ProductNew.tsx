@@ -14,6 +14,8 @@ import {
 	fetchSupabaseRows,
 	saveSupabaseRecord,
 	useSupabase,
+	useLeida,
+	setAwinLookfantasticSelection,
 } from '../../../../Leida';
 import { Editable, setNXAdmin } from '../../../../NXAdmin';
 
@@ -23,6 +25,12 @@ const ProductNew = () => {
 	const dispatch = useDispatch();
 	const router = useRouter();
 	const supabase = useSupabase();
+	const leida = useLeida();
+	const awinSearch = leida?.products?.awinSearch || {};
+	const selectedKey = typeof awinSearch?.selectedKey === 'string' ? awinSearch.selectedKey : '';
+	const selectedRow = Array.isArray(awinSearch?.rows)
+		? awinSearch.rows.find((row: Record<string, any>) => String(row?.unique_key) === selectedKey)
+		: null;
 	const [title, setTitle] = React.useState('');
 	const [description, setDescription] = React.useState('');
 	const [category, setCategory] = React.useState('');
@@ -43,6 +51,21 @@ const ProductNew = () => {
 			icon: 'products',
 		}));
 	}, [dispatch]);
+
+	React.useEffect(() => {
+		if (!selectedRow) {
+			return;
+		}
+
+		setTitle(String(selectedRow?.product_name || '').trim());
+		setDescription(String(selectedRow?.description || '').trim());
+		setCategory(String(selectedRow?.category_name || '').trim());
+		setPrice(
+			selectedRow?.search_price !== undefined && selectedRow?.search_price !== null
+				? String(selectedRow.search_price)
+				: ''
+		);
+	}, [selectedRow]);
 
 	const handleCreateProduct = React.useCallback(async () => {
 		setCreateError(null);
@@ -71,11 +94,14 @@ const ProductNew = () => {
 						description: description.trim(),
 						category: category.trim(),
 						price: parsedPrice,
+						source: selectedRow ? 'awin_lookfantastic' : 'manual',
+						awinRow: selectedRow || null,
 					},
 				},
 			}));
 
 			await dispatch(fetchSupabaseRows({ table: PRODUCTS_TABLE }));
+			await dispatch(setAwinLookfantasticSelection(null));
 
 			const productId = response?.data?.product_id || response?.product_id;
 			if (productId) {
@@ -96,7 +122,7 @@ const ProductNew = () => {
 		} finally {
 			setCreateLoading(false);
 		}
-	}, [category, description, dispatch, price, router, title]);
+	}, [category, description, dispatch, price, router, selectedRow, title]);
 
 	return (
 		<>
