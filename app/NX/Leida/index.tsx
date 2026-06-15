@@ -41,6 +41,7 @@ import { setLeida } from './actions/setLeida';
 import { deletePractitioner } from './actions/deletePractitioner';
 import { deleteProduct } from './actions/deleteProduct';
 import { updateProduct } from './actions/updateProduct';
+import { awinCheckFeed } from './components/Products/actions/awinCheckFeed';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
@@ -110,6 +111,7 @@ export {
 	submitClaudePrompt,
 	deletePractitioner,
 	deleteProduct,
+	awinCheckFeed,
 	createPractitioner,
 	updateAvatar,
 	updatePractitioner,

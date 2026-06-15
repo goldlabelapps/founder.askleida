@@ -7,6 +7,7 @@ This folder exposes server-side proxy routes for AWIN data under:
 - `/api/awin/lookfantastic/products`
 - `/api/awin/lookfantastic/feed`
 - `/api/awin/lookfantastic/save`
+- `/api/awin/lookfantastic/sync`
 
 The handlers use `app/api/awin/lib/client.ts` to call `https://api.awin.com` with your AWIN OAuth token.
 
@@ -31,6 +32,9 @@ AWIN_PUBLISHER_ID=your_publisher_id
 AWIN_LOOKFANTASTIC_ADVERTISER_ID=your_default_lookfantastic_advertiser_id
 # Optional, only needed when using source=feed or source=auto fallback:
 AWIN_LOOKFANTASTIC_FEED_URL=https://example.awin.com/path/to/lookfantastic/feed.jsonl
+# Optional sync storage/db settings:
+AWIN_FEED_SYNC_BUCKET=awin-feeds
+AWIN_FEED_SYNC_TABLE=awin_feed_snapshots
 NEXT_PUBLIC_TENANT=optional_tenant_name
 ```
 
@@ -40,6 +44,9 @@ Notes:
 - `AWIN_PUBLISHER_ID` is required for `/programmes` and `/lookfantastic/feed`.
 - `AWIN_LOOKFANTASTIC_ADVERTISER_ID` is required for `/lookfantastic/feed` unless you pass `advertiserId` as a query parameter.
 - `AWIN_LOOKFANTASTIC_FEED_URL` is optional and only used when the route is told to query feed download URLs.
+- `AWIN_LOOKFANTASTIC_FEED_URL` is required for `/lookfantastic/sync`.
+- `AWIN_FEED_SYNC_BUCKET` defaults to `awin-feeds`.
+- `AWIN_FEED_SYNC_TABLE` defaults to `awin_feed_snapshots`.
 
 ## 1) Status/Discovery Route
 
@@ -212,6 +219,34 @@ curl -X POST "http://localhost:3000/api/awin/lookfantastic/save" \
   }'
 ```
 
+## 6) Lookfantastic Feed Sync Route
+
+`GET /api/awin/lookfantastic/sync`
+
+Purpose:
+
+- Checks the Lookfantastic feed URL for changes.
+- Uses conditional request headers (`If-None-Match`, `If-Modified-Since`) from the last saved snapshot.
+- Computes SHA-256 hash of the downloaded CSV.
+- Uploads new CSV files to Supabase Storage only when changed.
+- Writes snapshot metadata to a DB table (`awin_feed_snapshots` by default).
+
+Behavior:
+
+- If feed returns `304`, response includes `changed: false`.
+- If content hash matches latest saved hash, response includes `changed: false`.
+- If changed, response includes `changed: true` and saved snapshot metadata.
+
+Also available as:
+
+- `POST /api/awin/lookfantastic/sync`
+
+Example:
+
+```bash
+curl "http://localhost:3000/api/awin/lookfantastic/sync"
+```
+
 ## Error Handling
 
 Common failures and returned status:
@@ -229,6 +264,7 @@ Common failures and returned status:
 4. Call `/api/awin/programmes`.
 5. Call `/api/awin/lookfantastic/products` first for normal product search.
 6. Use `/api/awin/lookfantastic/feed?source=auto` only when you want feed fallback behavior.
+7. Trigger `/api/awin/lookfantastic/sync` from your cron job to persist updated CSV snapshots.
 
 ## Security Notes
 

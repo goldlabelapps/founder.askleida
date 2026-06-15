@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
 import {
+  Button,
   Chip,
   Paper,
   Grid,
@@ -10,12 +11,19 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import { setNXAdmin } from '../../../NXAdmin';
+import { useLeida, awinCheckFeed } from '../../';
 
 export default function Products() {
   const dispatch = useDispatch();
+  const leida = useLeida();
   const pathname = usePathname();
   const uuid = pathname?.split('/').pop() ?? '';
   const isDetailRoute = !!uuid && uuid !== 'products' && uuid !== 'new';
+  const feedCheck = leida?.products?.awinFeedCheck || {};
+
+  const handleAwinFeedCheck = React.useCallback(async () => {
+    await dispatch(awinCheckFeed());
+  }, [dispatch]);
 
   React.useEffect(() => {
     dispatch(setNXAdmin('header', {
@@ -41,24 +49,56 @@ export default function Products() {
             background: 'linear-gradient(140deg, rgba(16,24,40,0.03), rgba(16,24,40,0.01))',
           }}
         >
-          <Stack spacing={2}>
-            <Chip label='Placeholder Clip' size='small' sx={{ width: 'fit-content' }} />
-            <Typography variant='h5' fontWeight={700}>
-              Planned Product Pipeline (Lookfantastic &rarr; Supabase &rarr; Leida)
-            </Typography>
-            <Typography color='text.secondary'>
-              We are preparing to ingest Lookfantastic&apos;s 25k-row CSV into Postgres on Supabase,
-              then expose fast product search from that source table.
-            </Typography>
-            <Typography color='text.secondary'>
-              The source table will be refreshed by a cron job whenever feed changes are detected
-              from Awin.
-            </Typography>
-            <Typography color='text.secondary'>
-              Products will then be read from that table, reshaped into Leida product records,
-              and tuned by AI (Claude) before being written into the `products` table.
-            </Typography>
+          <Stack direction="row" spacing={1.5} sx={{ mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+            <Button
+              variant="contained"
+              onClick={handleAwinFeedCheck}
+              disabled={Boolean(feedCheck?.loading)}
+            >
+              {feedCheck?.loading ? 'Checking Feed...' : 'Check AWIN Feed Changes'}
+            </Button>
+
+            {feedCheck?.lastCheckedAt ? (
+              <Chip
+                size="small"
+                label={`Last checked: ${new Date(feedCheck.lastCheckedAt).toLocaleString()}`}
+              />
+            ) : null}
+
+            {typeof feedCheck?.response?.changed === 'boolean' ? (
+              <Chip
+                color={feedCheck.response.changed ? 'warning' : 'success'}
+                size="small"
+                label={feedCheck.response.changed ? 'Feed changed' : 'No feed change'}
+              />
+            ) : null}
           </Stack>
+
+          {feedCheck?.error ? (
+            <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+              {feedCheck.error}
+            </Typography>
+          ) : null}
+
+          {feedCheck?.response ? (
+            <Paper variant="outlined" sx={{ p: 2, mb: 2, backgroundColor: 'background.default' }}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                AWIN Feed Check Response
+              </Typography>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {JSON.stringify(feedCheck.response, null, 2)}
+              </pre>
+            </Paper>
+          ) : null}
+
+          <ul>
+            <li>Awin subabase tables</li>
+            <li>Awin endpoint for awin which checks the lookfantastic feed url for changes & saves the latest csv to our storage bucket and DB</li>
+            <li>Node script runs through the latest CSV file, updating products as needed</li>
+            <li>Search UI for Awin products. Search within all fields, order fields, pagination, filters by tag or category</li>
+            <li>Build a processing interface to turn an Awin lookfantasic products into Leida products. This is where Claude gets used</li>
+            <li>Mirror this functionality in both founder & app</li>
+          </ul>
         </Paper>
       </Grid>
     </Grid>

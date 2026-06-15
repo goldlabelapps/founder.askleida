@@ -26,6 +26,7 @@ export async function GET() {
         lookfantasticProducts: `${baseURL}/awin/lookfantastic/products`,
         lookfantasticFeed: `${baseURL}/awin/lookfantastic/feed`,
         lookfantasticSave: `${baseURL}/awin/lookfantastic/save`,
+        lookfantasticSync: `${baseURL}/awin/lookfantastic/sync`,
       },
     },
   });
