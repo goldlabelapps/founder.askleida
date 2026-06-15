@@ -13,7 +13,12 @@ export const databaseUrl =
     process.env.SUPABASE_DB_URL;
 
 const TABLE_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
-const DEFAULT_ADMIN_TABLE_ALLOWLIST = ['products', 'practitioners'];
+const DEFAULT_ADMIN_TABLE_ALLOWLIST = [
+    'products',
+    'practitioners',
+    'awin_feed_snapshots',
+    'awin_lookfantastic',
+];
 
 type T_AllowlistConfig = {
     tables: string[];

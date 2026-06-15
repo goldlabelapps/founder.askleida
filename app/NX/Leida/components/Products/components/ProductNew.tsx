@@ -14,6 +14,8 @@ import {
 	fetchSupabaseRows,
 	saveSupabaseRecord,
 	useSupabase,
+	useLeida,
+	setAwinLookfantasticSelection,
 } from '../../../../Leida';
 import { Editable, setNXAdmin } from '../../../../NXAdmin';
 
@@ -23,6 +25,8 @@ const ProductNew = () => {
 	const dispatch = useDispatch();
 	const router = useRouter();
 	const supabase = useSupabase();
+	const leida = useLeida();
+	const pendingAwinProduct = leida?.products?.pendingAwinProduct || null;
 	const [title, setTitle] = React.useState('');
 	const [description, setDescription] = React.useState('');
 	const [category, setCategory] = React.useState('');
@@ -43,6 +47,21 @@ const ProductNew = () => {
 			icon: 'products',
 		}));
 	}, [dispatch]);
+
+	React.useEffect(() => {
+		if (!pendingAwinProduct) {
+			return;
+		}
+
+		setTitle(String(pendingAwinProduct?.product_name || '').trim());
+		setDescription(String(pendingAwinProduct?.description || '').trim());
+		setCategory(String(pendingAwinProduct?.category_name || '').trim());
+		setPrice(
+			pendingAwinProduct?.search_price !== undefined && pendingAwinProduct?.search_price !== null
+				? String(pendingAwinProduct.search_price)
+				: ''
+		);
+	}, [pendingAwinProduct]);
 
 	const handleCreateProduct = React.useCallback(async () => {
 		setCreateError(null);
@@ -71,11 +90,14 @@ const ProductNew = () => {
 						description: description.trim(),
 						category: category.trim(),
 						price: parsedPrice,
+						source: pendingAwinProduct ? 'awin_lookfantastic' : 'manual',
+						awinRow: pendingAwinProduct || null,
 					},
 				},
 			}));
 
 			await dispatch(fetchSupabaseRows({ table: PRODUCTS_TABLE }));
+			await dispatch(setAwinLookfantasticSelection(null));
 
 			const productId = response?.data?.product_id || response?.product_id;
 			if (productId) {

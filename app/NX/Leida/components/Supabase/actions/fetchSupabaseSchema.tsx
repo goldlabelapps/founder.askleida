@@ -24,10 +24,12 @@ export const fetchSupabaseSchema = (): any =>
             await dispatch(setSupabase('authPage', typeof data?.auth?.page === 'number' ? data.auth.page : 1));
             await dispatch(setSupabase('authPerPage', typeof data?.auth?.perPage === 'number' ? data.auth.perPage : 10));
             await dispatch(setSupabase('authTotal', typeof data?.auth?.total === 'number' ? data.auth.total : 0));
+            return data;
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);
             await dispatch(setSupabase('schemaError', msg));
             dispatch(setUbereduxKey({ key: 'error', value: msg }));
+            throw e;
         } finally {
             await dispatch(setSupabase('schemaLoading', false));
         }
