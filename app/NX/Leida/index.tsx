@@ -42,6 +42,7 @@ import { deletePractitioner } from './actions/deletePractitioner';
 import { deleteProduct } from './actions/deleteProduct';
 import { updateProduct } from './actions/updateProduct';
 import { awinCheckFeed } from './components/Products/actions/awinCheckFeed';
+import { awinIngestFeed } from './components/Products/actions/awinIngestFeed';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
@@ -112,6 +113,7 @@ export {
 	deletePractitioner,
 	deleteProduct,
 	awinCheckFeed,
+	awinIngestFeed,
 	createPractitioner,
 	updateAvatar,
 	updatePractitioner,

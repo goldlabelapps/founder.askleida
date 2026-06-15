@@ -8,6 +8,7 @@ This folder exposes server-side proxy routes for AWIN data under:
 - `/api/awin/lookfantastic/feed`
 - `/api/awin/lookfantastic/save`
 - `/api/awin/lookfantastic/sync`
+- `/api/awin/lookfantastic/ingest`
 
 The handlers use `app/api/awin/lib/client.ts` to call `https://api.awin.com` with your AWIN OAuth token.
 
@@ -35,6 +36,8 @@ AWIN_LOOKFANTASTIC_FEED_URL=https://example.awin.com/path/to/lookfantastic/feed.
 # Optional sync storage/db settings:
 AWIN_FEED_SYNC_BUCKET=awin-feeds
 AWIN_FEED_SYNC_TABLE=awin_feed_snapshots
+AWIN_LOOKFANTASTIC_TABLE=awin_looksfantastic
+AWIN_SYNC_LIMIT=optional_row_limit_for_ingest
 NEXT_PUBLIC_TENANT=optional_tenant_name
 ```
 
@@ -47,6 +50,8 @@ Notes:
 - `AWIN_LOOKFANTASTIC_FEED_URL` is required for `/lookfantastic/sync`.
 - `AWIN_FEED_SYNC_BUCKET` defaults to `awin-feeds`.
 - `AWIN_FEED_SYNC_TABLE` defaults to `awin_feed_snapshots`.
+- `AWIN_LOOKFANTASTIC_TABLE` defaults to `awin_looksfantastic`.
+- `AWIN_SYNC_LIMIT` optionally caps ingested rows.
 
 ## 1) Status/Discovery Route
 
@@ -247,6 +252,38 @@ Example:
 curl "http://localhost:3000/api/awin/lookfantastic/sync"
 ```
 
+## 7) Lookfantastic Feed Ingest Route
+
+`GET /api/awin/lookfantastic/ingest`
+
+Purpose:
+
+- Loads the latest saved feed snapshot from Storage.
+- Parses CSV and normalizes product rows.
+- Upserts rows into `awin_looksfantastic` (or `AWIN_LOOKFANTASTIC_TABLE`).
+- Uses a unique key derived in this priority order: `ean`, `product_GTIN`, `upc`, `isbn`, `mpn`, `merchant_product_id`, `aw_product_id`, then fallback hash signature.
+
+Behavior:
+
+- Creates target table/indexes if missing.
+- Upserts by `unique_key`.
+- Returns ingest summary (`csvRows`, `upserted`, `skipped`, `snapshot`).
+
+Optional query params:
+
+- `limit`: limits number of rows parsed/upserted for that request (useful for testing).
+
+Also available as:
+
+- `POST /api/awin/lookfantastic/ingest`
+
+Examples:
+
+```bash
+curl "http://localhost:3000/api/awin/lookfantastic/ingest"
+curl "http://localhost:3000/api/awin/lookfantastic/ingest?limit=2000"
+```
+
 ## Error Handling
 
 Common failures and returned status:
@@ -265,6 +302,7 @@ Common failures and returned status:
 5. Call `/api/awin/lookfantastic/products` first for normal product search.
 6. Use `/api/awin/lookfantastic/feed?source=auto` only when you want feed fallback behavior.
 7. Trigger `/api/awin/lookfantastic/sync` from your cron job to persist updated CSV snapshots.
+8. Trigger `/api/awin/lookfantastic/ingest` to upsert latest snapshot rows into `awin_looksfantastic`.
 
 ## Security Notes
 
