@@ -80,7 +80,7 @@ export default function Products() {
             </Typography>
           ) : null}
 
-          {feedCheck?.response ? (
+          {/* {feedCheck?.response ? (
             <Paper variant="outlined" sx={{ p: 2, mb: 2, backgroundColor: 'background.default' }}>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
                 AWIN Feed Check Response
@@ -89,11 +89,9 @@ export default function Products() {
                 {JSON.stringify(feedCheck.response, null, 2)}
               </pre>
             </Paper>
-          ) : null}
+          ) : null} */}
 
           <ul>
-            <li>Awin subabase tables</li>
-            <li>Awin endpoint for awin which checks the lookfantastic feed url for changes & saves the latest csv to our storage bucket and DB</li>
             <li>Node script runs through the latest CSV file, updating products as needed</li>
             <li>Search UI for Awin products. Search within all fields, order fields, pagination, filters by tag or category</li>
             <li>Build a processing interface to turn an Awin lookfantasic products into Leida products. This is where Claude gets used</li>
