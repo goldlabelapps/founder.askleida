@@ -36,7 +36,7 @@ AWIN_LOOKFANTASTIC_FEED_URL=https://example.awin.com/path/to/lookfantastic/feed.
 # Optional sync storage/db settings:
 AWIN_FEED_SYNC_BUCKET=awin-feeds
 AWIN_FEED_SYNC_TABLE=awin_feed_snapshots
-AWIN_LOOKFANTASTIC_TABLE=awin_looksfantastic
+AWIN_LOOKFANTASTIC_TABLE=awin_lookfantastic
 AWIN_SYNC_LIMIT=optional_row_limit_for_ingest
 NEXT_PUBLIC_TENANT=optional_tenant_name
 ```
@@ -50,7 +50,7 @@ Notes:
 - `AWIN_LOOKFANTASTIC_FEED_URL` is required for `/lookfantastic/sync`.
 - `AWIN_FEED_SYNC_BUCKET` defaults to `awin-feeds`.
 - `AWIN_FEED_SYNC_TABLE` defaults to `awin_feed_snapshots`.
-- `AWIN_LOOKFANTASTIC_TABLE` defaults to `awin_looksfantastic`.
+- `AWIN_LOOKFANTASTIC_TABLE` defaults to `awin_lookfantastic`.
 - `AWIN_SYNC_LIMIT` optionally caps ingested rows.
 
 ## 1) Status/Discovery Route
@@ -260,7 +260,7 @@ Purpose:
 
 - Loads the latest saved feed snapshot from Storage.
 - Parses CSV and normalizes product rows.
-- Upserts rows into `awin_looksfantastic` (or `AWIN_LOOKFANTASTIC_TABLE`).
+- Upserts rows into `awin_lookfantastic` (or `AWIN_LOOKFANTASTIC_TABLE`).
 - Uses a unique key derived in this priority order: `ean`, `product_GTIN`, `upc`, `isbn`, `mpn`, `merchant_product_id`, `aw_product_id`, then fallback hash signature.
 
 Behavior:
@@ -302,7 +302,7 @@ Common failures and returned status:
 5. Call `/api/awin/lookfantastic/products` first for normal product search.
 6. Use `/api/awin/lookfantastic/feed?source=auto` only when you want feed fallback behavior.
 7. Trigger `/api/awin/lookfantastic/sync` from your cron job to persist updated CSV snapshots.
-8. Trigger `/api/awin/lookfantastic/ingest` to upsert latest snapshot rows into `awin_looksfantastic`.
+8. Trigger `/api/awin/lookfantastic/ingest` to upsert latest snapshot rows into `awin_lookfantastic`.
 
 ## Security Notes
 

@@ -10,8 +10,9 @@ import {
   Typography,
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
+import { Icon } from '../../../DesignSystem';
 import { setNXAdmin } from '../../../NXAdmin';
-import { useLeida, awinCheckFeed, awinIngestFeed, } from '../../';
+import { useLeida, awinCheckFeed, awinIngestFeed, awinSyncFeed } from '../../';
 
 export default function Products() {
   const dispatch = useDispatch();
@@ -44,6 +45,18 @@ export default function Products() {
       <Grid size={{
         xs: 12,
       }}>
+
+        <Button
+          variant="contained"
+          startIcon={<Icon icon="awin" />}
+          onClick={() => dispatch(awinSyncFeed())}
+          disabled={Boolean(feedCheck?.loading || feedIngest?.loading)}
+          sx={{ mr: 1 }}
+        >
+          {feedCheck?.loading ? 'Checking feed...' : feedIngest?.loading ? 'Ingesting...' : 'Awin Feed'}
+        </Button>
+
+
         <Paper
           elevation={0}
           sx={{
@@ -67,25 +80,24 @@ export default function Products() {
             </Typography>
           ) : null}
 
-          {feedCheck?.response ? (
-            <Paper variant="outlined" sx={{ p: 2, mb: 2, backgroundColor: 'background.default' }}>
+            <Paper variant="outlined" sx={{ 
+              p: 2, 
+              mb: 2, 
+            }}>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                Search UI for Awin products. Search within all fields, order fields, pagination, filters by tag or category
+                Search UI for Awin products. 
+                Search within all fields, order fields, pagination, 
+                filters by tag or category
               </Typography>
-
-              <pre>table: awin_looksfantastic</pre>
+              <pre>table: awin_lookfantastic</pre>
 
               {/* <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                 {JSON.stringify(feedCheck.response, null, 2)}
               </pre> */}
-            </Paper>
-          ) : null}
 
-          <ul>
-            
-            <li>Build a processing interface to turn an Awin lookfantasic products into Leida products. This is where Claude gets used</li>
-            <li>Mirror this functionality in both founder & app</li>
-          </ul>
+              
+
+            </Paper>
         </Paper>
       </Grid>
     </Grid>

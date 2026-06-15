@@ -43,6 +43,7 @@ import { deleteProduct } from './actions/deleteProduct';
 import { updateProduct } from './actions/updateProduct';
 import { awinCheckFeed } from './components/Products/actions/awinCheckFeed';
 import { awinIngestFeed } from './components/Products/actions/awinIngestFeed';
+import { awinSyncFeed } from './components/Products/actions/awinSyncFeed';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
@@ -114,6 +115,7 @@ export {
 	deleteProduct,
 	awinCheckFeed,
 	awinIngestFeed,
+	awinSyncFeed,
 	createPractitioner,
 	updateAvatar,
 	updatePractitioner,

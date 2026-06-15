@@ -8,8 +8,7 @@
     "lint": "eslint",
     "clean": "yarn kill && bash app/NX/lib/bash/clean.sh",
     "kill": "bash app/NX/lib/bash/kill.sh",
-    "open": "bash app/NX/lib/bash/open.sh",
-    "awin:sync:lookfantastic": "DOTENV_CONFIG_PATH=.env.local tsx -r dotenv/config scripts/awin/syncLookfantastic.ts"
+    "open": "bash app/NX/lib/bash/open.sh"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",

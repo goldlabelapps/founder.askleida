@@ -2,7 +2,7 @@
 
 - Practitioners
 - Products
-    - Awin afilliate / Looksfantastic 
+    - Awin afilliate / Lookfantastic 
     
 ![NextJS](public/shared/png/python.png)  
 > Wei Zang's son

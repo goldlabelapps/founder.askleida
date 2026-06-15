@@ -54,7 +54,7 @@ export default function Awin() {
                     Searching Lookfantastic Products
                 </Typography>
                     <Typography variant="body1" sx={{mb:2}}>
-                        Our plan was to query the Awin API for Looksfantastic products 
+                        Our plan was to query the Awin API for Lookfantastic products 
                         at this point, but it turns out that's not possible, so we will 
                         have to do a cron job to check the feed url for changes. When it 
                         changes, we pull the latest feed and update products which have changed

@@ -41,7 +41,7 @@ type T_ProductRow = {
 
 const LOOKFANTASTIC_SOURCE = 'lookfantastic';
 const DEFAULT_SNAPSHOT_TABLE = process.env.AWIN_FEED_SYNC_TABLE?.trim() || 'awin_feed_snapshots';
-const DEFAULT_TARGET_TABLE = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_looksfantastic';
+const DEFAULT_TARGET_TABLE = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_lookfantastic';
 
 function requireEnv(name: string) {
   const value = process.env[name]?.trim();

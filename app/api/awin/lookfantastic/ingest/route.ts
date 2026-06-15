@@ -9,7 +9,7 @@ import { makeRes } from '../../../';
 const tenant = process.env.NEXT_PUBLIC_TENANT;
 const LOOKFANTASTIC_SOURCE = 'lookfantastic';
 const DEFAULT_SNAPSHOT_TABLE = process.env.AWIN_FEED_SYNC_TABLE?.trim() || 'awin_feed_snapshots';
-const DEFAULT_TARGET_TABLE = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_looksfantastic';
+const DEFAULT_TARGET_TABLE = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_lookfantastic';
 const TABLE_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 type T_SnapshotRow = {
@@ -363,7 +363,7 @@ async function runIngest(req: Request) {
     const res = makeRes({
       tenant,
       severity: 'success',
-      message: 'Synced latest Lookfantastic snapshot into awin_looksfantastic',
+      message: 'Synced latest Lookfantastic snapshot into awin_lookfantastic',
       data: {
         snapshot: {
           id: snapshot.id,
