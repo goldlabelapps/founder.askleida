@@ -54,6 +54,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const query = (url.searchParams.get('q') || '').trim();
   const category = (url.searchParams.get('category') || '').trim().toLowerCase();
+  const brand = (url.searchParams.get('brand') || '').trim().toLowerCase();
   const limit = parseIntParam(url.searchParams.get('limit'), 25, 1, 100);
   const offset = parseIntParam(url.searchParams.get('offset'), 0, 0, 20000);
   const safeTable = assertSafeTableName(LOOKFANTASTIC_TABLE);
@@ -80,7 +81,11 @@ export async function GET(req: Request) {
       ? sql`lower(coalesce(category_name, '')) = ${category}`
       : sql`true`;
 
-    const whereClause = sql`${filter} and ${categoryFilter}`;
+    const brandFilter = brand
+      ? sql`lower(coalesce(data->>'brand_name', '')) = ${brand}`
+      : sql`true`;
+
+    const whereClause = sql`${filter} and ${categoryFilter} and ${brandFilter}`;
 
     const [rows, countRows] = await Promise.all([
       sql<T_SearchRow[]>`
@@ -120,6 +125,7 @@ export async function GET(req: Request) {
         table: safeTable,
         query,
         category,
+        brand,
         limit,
         offset,
         count: total,

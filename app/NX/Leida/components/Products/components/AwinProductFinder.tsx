@@ -17,8 +17,10 @@ import {
   Typography,
 } from '@mui/material';
 import { navigateTo, Icon } from '../../../../DesignSystem';
+import { Editable } from '../../../../NXAdmin';
 import { useDispatch } from '../../../../Uberedux';
 import { useLeida } from '../../../hooks/useLeida';
+import { fetchAwinLookfantasticBrands } from '../actions/fetchAwinLookfantasticBrands';
 import { searchAwinLookfantastic } from '../actions/searchAwinLookfantastic';
 import { setAwinLookfantasticSelection } from '../actions/setAwinLookfantasticSelection';
 
@@ -39,16 +41,32 @@ export default function AwinProductFinder() {
   const offset = typeof awinSearch?.offset === 'number' ? awinSearch.offset : 0;
   const queryFromState = typeof awinSearch?.query === 'string' ? awinSearch.query : '';
   const categoryFromState = typeof awinSearch?.category === 'string' ? awinSearch.category : DEFAULT_CATEGORY;
+  const brandFromState = typeof awinSearch?.brand === 'string' ? awinSearch.brand : '';
+  const brands = Array.isArray(awinSearch?.brands) ? awinSearch.brands : [];
+  const brandsLoading = Boolean(awinSearch?.brandsLoading);
+  const brandsError = typeof awinSearch?.brandsError === 'string' ? awinSearch.brandsError : null;
   const page = Math.floor(offset / LIMIT) + 1;
   const totalPages = Math.max(Math.ceil(count / LIMIT), 1);
 
   const [query, setQuery] = React.useState(queryFromState);
   const [category, setCategory] = React.useState(categoryFromState || DEFAULT_CATEGORY);
+  const [brand, setBrand] = React.useState(brandFromState);
   const [selectedKey, setSelectedKey] = React.useState<string | null>(null);
   const [isTyping, setIsTyping] = React.useState(false);
 
+  const brandOptions = React.useMemo(
+    () => brands
+      .map((item: Record<string, any>) => String(item?.brand_name || '').trim())
+      .filter(Boolean),
+    [brands]
+  );
+
   const selectedRow = rows.find((row: Record<string, any>) => String(row?.unique_key) === selectedKey) || null;
-  const showLoading = loading;
+  const showLoading = loading || brandsLoading;
+
+  React.useEffect(() => {
+    dispatch(fetchAwinLookfantasticBrands({ category }));
+  }, [category, dispatch]);
 
   React.useEffect(() => {
     if (rows.length > 0) {
@@ -72,14 +90,19 @@ export default function AwinProductFinder() {
     setCategory(categoryFromState || DEFAULT_CATEGORY);
   }, [categoryFromState]);
 
-  const runSearch = React.useCallback(async (nextOffset = 0, nextQuery = query, nextCategory = category) => {
+  React.useEffect(() => {
+    setBrand(brandFromState);
+  }, [brandFromState]);
+
+  const runSearch = React.useCallback(async (nextOffset = 0, nextQuery = query, nextCategory = category, nextBrand = brand) => {
     await dispatch(searchAwinLookfantastic({
       query: nextQuery.trim(),
       category: nextCategory.trim(),
+      brand: nextBrand.trim(),
       limit: LIMIT,
       offset: nextOffset,
     }));
-  }, [category, dispatch, query]);
+  }, [brand, category, dispatch, query]);
 
   const moveSelection = React.useCallback((direction: 1 | -1) => {
     if (rows.length === 0) {
@@ -116,7 +139,7 @@ export default function AwinProductFinder() {
   };
 
   React.useEffect(() => {
-    if (!query.trim() && !category.trim()) {
+    if (!query.trim() && !category.trim() && !brand.trim()) {
       setIsTyping(false);
       return;
     }
@@ -130,7 +153,7 @@ export default function AwinProductFinder() {
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [category, query, runSearch]);
+  }, [brand, category, query, runSearch]);
 
   const openSelectedRow = async (row: Record<string, any>) => {
     await dispatch(setAwinLookfantasticSelection(row));
@@ -140,8 +163,8 @@ export default function AwinProductFinder() {
   const handleClearQuery = React.useCallback(() => {
     setQuery('');
     setSelectedKey(null);
-    void runSearch(0, '', category);
-  }, [category, runSearch]);
+    void runSearch(0, '', category, brand);
+  }, [brand, category, runSearch]);
 
   const handleSearchKeyDown = async (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
@@ -232,10 +255,25 @@ export default function AwinProductFinder() {
         </Stack>
 
         {error ? <Alert severity="error">{error}</Alert> : null}
+        {brandsError ? <Alert severity="warning">{brandsError}</Alert> : null}
+
+        <Editable
+          label="Brand"
+          editableType="select"
+          value={brand}
+          onChange={(nextBrand: string) => {
+            setSelectedKey(null);
+            setBrand(nextBrand);
+          }}
+          options={brandOptions}
+          placeholder="All brands"
+          disabled={brandsLoading}
+        />
 
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           <Alert severity="info" sx={{ py: 0, alignItems: 'center' }}>
             {count} result{count === 1 ? '' : 's'} in {category} · Page {page} of {totalPages}
+            {brand ? ` · ${brand}` : ''}
             {selectedRow ? ' · Selected' : ''}
             {isTyping ? ' · Typing...' : ''}
           </Alert>
