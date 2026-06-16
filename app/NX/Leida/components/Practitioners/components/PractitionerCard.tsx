@@ -4,7 +4,7 @@ import {useRouter} from 'next/navigation';
 import {
 	Avatar,
 	ButtonBase,
-	Chip,
+	LinearProgress,
 	Paper,
 	Box,
 	Typography,
@@ -116,12 +116,8 @@ const PractitionerCard = ({
 						<Avatar
 							src={avatar}
 							alt={displayName}
-							sx={{ alignSelf: 'flex-start' }}
+							sx={{ alignSelf: 'flex-start', backgroundColor: 'primary.main', mr: 1 }}
 						/>
-
-						<Typography variant="caption">
-							{accessLevelLabel}
-						</Typography>
 					</Box>
 					<Box sx={{mx: 1}}>
 						<Typography variant="body1">

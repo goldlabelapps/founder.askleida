@@ -1,8 +1,10 @@
 import React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
+	Box,
 	Button,
 	Grid,
+	LinearProgress,
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import { Icon, navigateTo } from '../../../DesignSystem';
@@ -39,6 +41,9 @@ const Practitioners = () => {
 			<Grid size={{
 				xs: 12,
 			}}>
+
+				
+
 				<Button
 					fullWidth
 					variant="outlined"
@@ -51,6 +56,9 @@ const Practitioners = () => {
 			<Grid size={{
 				xs: 12,
 			}}>
+				<Box sx={{height: 12}}>
+					{loading && <LinearProgress />}
+				</Box>
 				<PractitionerList />
 			</Grid>
 		</Grid>

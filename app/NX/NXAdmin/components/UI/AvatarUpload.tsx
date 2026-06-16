@@ -90,7 +90,12 @@ export default function AvatarUpload({
                     <Avatar
                         src={preview}
                         alt={displayName ?? 'Avatar'}
-                        sx={{ width: size, height: size, cursor: uploading ? 'default' : 'pointer' }}
+                        sx={{ 
+                            backgroundColor: 'primary.main',
+                            width: size, 
+                            height: size, 
+                            cursor: uploading ? 'default' : 'pointer' 
+                        }}
                         onClick={handleClick}
                     >
                         {!preview ? <Icon icon="clients" color="primary" /> : null}
