@@ -7,7 +7,7 @@ import { setFeedback } from '../../../../DesignSystem'
 
 const PRACTITIONERS_TABLE = 'practitioners';
 const ACCESS_LEVEL = 2;
-const DEFAULT_AVATAR_URL = 'https://app.askleida.com/shared/svg/guest.svg';
+const DEFAULT_AVATAR_URL = 'https://app.askleida.com/askleida/png/default-logo.png';
 
 type T_CreatePractitionerArgs = {
 	email: string;

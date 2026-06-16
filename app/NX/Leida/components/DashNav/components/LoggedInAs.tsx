@@ -50,8 +50,7 @@ export default function LoggedInAs({
                     <Icon icon={'signout'} color={'primary'} />
                 </ListItemIcon>
                 <ListItemText
-                    primary={<Typography variant="body1" color="textSecondary">Sign out</Typography>}
-                    secondary={<Typography variant="body2" color="textSecondary">{email}</Typography>}
+                    primary={<Typography variant="body2">{email}</Typography>}
                 />
             </ListItemButton>
 

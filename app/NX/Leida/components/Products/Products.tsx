@@ -25,11 +25,11 @@ export default function Products() {
 
   return (
     <Grid container spacing={2}>
-      <Grid size={{ xs: 6 }}>
-        Awin affiliate table dsf
-      </Grid>
-      <Grid size={{ xs: 6 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
         Leida products
+      </Grid>
+      <Grid size={{ xs: 12, md: 6 }}>
+        Awin affiliate table dsf
       </Grid>
     </Grid>
   );

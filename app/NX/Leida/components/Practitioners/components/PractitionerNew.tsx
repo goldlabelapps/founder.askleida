@@ -6,6 +6,7 @@ import {
 	Box,
 	Button,
 	Paper,
+	Typography,
 } from '@mui/material';
 import { Icon, navigateTo } from '../../../../DesignSystem';
 import { useDispatch } from '../../../../Uberedux';
@@ -38,7 +39,7 @@ const PractitionerNew = () => {
 
 	React.useEffect(() => {
 		dispatch(setNXAdmin('header', {
-			title: 'Create Practitioner',
+			title: 'Add Practitioner',
 			icon: 'practitioner',
 		}));
 	}, [dispatch]);
@@ -87,10 +88,10 @@ const PractitionerNew = () => {
 			) : null}
 		
 			<Paper variant="outlined" sx={{ p: 1.5, width: '100%' }}>
-				<Box sx={{ display: 'flex', mx: 2 }}>
+				<Box sx={{ mx: 0 }}>
 					<Editable
 						key={`invite-email-${emailFocusKey}`}
-						label="Create Practitioner"
+						label="New Practitioner's Email"
 						startAdornment={"email"}
 						variant="standard"
 						value={inviteEmail}
@@ -100,15 +101,22 @@ const PractitionerNew = () => {
 						placeholder="name@example.com"
 					/>
 					<Button
-						sx={{my: 2, ml: 2}}
-						variant="contained"
+						fullWidth
+						sx={{my: 3}}
+						variant="outlined"
 						endIcon={<Icon icon="tick" />}
 						onClick={handleCreatePractitioner}
 						disabled={createLoading}
 					>
 						{createLoading ? 'Adding...' : 'Add'}
 					</Button>
+					
 				</Box>
+				<Typography 
+					variant="body1" 
+					sx={{ m: 0 }}>
+					Just enter their email. They receive an email to set up their account. They'll be asked to create a password and complete onboarding by creating their first client
+				</Typography>
 			</Paper>
 		
 		</>

@@ -48,7 +48,12 @@ export default function DashNav({
   }, [normalizedPathname]);
 
   return (<>
+
+  
         <Box sx={{ height: 24 }} />
+
+        
+
         {navItems.map((item) => (
           <React.Fragment key={item.route}>
             <MiniListItem
@@ -65,9 +70,10 @@ export default function DashNav({
           </React.Fragment>
         ))}
     
-        <Box sx={{ my: 2 }}>
-          <LoggedInAs onNavigate={onNavigate} />
-        </Box>
+       <Box sx={{ height: 24 }} />
+    <Box sx={{ my: 2 }}>
+      <LoggedInAs onNavigate={onNavigate} />
+    </Box>
     </>
   );
 }

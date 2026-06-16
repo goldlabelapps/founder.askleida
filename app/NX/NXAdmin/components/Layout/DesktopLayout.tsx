@@ -28,7 +28,7 @@ import { DashNav, PageRouter } from '../../../Leida';
 import { NAV_ROUTES, sanitizePath, getActiveFromPathname } from '../PageRouter';
 import { useDispatch } from '../../../Uberedux';
 
-const drawerWidth = 220;
+const drawerWidth = 250;
 const FALLBACK_ADMIN_BASE_PATH = '/';
 
 const buildAdminPath = (route?: string) => {
