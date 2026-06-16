@@ -91,7 +91,7 @@ export default function AvatarUpload({
                         src={preview}
                         alt={displayName ?? 'Avatar'}
                         sx={{ 
-                            backgroundColor: 'primary.main',
+                            backgroundColor: 'common.white',
                             width: size, 
                             height: size, 
                             cursor: uploading ? 'default' : 'pointer' 

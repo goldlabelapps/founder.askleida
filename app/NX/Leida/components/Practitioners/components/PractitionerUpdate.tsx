@@ -223,29 +223,39 @@ const PractitionerUpdate = () => {
 			sx={{ pb: 'calc(104px + env(safe-area-inset-bottom))' }}
 		>
 			<>
-				{/* Header with delete button */}
-				<Stack
-					direction="row"
-					justifyContent="space-between"
-					alignItems="center"
-					sx={{ mb: 1 }}
-				>
-					<IconButton
-						color="primary"
-						disabled={deleting}
-						onClick={handleBack}
-					>
-						<Icon icon="left" />
-					</IconButton>
+				{!loading && !deleting && (
+					<>
+						{/* Header with delete button */}
+						<Stack
+							direction="row"
+							justifyContent="space-between"
+							alignItems="center"
+							sx={{ mb: 1 }}
+						>
+							<IconButton
+								color="primary"
+								disabled={deleting}
+								onClick={handleBack}
+							>
+								<Icon icon="left" />
+							</IconButton>
+							
+							{email ? (
+								<Typography variant="caption">
+									{email}
+								</Typography>
+							) : null}
 
-					<IconButton 
-						color="primary"
-						disabled={deleting}
-						onClick={handleDelete}
-					>
-						<Icon icon="delete" />
-					</IconButton>
-				</Stack>
+							<IconButton 
+								color="primary"
+								disabled={deleting}
+								onClick={handleDelete}
+							>
+								<Icon icon="delete" />
+							</IconButton>
+						</Stack>
+					</>
+				)}
 				
 				{deleting ? (
 					<Stack spacing={1} sx={{ pt: 0.5 }}>
@@ -303,16 +313,6 @@ const PractitionerUpdate = () => {
 									sm: 8,
 								}} sx={{ order: { xs: 2, sm: 1 } }}>
 									<Stack spacing={2}>
-
-										
-
-										<Editable
-											label="Email"
-											disabled
-											value={email}
-											variant="standard"
-											onChange={setEmail}
-										/>
 
 										<Editable
 											label="Name"

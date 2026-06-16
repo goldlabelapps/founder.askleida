@@ -116,7 +116,7 @@ const PractitionerCard = ({
 						<Avatar
 							src={avatar}
 							alt={displayName}
-							sx={{ alignSelf: 'flex-start', backgroundColor: 'primary.main', mr: 1 }}
+							sx={{ alignSelf: 'flex-start', backgroundColor: 'common.white', mr: 1 }}
 						/>
 					</Box>
 					<Box sx={{mx: 1}}>

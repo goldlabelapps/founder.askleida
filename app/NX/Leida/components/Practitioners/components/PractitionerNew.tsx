@@ -85,6 +85,13 @@ const PractitionerNew = () => {
 			) : null}
 		
 			<Paper variant="outlined" sx={{ p: 1.5, width: '100%' }}>
+
+				<Typography
+					variant="body1"
+					sx={{ mb: 2 }}>
+					Just enter an email. Practitioners receive an email to set up their account. They'll be asked to create a password and complete onboarding by creating their first client
+				</Typography>
+
 				<Box sx={{ mx: 0 }}>
 					<Editable
 						key={`invite-email-${emailFocusKey}`}
@@ -99,7 +106,7 @@ const PractitionerNew = () => {
 					/>
 					<Button
 						fullWidth
-						sx={{my: 3}}
+						sx={{my: 4}}
 						variant="outlined"
 						endIcon={<Icon icon="tick" />}
 						onClick={handleCreatePractitioner}
@@ -109,11 +116,7 @@ const PractitionerNew = () => {
 					</Button>
 					
 				</Box>
-				<Typography 
-					variant="body1" 
-					sx={{ m: 0 }}>
-					Just enter their email. They receive an email to set up their account. They'll be asked to create a password and complete onboarding by creating their first client
-				</Typography>
+				
 			</Paper>
 		
 		</>

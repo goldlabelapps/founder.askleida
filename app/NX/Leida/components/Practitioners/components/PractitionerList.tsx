@@ -1,6 +1,6 @@
 "use client";
 import * as React from 'react';
-import { Alert, Box, CircularProgress, Stack, Typography } from '@mui/material';
+import { Alert, Box, LinearProgress, Stack } from '@mui/material';
 import { useDispatch } from '../../../../Uberedux';
 import { initSupabase } from '../../Supabase/actions/initSupabase';
 import { fetchSupabaseRows } from '../../Supabase/actions/fetchSupabaseRows';
@@ -51,6 +51,9 @@ const PractitionerList = () => {
 		<>
 		{/* <PractitionerNew /> */}
 			<Stack spacing={1.5}>
+				<Box sx={{ height: 12 }}>
+					{rowsState?.loading && <LinearProgress />}
+				</Box>
 				{rowsState?.error && <Alert severity="error">{rowsState.error}</Alert>}
 				{!rowsState?.loading && sortedRows.length === 0 && (
 					<Alert severity="info">No practitioners found.</Alert>
