@@ -114,8 +114,8 @@ export default function NXAdmin({
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <CircularProgress size={20} />
-                <Typography variant="body2">Checking access level...</Typography>
+                <CircularProgress />
+                <Typography variant="h4">Authorising...</Typography>
               </Box>
             </Container>
         : !hasFounderAccess

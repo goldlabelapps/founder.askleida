@@ -18,6 +18,12 @@ export const navItems: DashNavItem[] = [
     route: '/practitioners',
     activeRoutes: ['/practitioners'],
   },
+  // {
+  //   label: 'New',
+  //   icon: 'practitioner',
+  //   route: '/practitioners/new',
+  //   activeRoutes: ['/practitioners/new'],
+  // },
   {
     label: 'Products',
     icon: 'products',

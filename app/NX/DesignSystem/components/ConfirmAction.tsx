@@ -16,7 +16,7 @@ export interface I_ConfirmAction {
     open: boolean;
     icon?: I_Icon['icon'];
     title: React.ReactNode;
-    body: React.ReactNode;
+    body?: React.ReactNode;
     handleConfirm: () => void;
     handleClose: () => void;
 }
