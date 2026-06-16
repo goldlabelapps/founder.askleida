@@ -61,12 +61,9 @@ const PractitionerNew = () => {
 			const practitionerId = response?.practitionerId;
 
 			if (practitionerId) {
-				setCreateSuccess(`Invited ${email}. Navigating to practitioner profile...`);
-				setTimeout(() => {
-					router.push(`/practitioners/${practitionerId}`);
-				}, 500);
+				setCreateSuccess(`practitionerId ${practitionerId} created`);
 			} else {
-				setCreateSuccess(`Invited ${email} and refreshed practitioners.`);
+				setCreateSuccess(`email ${email} created`);
 				setInviteEmail('');
 			}
 		} catch (e: unknown) {

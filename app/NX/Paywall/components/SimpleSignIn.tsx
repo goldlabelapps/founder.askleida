@@ -41,7 +41,7 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
         <form onSubmit={handleSubmit}>
 
             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                <img src={`/nxadmin/svg/logo-${currentThemeMode === 'dark' ? 'light' : 'dark'}.svg`} alt="Logo" style={{ height: 48 }} />
+                <img src={`/nxadmin/svg/favicon.svg`} alt="Logo" style={{ height: 48 }} />
             </Box>
             
             <Box sx={{}}>

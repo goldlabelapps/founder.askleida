@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>You've been invited to Leida</title>
+</head>
+
+<body
+    style="margin:0;padding:0;background-color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1a1a1a;">
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f5;">
+        <tr>
+            <td align="center" style="padding:40px 16px;">
+
+                <!-- Card -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                    style="max-width:560px;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e0e0e0;">
+
+                    <!-- Header -->
+                    <tr>
+                        <td align="center"
+                            style="padding:32px 32px 24px 32px;background-color:#f8f8f8;border-bottom:1px solid #e0e0e0;">
+                            <img src="https://founder.askleida.com/nxadmin/svg/logo-dark.svg" alt="Leida" width="160"
+                                height="52" style="display:block;" />
+                        </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding:36px 32px 12px 32px;">
+                            <h1 style="margin:0 0 8px 0;font-size:22px;font-weight:700;color:#111111;line-height:1.3;">
+                                You've been invited
+                            </h1>
+                            <p style="margin:0 0 28px 0;font-size:15px;color:#555555;line-height:1.6;">
+                            
+                                Click the button below to accept your invitation and set your
+                                password.
+                            </p>
+
+                            <!-- CTA Button -->
+                            <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+                                <tr>
+                                    <td align="center" style="background-color:#16a34a;border-radius:8px;">
+                                        <a href="{{ .ConfirmationURL }}"
+                                            style="display:inline-block;padding:16px 40px;font-size:17px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.3px;">
+                                            Accept Invite
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                    
+                            <!-- Divider -->
+                            <hr style="border:none;border-top:1px solid #e8e8e8;margin:0 0 28px 0;" />
+
+                            <!-- How it works -->
+                            <h2
+                                style="margin:0 0 12px 0;font-size:15px;font-weight:700;color:#16a34a;letter-spacing:0.5px;text-transform:uppercase;">
+                                How this works
+                            </h2>
+
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+
+                                <tr>
+                                    <td
+                                        style="padding:10px 0;vertical-align:top;width:28px;font-size:18px;line-height:1.4;">
+                                        🔐</td>
+                                    <td style="padding:10px 0 10px 10px;vertical-align:top;">
+                                        <strong style="color:#1a1a1a;font-size:14px;">Set your password</strong>
+                                        <p style="margin:4px 0 0 0;font-size:13px;color:#666666;line-height:1.5;">
+                                            The link above takes you directly to a secure password-setup screen. Once
+                                            set, you can sign in at any time using your email (<strong
+                                                style="color:#333333;">{{ .Email }}</strong>) and that password
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td
+                                        style="padding:10px 0;vertical-align:top;width:28px;font-size:18px;line-height:1.4;">
+                                        🏥</td>
+                                    <td style="padding:10px 0 10px 10px;vertical-align:top;">
+                                        <strong style="color:#1a1a1a;font-size:14px;">Practitioner profile</strong>
+                                        <p style="margin:4px 0 0 0;font-size:13px;color:#666666;line-height:1.5;">
+                                            Your a profile has a display name, clinic, website, and
+                                            avatar. You can update these at any time from the Account screen
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td
+                                        style="padding:10px 0;vertical-align:top;width:28px;font-size:18px;line-height:1.4;">
+                                        🎚️</td>
+                                    <td style="padding:10px 0 10px 10px;vertical-align:top;">
+                                        <strong style="color:#1a1a1a;font-size:14px;">Access levels</strong>
+                                        <p style="margin:4px 0 0 0;font-size:13px;color:#666666;line-height:1.5;">
+                                            The platform uses numbered access levels. <strong
+                                                style="color:#333333;">Founder (4)</strong> has full system access.
+                                            <strong style="color:#333333;">QA (3)</strong> can test and review all
+                                            features. <strong style="color:#333333;">Practitioner (2)</strong> has
+                                            standard clinical access. <strong style="color:#333333;">Client (1)</strong>
+                                            has read-only patient-facing access. Your level is set by whomever invited
+                                            you
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td
+                                        style="padding:10px 0;vertical-align:top;width:28px;font-size:18px;line-height:1.4;">
+                                        🤖</td>
+                                    <td style="padding:10px 0 10px 10px;vertical-align:top;">
+                                        <strong style="color:#1a1a1a;font-size:14px;">Powered by Claude</strong>
+                                        <p style="margin:4px 0 0 0;font-size:13px;color:#666666;line-height:1.5;">
+                                            Founder Dash integrates Anthropic's Claude AI directly into the platform.
+                                            Founder and QA users can interact with it to test and refine clinical
+                                            content and product logic.
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td
+                                        style="padding:10px 0;vertical-align:top;width:28px;font-size:18px;line-height:1.4;">
+                                        🛡️</td>
+                                    <td style="padding:10px 0 10px 10px;vertical-align:top;">
+                                        <strong style="color:#1a1a1a;font-size:14px;">This link expires</strong>
+                                        <p style="margin:4px 0 0 0;font-size:13px;color:#666666;line-height:1.5;">
+                                            The invitation link is single-use and expires after 24 hours. If it has
+                                            expired, ask the person who invited you to resend it from the Practitioners
+                                            panel.
+                                        </p>
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding:24px 32px;border-top:1px solid #e8e8e8;background-color:#f8f8f8;text-align:center;">
+                            <p style="margin:0 0 6px 0;font-size:12px;color:#888888;">
+                                <a href="https://goldlabel.pro/nx" style="color:#888888;text-decoration:none;">
+                                    Sent using <strong style="color:#555555;">NX°</strong>
+                            </a>
+                            </p>
+                            <p style="margin:0;font-size:12px;color:#aaaaaa;">
+                                <a href="https://app.askleida.com"
+                                    style="color:#888888;text-decoration:none;">askleida.com</a>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+                <!-- /Card -->
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

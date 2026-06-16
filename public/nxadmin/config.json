@@ -16,6 +16,7 @@
         "light": "/nxadmin/png/apps.png",
         "dark": "/nxadmin/png/apps.png"
     },
+    
     "cartridges": {
         "designSystem": {
             "themeSwitching": true,
@@ -32,8 +33,8 @@
                 },
                 "dark": {
                     "mode": "dark",
-                    "primary": "#F7F5F2",
-                    "secondary": "#2C2C2A",
+                    "primary": "#11F766",
+                    "secondary": "#F7F611",
                     "text": "#F7F7F4",
                     "background": "#2C2C2A",
                     "paper": "#131311",
