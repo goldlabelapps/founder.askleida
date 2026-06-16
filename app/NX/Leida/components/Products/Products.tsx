@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
 import { setNXAdmin } from '../../../NXAdmin';
-import AwinProductFinder from './components/AwinProductFinder';
+// import AwinProductFinder from './components/AwinProductFinder';
 
 export default function Products() {
   const dispatch = useDispatch();
@@ -24,10 +24,12 @@ export default function Products() {
   if (isDetailRoute) return null;
 
   return (
-    <Grid container spacing={2} sx={{ mb: 2 }}>
-      <Grid size={{ xs: 12 }}>
-        <AwinProductFinder />
-
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 12, md: 6 }}>
+        Leida products
+      </Grid>
+      <Grid size={{ xs: 12, md: 6 }}>
+        Awin affiliate table dsf
       </Grid>
     </Grid>
   );

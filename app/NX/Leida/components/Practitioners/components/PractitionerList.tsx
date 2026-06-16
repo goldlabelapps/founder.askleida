@@ -18,13 +18,20 @@ const PractitionerList = () => {
 	const rowsState = supabase?.rowsByTable?.[PRACTITIONERS_TABLE] || null;
 	const rows = (Array.isArray(rowsState?.rows) ? rowsState.rows : []) as T_PractitionerRecord[];
 	const sortedRows = React.useMemo(() => {
-		return [...rows].sort((a, b) => {
-			const aTime = Date.parse(typeof a?.updated === 'string' ? a.updated : '');
-			const bTime = Date.parse(typeof b?.updated === 'string' ? b.updated : '');
-			const aValue = Number.isNaN(aTime) ? 0 : aTime;
-			const bValue = Number.isNaN(bTime) ? 0 : bTime;
-			return bValue - aValue;
-		});
+		return [...rows]
+			.filter((row) => {
+				const accessLevel = row?.data && typeof row.data === 'object' 
+					? (row.data as Record<string, unknown>).access_level 
+					: null;
+				return accessLevel !== 4;
+			})
+			.sort((a, b) => {
+				const aTime = Date.parse(typeof a?.updated === 'string' ? a.updated : '');
+				const bTime = Date.parse(typeof b?.updated === 'string' ? b.updated : '');
+				const aValue = Number.isNaN(aTime) ? 0 : aTime;
+				const bValue = Number.isNaN(bTime) ? 0 : bTime;
+				return bValue - aValue;
+			});
 	}, [rows]);
 
 	React.useEffect(() => {

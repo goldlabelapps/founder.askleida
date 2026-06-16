@@ -118,6 +118,10 @@ const PractitionerCard = ({
 							alt={displayName}
 							sx={{ alignSelf: 'flex-start' }}
 						/>
+
+						<Typography variant="caption">
+							{accessLevelLabel}
+						</Typography>
 					</Box>
 					<Box sx={{mx: 1}}>
 						<Typography variant="body1">
@@ -126,12 +130,6 @@ const PractitionerCard = ({
 						<Typography variant="body2" color="textSecondary">
 							{email}
 						</Typography>
-						<Chip 
-							sx={{ mt: 1 }}
-							size="small"
-							variant="outlined" 
-							label={accessLevelLabel} 
-						/>
 					</Box>
 				</Box>
 				

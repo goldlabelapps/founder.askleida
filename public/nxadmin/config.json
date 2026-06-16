@@ -19,7 +19,7 @@
     "cartridges": {
         "designSystem": {
             "themeSwitching": true,
-            "defaultTheme": "light",
+            "defaultTheme": "dark",
             "themes": {
                 "light": {
                     "mode": "light",
@@ -33,7 +33,7 @@
                 "dark": {
                     "mode": "dark",
                     "primary": "#F7F5F2",
-                    "secondary": "#F7F5F2",
+                    "secondary": "#2C2C2A",
                     "text": "#F7F7F4",
                     "background": "#2C2C2A",
                     "paper": "#131311",

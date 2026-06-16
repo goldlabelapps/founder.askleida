@@ -5,11 +5,9 @@ import {
   Box,
   Divider,
 } from '@mui/material';
-import { useDispatch } from '../../../Uberedux';
-import { logout } from '../../../Paywall';
-import { ConfirmAction } from '../../../DesignSystem';
 import { navItems } from '../../../Leida';
 import { MiniListItem } from '../../../NXAdmin';
+import { LoggedInAs } from './components/index';
 
 export default function DashNav({
   onNavigate,
@@ -19,8 +17,6 @@ export default function DashNav({
 
   const router = useRouter();
   const pathname = usePathname();
-  const dispatch = useDispatch();
-  const [confirmSignOutOpen, setConfirmSignOutOpen] = React.useState(false);
 
   const buildAdminPath = (route?: string) => {
     if (!route) return '/';
@@ -35,20 +31,6 @@ export default function DashNav({
       }
       onNavigate?.();
   }, [onNavigate, pathname, router]);
-
-    const handleOpenSignOutConfirm = React.useCallback(() => {
-      setConfirmSignOutOpen(true);
-    }, []);
-
-    const handleCloseSignOutConfirm = React.useCallback(() => {
-      setConfirmSignOutOpen(false);
-    }, []);
-
-    const handleSignOut = React.useCallback(() => {
-      setConfirmSignOutOpen(false);
-      dispatch(logout());
-      onNavigate?.();
-    }, [dispatch, onNavigate]);
 
   const open = true;
   const normalizedPathname = React.useMemo(() => {
@@ -66,7 +48,12 @@ export default function DashNav({
   }, [normalizedPathname]);
 
   return (<>
+
+  
         <Box sx={{ height: 24 }} />
+
+        
+
         {navItems.map((item) => (
           <React.Fragment key={item.route}>
             <MiniListItem
@@ -82,17 +69,11 @@ export default function DashNav({
             <Divider />
           </React.Fragment>
         ))}
-
-        <Box sx={{ height: 50 }} />
-
-        <ConfirmAction
-          open={confirmSignOutOpen}
-          icon="signout"
-          title="Sign out?"
-          body="This will log you out."
-          handleConfirm={handleSignOut}
-          handleClose={handleCloseSignOutConfirm}
-        />
+    
+       <Box sx={{ height: 24 }} />
+    <Box sx={{ my: 2 }}>
+      <LoggedInAs onNavigate={onNavigate} />
+    </Box>
     </>
   );
 }

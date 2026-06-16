@@ -1,6 +1,6 @@
 // Components
 import { PageRouter } from './PageRouter';
-import DashNav from './components/DashNav/DashNav';
+import { DashNav, navItems, LoggedInAs } from './components/DashNav';
 import README from './components/README';
 import {
 	FounderDash,
@@ -11,7 +11,6 @@ import {
 	DashSurface,
 } from './components/FounderDash';
 import DashAuth from './components/FounderDash/components/DashAuth';
-import { navItems } from './components/DashNav/navItems';
 import Awin from './components/Awin/Awin';
 import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
@@ -67,6 +66,7 @@ export {
 	PageRouter,
 	DashNav,
 	navItems,
+	LoggedInAs,
 	README,
 	FounderDash,
 	DashAuth,
