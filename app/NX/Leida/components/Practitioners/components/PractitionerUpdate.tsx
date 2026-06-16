@@ -256,14 +256,22 @@ const PractitionerUpdate = () => {
 					</Stack>
 				) : (
 					<>
-						{error && <Typography variant="body2" color="error">Error: {error}</Typography>}
+						{loading && (
+							<Box sx={{height: 12}}>
+								{loading && <LinearProgress />}
+							</Box>
+						)}
+						{error && <Typography variant="body2" color="error">
+							Error: {error}
+						</Typography>}
+
 						{!loading && !error && (
 							<>
 							<Grid container spacing={2} alignItems="center">
 								
 								<Grid size={{
 									xs: 12,
-									sm: 6,
+									sm: 4,
 								}} sx={{ alignSelf: 'flex-start', order: { xs: 1, sm: 2 } }}>
 									<Box sx={{ 
 										display: 'flex', 
@@ -272,28 +280,31 @@ const PractitionerUpdate = () => {
 										height: '100%',
 									 }}>
 										<AvatarUpload
-											size={200}
+											size={150}
 											practitionerId={uuid}
 											currentAvatar={currentAvatar}
 											displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
 											onSuccess={handleAvatarSuccess}
 										/>
+
+										
 									</Box>
+											<OptionSelect
+												label="Access Level"
+												options={ACCESS_LEVEL_OPTIONS}
+												value={accessLevel}
+												onChange={setAccessLevel}
+												disabled={savingDisplayName}
+											/>
 								</Grid>
 
 								<Grid size={{
 									xs: 12,
-									sm: 6,
+									sm: 8,
 								}} sx={{ order: { xs: 2, sm: 1 } }}>
 									<Stack spacing={2}>
 
-										<OptionSelect
-											label="Access Level"
-											options={ACCESS_LEVEL_OPTIONS}
-											value={accessLevel}
-											onChange={setAccessLevel}
-											disabled={savingDisplayName}
-										/>
+										
 
 										<Editable
 											label="Email"
@@ -329,7 +340,8 @@ const PractitionerUpdate = () => {
 							</Grid>
 								
 								{displayNameError ? (
-									<Typography variant="body2" color="error">	{displayNameError}
+									<Typography variant="body2" color="error">
+										{displayNameError}
 									</Typography>
 								) : null}
 							</>
@@ -354,7 +366,7 @@ const PractitionerUpdate = () => {
 					left: 0,
 					right: 0,
 					bottom: 0,
-					zIndex: (theme) => theme.zIndex.appBar,
+					zIndex: (theme) => theme.zIndex.appBar + 123,
 					// borderTop: 1,
 					// borderColor: 'divider',
 					// backgroundColor: 'background.paper',
