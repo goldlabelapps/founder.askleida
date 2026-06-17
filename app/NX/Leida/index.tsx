@@ -60,6 +60,7 @@ import { useSupabase } from './components/Supabase/hooks/useSupabase';
 
 // Lib
 import { normalizeLeidaRouteKey } from './lib/normalizeLeidaRouteKey';
+import { loadingMessages, getRandomLoadingMessage } from './lib/loadingMessages';
 
 export {
 	// Components
@@ -127,4 +128,6 @@ export {
 	setDash,
 	// Lib
 	normalizeLeidaRouteKey,
+	loadingMessages,
+	getRandomLoadingMessage,
 };

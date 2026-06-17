@@ -47,33 +47,29 @@ export default function DashNav({
     });
   }, [normalizedPathname]);
 
-  return (<>
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box sx={{ height: 24 }} />
 
-  
-        <Box sx={{ height: 24 }} />
+      {navItems.map((item) => (
+        <React.Fragment key={item.route}>
+          <MiniListItem
+            open={open}
+            selected={isRouteActive(item.activeRoutes)}
+            onClick={navigateToRoute}
+            options={{
+              label: item.label,
+              icon: item.icon,
+              route: item.route,
+            }}
+          />
+          <Divider />
+        </React.Fragment>
+      ))}
 
-        
-
-        {navItems.map((item) => (
-          <React.Fragment key={item.route}>
-            <MiniListItem
-              open={open}
-              selected={isRouteActive(item.activeRoutes)}
-              onClick={navigateToRoute}
-              options={{
-                label: item.label,
-                icon: item.icon,
-                route: item.route,
-              }}
-            />
-            <Divider />
-          </React.Fragment>
-        ))}
-    
-       <Box sx={{ height: 24 }} />
-    <Box sx={{ my: 2 }}>
-      <LoggedInAs onNavigate={onNavigate} />
+      <Box sx={{ mt: 'auto', mb: 2 }}>
+        <LoggedInAs onNavigate={onNavigate} />
+      </Box>
     </Box>
-    </>
   );
 }

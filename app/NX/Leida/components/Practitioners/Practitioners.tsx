@@ -37,28 +37,21 @@ const Practitioners = () => {
 	}
 
 	return <>
-		<Grid container spacing={2} sx={{ mb: 2 }}>
+		<Grid container spacing={2} sx={{ }}>
 			<Grid size={{
 				xs: 12,
 			}}>
-
-				
-
 				<Button
-					fullWidth
 					variant="outlined"
 					startIcon={<Icon icon="practitioner-add" />}
 					onClick={handleNewPractitioner}
 				>
-					New Practitioner
+					New
 				</Button>
 			</Grid>
 			<Grid size={{
 				xs: 12,
 			}}>
-				<Box sx={{height: 12}}>
-					{loading && <LinearProgress />}
-				</Box>
 				<PractitionerList />
 			</Grid>
 		</Grid>

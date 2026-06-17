@@ -58,14 +58,12 @@ const PractitionerNew = () => {
 		setCreateLoading(true);
 		try {
 			const response = await dispatch(createPractitioner({ email }));
-			const practitionerId = response?.practitionerId;
-
-			if (practitionerId) {
-				setCreateSuccess(`practitionerId ${practitionerId} created`);
-			} else {
-				setCreateSuccess(`email ${email} created`);
-				setInviteEmail('');
-			}
+			// const practitionerId = response?.practitionerId;
+			dispatch(navigateTo(router, '/practitioners'));
+			// if (practitionerId) {
+			// } else {
+			// 	dispatch(navigateTo(router, '/practitioners'));
+			// }
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : String(e);
 			setCreateError(msg || 'Failed to create practitioner');
@@ -85,6 +83,13 @@ const PractitionerNew = () => {
 			) : null}
 		
 			<Paper variant="outlined" sx={{ p: 1.5, width: '100%' }}>
+
+				<Typography
+					variant="body1"
+					sx={{ mb: 2 }}>
+					Just enter an email. Practitioners receive an email to set up their account. They'll be asked to create a password and complete onboarding by creating their first client
+				</Typography>
+
 				<Box sx={{ mx: 0 }}>
 					<Editable
 						key={`invite-email-${emailFocusKey}`}
@@ -99,7 +104,7 @@ const PractitionerNew = () => {
 					/>
 					<Button
 						fullWidth
-						sx={{my: 3}}
+						sx={{my: 4}}
 						variant="outlined"
 						endIcon={<Icon icon="tick" />}
 						onClick={handleCreatePractitioner}
@@ -109,11 +114,7 @@ const PractitionerNew = () => {
 					</Button>
 					
 				</Box>
-				<Typography 
-					variant="body1" 
-					sx={{ m: 0 }}>
-					Just enter their email. They receive an email to set up their account. They'll be asked to create a password and complete onboarding by creating their first client
-				</Typography>
+				
 			</Paper>
 		
 		</>

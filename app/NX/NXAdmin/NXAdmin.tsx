@@ -32,7 +32,12 @@ import {
   README,
   requestNotifications,
 } from '../NXAdmin';
-import { initLeida, useFounderAccess, useLeida } from '../Leida';
+import {
+  initLeida,
+  useFounderAccess,
+  useLeida,
+  getRandomLoadingMessage,
+} from '../Leida';
 
 export type { I_NXAdmin };
 
@@ -79,6 +84,11 @@ export default function NXAdmin({
     }
   }, [isAuthed, hasFounderAccess, dispatch]);
 
+  const accessLoadingMessage = React.useMemo(() => {
+    if (!isCheckingAccess) return 'Authorising...';
+    return getRandomLoadingMessage();
+  }, [isCheckingAccess]);
+
   if (!authChecked) return null;
 
   return (
@@ -115,7 +125,9 @@ export default function NXAdmin({
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <CircularProgress />
-                <Typography variant="h4">Authorising...</Typography>
+                <Typography variant="body1" sx={{ml: 1}}>
+                  {accessLoadingMessage}
+                </Typography>
               </Box>
             </Container>
         : !hasFounderAccess
