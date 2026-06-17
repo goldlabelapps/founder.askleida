@@ -58,14 +58,12 @@ const PractitionerNew = () => {
 		setCreateLoading(true);
 		try {
 			const response = await dispatch(createPractitioner({ email }));
-			const practitionerId = response?.practitionerId;
-
-			if (practitionerId) {
-				setCreateSuccess(`practitionerId ${practitionerId} created`);
-			} else {
-				setCreateSuccess(`email ${email} created`);
-				setInviteEmail('');
-			}
+			// const practitionerId = response?.practitionerId;
+			dispatch(navigateTo(router, '/practitioners'));
+			// if (practitionerId) {
+			// } else {
+			// 	dispatch(navigateTo(router, '/practitioners'));
+			// }
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : String(e);
 			setCreateError(msg || 'Failed to create practitioner');
