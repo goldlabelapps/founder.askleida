@@ -73,7 +73,7 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
                                     onClick={() => setShowPassword((show) => !show)}
                                     edge="end"
                                 >
-                                    <Icon icon={showPassword ? 'hide' : 'show'} />
+                                    <Icon icon={showPassword ? 'hide' : 'show'} color="primary" />
                                 </IconButton>
                             </InputAdornment>
                         ),
