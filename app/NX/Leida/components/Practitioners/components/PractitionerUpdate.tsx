@@ -228,8 +228,8 @@ const PractitionerUpdate = () => {
 						{/* Header with delete button */}
 						<Stack
 							direction="row"
-							justifyContent="space-between"
-							alignItems="center"
+							// justifyContent="space-between"
+							// alignItems="center"
 							sx={{ mb: 1 }}
 						>
 							<IconButton
@@ -241,11 +241,11 @@ const PractitionerUpdate = () => {
 							</IconButton>
 							
 							{email ? (
-								<Typography variant="caption">
+								<Typography variant="caption" sx={{m:1}}>
 									{email}
 								</Typography>
 							) : null}
-
+							<Box sx={{ flexGrow: 1 }} />
 							<IconButton 
 								color="primary"
 								disabled={deleting}
@@ -288,6 +288,7 @@ const PractitionerUpdate = () => {
 										justifyContent: 'center', 
 										alignItems: 'flex-start', 
 										height: '100%',
+										m:2
 									 }}>
 										<AvatarUpload
 											size={150}
@@ -312,25 +313,28 @@ const PractitionerUpdate = () => {
 									xs: 12,
 									sm: 8,
 								}} sx={{ order: { xs: 2, sm: 1 } }}>
-									<Stack spacing={2}>
+									<Stack spacing={2} sx={{m:2}}>
 
 										<Editable
 											label="Name"
 											value={displayName}
 											variant="standard"
 											onChange={setDisplayName}
+											startAdornment="user"
 										/>
 										<Editable
-											label="Clinic Name"
+											label="Clinic"
 											value={clinic}
 											variant="standard"
 											onChange={setClinic}
+											startAdornment="medical"
 										/>
 										<Editable
 											label="Website"
 											value={website}
 											variant="standard"
 											onChange={setWebsite}
+											startAdornment="link"
 										/>
 										
 									</Stack>
