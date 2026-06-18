@@ -1,7 +1,6 @@
 'use client';
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
-
 import {
   Supabase,
   SupabaseUsers,
@@ -13,9 +12,6 @@ import {
   AwinSearch,
   Awin,
   PractitionerNew,
-  // Products,
-  // ProductNew,
-  // ProductUpdate,
 } from '../Leida';
 
 interface I_PageRouter {

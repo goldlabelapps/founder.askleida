@@ -12,6 +12,10 @@ import {
 import DashAuth from './components/FounderDash/components/DashAuth';
 import Awin from './components/Awin/Awin';
 import AwinSearch from './components/Awin/components/AwinSearch';
+import Products from './components/Products/Products';
+import ListProducts from './components/Products/components/ListProducts';
+import RenderProduct from './components/Products/components/RenderProduct';
+import FindProduct from './components/Products/components/FindProduct';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
 import { PractitionerList, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners } from './components/Practitioners';
@@ -25,6 +29,7 @@ import { getLeidaContextPrompt, testProduct } from './components/Claude/prompts'
 import { useLeida, useLeidaBus } from './hooks/useLeida';
 import { useFounderAccess } from './hooks/useFounderAccess';
 import { useAwin } from './components/Awin/hooks/useAwin';
+import { useProducts } from './components/Products/hooks/useProducts';
 import { useClaude } from './components/Claude/hooks/useClaude';
 
 // Actions
@@ -40,6 +45,8 @@ import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRo
 import { saveSupabaseRecord } from './components/Supabase/actions/saveSupabaseRecord';
 import { initAwin } from './components/Awin/actions/initAwin';
 import { setAwin } from './components/Awin/actions/setAwin';
+import { initProducts } from './components/Products/actions/initProducts';
+import { setProducts } from './components/Products/actions/setProducts';
 import { initClaude } from './components/Claude/actions/initClaude';
 import { setClaude } from './components/Claude/actions/setClaude';
 import { submitClaudePrompt } from './components/Claude/actions/submitClaudePrompt';
@@ -65,6 +72,10 @@ export {
     DashSurface,
     Awin,
     AwinSearch,
+    Products,
+    ListProducts,
+    RenderProduct,
+    FindProduct,
     Claude,
     ClaudePopup,
     PractitionerList,
@@ -83,6 +94,7 @@ export {
     useLeidaBus,
     useFounderAccess,
     useAwin,
+    useProducts,
     useClaude,
     useDash,
     useSupabase,
@@ -91,11 +103,13 @@ export {
     initDash,
     initSupabase,
     initAwin,
+    initProducts,
     initClaude,
     fetchLeida,
     fetchSupabaseRows,
     setLeida,
     setAwin,
+    setProducts,
     setClaude,
     saveSupabaseRecord,
     submitClaudePrompt,
