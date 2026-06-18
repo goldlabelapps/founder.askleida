@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import type { IconName } from '../../types';
 import { Icon } from '../../../../NX/DesignSystem';
-import { textFieldSx, selectMenuItemSx } from '../../../Leida';
+import { textFieldSx, selectMenuItemSx } from '../../../../Leida';
 
 export default function OptionSelect({
     label,

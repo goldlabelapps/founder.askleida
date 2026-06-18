@@ -9,7 +9,7 @@ import {
   Supabase,
   SupabasePostgres,
   SupabaseUsers,
-} from '../../Leida';
+} from '../../../Leida';
 
 export const NAV_ROUTES = new Set([
   'account',

@@ -37,7 +37,7 @@ import {
   useFounderAccess,
   useLeida,
   getRandomLoadingMessage,
-} from '../Leida';
+} from '../../Leida';
 
 export type { I_NXAdmin };
 
