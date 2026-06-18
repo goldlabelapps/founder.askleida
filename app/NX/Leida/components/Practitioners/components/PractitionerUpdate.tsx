@@ -300,13 +300,7 @@ const PractitionerUpdate = () => {
 
 										
 									</Box>
-											<OptionSelect
-												label="Access Level"
-												options={ACCESS_LEVEL_OPTIONS}
-												value={accessLevel}
-												onChange={setAccessLevel}
-												disabled={savingDisplayName}
-											/>
+											
 								</Grid>
 
 								<Grid size={{
@@ -314,28 +308,42 @@ const PractitionerUpdate = () => {
 									sm: 8,
 								}} sx={{ order: { xs: 2, sm: 1 } }}>
 									<Stack spacing={2} sx={{m:2}}>
+										
+										<Box sx={{ m: 3 }}>
+											<OptionSelect
+												// label="Access Level"
+												startAdornment="admin"
+												options={ACCESS_LEVEL_OPTIONS}
+												value={accessLevel}
+												onChange={setAccessLevel}
+												disabled={savingDisplayName}
+											/>
+										</Box>
 
 										<Editable
-											label="Name"
+											placeholder="Name"
 											value={displayName}
 											variant="standard"
 											onChange={setDisplayName}
 											startAdornment="user"
 										/>
 										<Editable
-											label="Clinic"
+											placeholder="Clinic"
 											value={clinic}
 											variant="standard"
 											onChange={setClinic}
 											startAdornment="medical"
 										/>
-										<Editable
-											label="Website"
-											value={website}
-											variant="standard"
-											onChange={setWebsite}
-											startAdornment="link"
-										/>
+
+										{false && (
+											<Editable
+												label="Website"
+												value={website}
+												variant="standard"
+												onChange={setWebsite}
+												startAdornment="link"
+											/>
+										)}
 										
 									</Stack>
 									

@@ -26,8 +26,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Icon } from '../../../../NX/DesignSystem';
-import { toDayjsOrNull } from '../../../Leida/lib/toDayjsOrNull';
-import { toHumanDateLabel } from '../../../Leida/lib/toHumanDateLabel';
+import { toDayjsOrNull, toHumanDateLabel, textFieldSx, selectMenuItemSx } from '../../../Leida';
 
 export default function Editable({
 	id,
@@ -48,19 +47,6 @@ export default function Editable({
 	endAdornment,
 }: EditableProps) {
 	const [dateAnchorEl, setDateAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-	const textFieldSx = {
-		'& .MuiInputBase-input': {
-			fontSize: { xs: '1rem', sm: '2rem' },
-		},
-		'& .MuiSelect-select': {
-			fontSize: { xs: '1rem', sm: '2rem' },
-		},
-	};
-
-	const selectMenuItemSx = {
-		fontSize: { xs: '1rem', sm: '2rem' },
-	};
 
 	const handleOpenDatePicker = (event: React.MouseEvent<HTMLButtonElement>) => {
 		setDateAnchorEl(event.currentTarget);

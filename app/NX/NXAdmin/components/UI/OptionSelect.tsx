@@ -1,16 +1,16 @@
 'use client';
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import {
-    IconButton,
-    Button,
+    Box,
     Select,
     MenuItem,
     InputLabel,
     FormControl,
+    InputAdornment,
 } from '@mui/material';
+import type { IconName } from '../../types';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { setNXAdmin, setCRUD, useCRUD } from '../../../NXAdmin'
+import { setNXAdmin, useCRUD } from '../../../NXAdmin'
 import { Icon } from '../../../../NX/DesignSystem';
 
 export default function OptionSelect({
@@ -18,19 +18,20 @@ export default function OptionSelect({
     options,
     value,
     variant = 'standard',
-    field,
     collection,
     onChange,
     disabled = false,
+    startAdornment,
 }: {
-    label: string;
-    options: any[];
+    label?: string;
+    options?: any[];
     value?: string | number;
     variant?: 'standard' | 'outlined' | 'filled';
     field?: string;
     collection?: string;
     onChange?: (newValue: string) => void;
     disabled?: boolean;
+    startAdornment?: IconName;
 }) {
 
     const dispatch = useDispatch();
@@ -51,8 +52,16 @@ export default function OptionSelect({
                 value={value ?? ''}
                 onChange={e => onChange && onChange(String(e.target.value))}
                 disabled={disabled}
+                startAdornment={startAdornment ? (
+                    <InputAdornment position="start">
+                        <Box sx={{ my: 2, pb: 1 }}>
+                            <Icon icon={startAdornment} />
+                        </Box>
+                    </InputAdornment>
+                ) : undefined}
+                
             >
-                {options.map((opt, idx) => {
+                {(options || []).map((opt, idx) => {
                     if (typeof opt === 'object' && opt !== null) {
                         return (
                             <MenuItem key={idx} value={opt.index !== undefined ? opt.index : opt.label || String(opt)}>
