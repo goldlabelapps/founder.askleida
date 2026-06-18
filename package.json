@@ -1,6 +1,6 @@
 {
   "name": "founder",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "scripts": {
     "dev": "yarn kill && yarn install && rm -rf .next && next dev -p 2005 --webpack",
     "build": "next build --webpack",
