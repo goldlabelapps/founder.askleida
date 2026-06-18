@@ -1,4 +1,4 @@
-# Leida (NX Module)
+# Leida Founder (NX Module)
 
 
 Leida is a client-side dashboard module used inside the NX Admin app shell.
