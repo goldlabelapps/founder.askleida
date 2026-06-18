@@ -27,17 +27,18 @@ export default function FounderDash() {
 
     const dashboardActions = [
         {
-            title: 'Practitioners',
-            description: 'Manage practitioner profiles and records.',
-            icon: 'practitioner',
-            route: '/practitioners',
-        },
-        {
             title: 'Products',
-            description: 'Browse and maintain the product catalog.',
+            description: 'Browse and manage the product catalog.',
             icon: 'products',
             route: '/products',
         },
+        {
+            title: 'Practitioners',
+            description: 'Manage practitioner profiles.',
+            icon: 'practitioner',
+            route: '/practitioners',
+        },
+        
     ] as const;
     
     React.useEffect(() => {
