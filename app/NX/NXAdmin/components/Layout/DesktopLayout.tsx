@@ -24,7 +24,7 @@ import {
     useNotifications,
     Header,
 } from '../../../NXAdmin';
-import { DashNav, PageRouter } from '../../../Leida';
+import { DashNav, PageRouter } from '../../../../Leida';
 import { NAV_ROUTES, sanitizePath, getActiveFromPathname } from '../PageRouter';
 import { useDispatch } from '../../../Uberedux';
 

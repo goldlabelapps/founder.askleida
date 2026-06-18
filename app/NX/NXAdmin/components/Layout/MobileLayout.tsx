@@ -17,7 +17,7 @@ import {
     useNotifications,
     useNXAdmin,
 } from '../../../NXAdmin';    
-import { DashNav, PageRouter } from '../../../Leida';
+import { DashNav, PageRouter } from '../../../../Leida';
 import { NAV_ROUTES, sanitizePath, getActiveFromPathname } from '../PageRouter';
 
 const FALLBACK_ADMIN_BASE_PATH = '/';

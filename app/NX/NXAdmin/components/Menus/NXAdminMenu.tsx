@@ -15,7 +15,7 @@ import { useDispatch } from '../../../Uberedux';
 import { Icon, setDesignSystem, navigateTo } from '../../../DesignSystem';
 import { logout, UserSpot } from '../../../Paywall';
 import { MiniListItem } from '../../../NXAdmin';
-import { DashAuth } from '../../../Leida';
+import { DashAuth } from '../../../../Leida';
 
 export default function NXAdminMenu() {
 
