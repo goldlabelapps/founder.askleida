@@ -28,6 +28,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Icon } from '../../../../NX/DesignSystem';
 import { toDayjsOrNull, toHumanDateLabel, textFieldSx, selectMenuItemSx } from '../../../Leida';
 
+
 export default function Editable({
 	id,
 	value = '',
@@ -242,7 +243,9 @@ export default function Editable({
 					input: {
 						startAdornment: startAdornment ? (
 							<InputAdornment position="start">
-								<Icon icon={startAdornment} />
+								<Box sx={{ mr: 2 }}>
+									<Icon icon={startAdornment} />
+								</Box>
 							</InputAdornment>
 						) : undefined,
 						endAdornment: endAdornment ? (

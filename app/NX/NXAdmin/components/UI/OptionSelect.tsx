@@ -3,22 +3,21 @@ import * as React from 'react';
 import {
     Box,
     Select,
+    Typography,
     MenuItem,
     InputLabel,
     FormControl,
     InputAdornment,
 } from '@mui/material';
 import type { IconName } from '../../types';
-import { useDispatch } from '../../../../NX/Uberedux';
-import { setNXAdmin, useCRUD } from '../../../NXAdmin'
 import { Icon } from '../../../../NX/DesignSystem';
+import { textFieldSx, selectMenuItemSx } from '../../../Leida';
 
 export default function OptionSelect({
     label,
     options,
     value,
     variant = 'standard',
-    collection,
     onChange,
     disabled = false,
     startAdornment,
@@ -27,22 +26,11 @@ export default function OptionSelect({
     options?: any[];
     value?: string | number;
     variant?: 'standard' | 'outlined' | 'filled';
-    field?: string;
-    collection?: string;
     onChange?: (newValue: string) => void;
     disabled?: boolean;
     startAdornment?: IconName;
 }) {
 
-    const dispatch = useDispatch();
-    const crud = useCRUD();
-    const state = collection ? crud[collection] : undefined;
-
-    const handleClick = () => {
-        console.log('collection', collection);
-        dispatch(setNXAdmin('active', null));
-    };
-    
     return (
         <FormControl margin="normal" variant={variant} fullWidth>
             <InputLabel>{label}</InputLabel>
@@ -52,25 +40,29 @@ export default function OptionSelect({
                 value={value ?? ''}
                 onChange={e => onChange && onChange(String(e.target.value))}
                 disabled={disabled}
+                sx={textFieldSx}
                 startAdornment={startAdornment ? (
                     <InputAdornment position="start">
-                        <Box sx={{ my: 2, pb: 1 }}>
+                        <Box sx={{ mr: 2 }}>
                             <Icon icon={startAdornment} />
                         </Box>
                     </InputAdornment>
                 ) : undefined}
-                
             >
                 {(options || []).map((opt, idx) => {
                     if (typeof opt === 'object' && opt !== null) {
                         return (
-                            <MenuItem key={idx} value={opt.index !== undefined ? opt.index : opt.label || String(opt)}>
-                                {opt.label || String(opt)}
+                            <MenuItem key={idx} value={opt.index !== undefined ? opt.index : opt.label || String(opt)} sx={selectMenuItemSx}>
+                                <Typography 
+                                    variant="body2" 
+                                    sx={{}}>
+                                    {opt.label || String(opt)}
+                                </Typography>
                             </MenuItem>
                         );
                     }
                     return (
-                        <MenuItem key={idx} value={String(opt)}>
+                        <MenuItem key={idx} value={String(opt)} sx={selectMenuItemSx}>
                             {String(opt)}
                         </MenuItem>
                     );
