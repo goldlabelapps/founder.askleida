@@ -1,5 +1,6 @@
 # Leida (NX Module)
 
+
 Leida is a client-side dashboard module used inside the NX Admin app shell.
 
 This README is written as a handoff for a React/Next developer who needs to continue work without the original author.
