@@ -12,6 +12,7 @@ import {
   AwinSearch,
   Awin,
   PractitionerNew,
+  Products,
 } from '../Leida';
 
 interface I_PageRouter {
@@ -55,8 +56,8 @@ export function PageRouter({ active }: I_PageRouter) {
       return <AwinSearch />;
     case 'claude':
       return <Claude />;
-    // case 'products':
-    //   return <Products />;
+    case 'products':
+      return <Products />;
     default:
       return <FounderDash />;
   }

@@ -18,28 +18,17 @@ export const navItems: DashNavItem[] = [
     route: '/practitioners',
     activeRoutes: ['/practitioners'],
   },
-  // {
-  //   label: 'New',
-  //   icon: 'practitioner',
-  //   route: '/practitioners/new',
-  //   activeRoutes: ['/practitioners/new'],
-  // },
+  {
+    label: 'Awin',
+    icon: 'awin',
+    route: '/awin',
+    activeRoutes: ['/awin'],
+  },
   {
     label: 'Products',
     icon: 'products',
     route: '/products',
     activeRoutes: ['/products'],
   },
-//   {
-//     label: 'Awin',
-//     icon: 'awin',
-//     route: '/awin',
-//     activeRoutes: ['/awin'],
-//   },
-//   {
-//     label: 'Claude',
-//     icon: 'claude',
-//     route: '/claude',
-//     activeRoutes: ['/claude'],
-//   },
+
 ];
