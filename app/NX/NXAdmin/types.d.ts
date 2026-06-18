@@ -1,6 +1,47 @@
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import type { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import type { CheckboxProps } from '@mui/material';
+import type { Icon } from '../DesignSystem';
 import type { T_Config } from '../types';
+
+export type IconName = ComponentProps<typeof Icon>['icon'];
+
+export type EditableBaseProps = {
+	id?: string;
+	label?: string;
+	placeholder?: string;
+	disabled?: boolean;
+	required?: boolean;
+	autoFocus?: boolean;
+	multiline?: boolean;
+	minRows?: number;
+	variant?: 'standard' | 'outlined' | 'filled';
+	startAdornment?: IconName;
+	endAdornment?: IconName;
+	editableType?: 'text' | 'date' | 'select' | 'chips';
+	options?: readonly string[];
+	checkboxProps?: Omit<CheckboxProps, 'checked' | 'onChange' | 'disabled' | 'required'>;
+};
+
+export type EditableTextProps = EditableBaseProps & {
+	value?: string | number;
+	onChange?: (value: string) => void;
+	checkboxProps?: never;
+};
+
+export type EditableMultiSelectProps = EditableBaseProps & {
+	value: string[];
+	onChange?: (value: string[]) => void;
+	checkboxProps?: never;
+};
+
+export type EditableBooleanProps = EditableBaseProps & {
+	value: boolean;
+	onChange?: (value: boolean) => void;
+	checkboxProps?: Omit<CheckboxProps, 'checked' | 'onChange' | 'disabled' | 'required'>;
+};
+
+export type EditableProps = EditableTextProps | EditableBooleanProps | EditableMultiSelectProps;
 
 // ─── Geo ─────────────────────────────────────────────────────────────────────
 

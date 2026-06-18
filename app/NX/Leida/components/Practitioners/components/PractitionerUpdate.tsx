@@ -228,8 +228,8 @@ const PractitionerUpdate = () => {
 						{/* Header with delete button */}
 						<Stack
 							direction="row"
-							justifyContent="space-between"
-							alignItems="center"
+							// justifyContent="space-between"
+							// alignItems="center"
 							sx={{ mb: 1 }}
 						>
 							<IconButton
@@ -241,11 +241,11 @@ const PractitionerUpdate = () => {
 							</IconButton>
 							
 							{email ? (
-								<Typography variant="caption">
+								<Typography variant="caption" sx={{m:1}}>
 									{email}
 								</Typography>
 							) : null}
-
+							<Box sx={{ flexGrow: 1 }} />
 							<IconButton 
 								color="primary"
 								disabled={deleting}
@@ -288,6 +288,7 @@ const PractitionerUpdate = () => {
 										justifyContent: 'center', 
 										alignItems: 'flex-start', 
 										height: '100%',
+										m:2
 									 }}>
 										<AvatarUpload
 											size={150}
@@ -299,39 +300,50 @@ const PractitionerUpdate = () => {
 
 										
 									</Box>
-											<OptionSelect
-												label="Access Level"
-												options={ACCESS_LEVEL_OPTIONS}
-												value={accessLevel}
-												onChange={setAccessLevel}
-												disabled={savingDisplayName}
-											/>
+											
 								</Grid>
 
 								<Grid size={{
 									xs: 12,
 									sm: 8,
 								}} sx={{ order: { xs: 2, sm: 1 } }}>
-									<Stack spacing={2}>
+									<Stack spacing={2} sx={{m:2}}>
+										
+										<Box sx={{ m: 3 }}>
+											<OptionSelect
+												// label="Access Level"
+												startAdornment="admin"
+												options={ACCESS_LEVEL_OPTIONS}
+												value={accessLevel}
+												onChange={setAccessLevel}
+												disabled={savingDisplayName}
+											/>
+										</Box>
 
 										<Editable
-											label="Name"
+											placeholder="Name"
 											value={displayName}
 											variant="standard"
 											onChange={setDisplayName}
+											startAdornment="user"
 										/>
 										<Editable
-											label="Clinic Name"
+											placeholder="Clinic"
 											value={clinic}
 											variant="standard"
 											onChange={setClinic}
+											startAdornment="medical"
 										/>
-										<Editable
-											label="Website"
-											value={website}
-											variant="standard"
-											onChange={setWebsite}
-										/>
+
+										{false && (
+											<Editable
+												label="Website"
+												value={website}
+												variant="standard"
+												onChange={setWebsite}
+												startAdornment="link"
+											/>
+										)}
 										
 									</Stack>
 									

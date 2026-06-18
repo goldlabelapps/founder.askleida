@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react';
 import {
 	Box,
@@ -14,77 +15,19 @@ import {
 	Typography,
 } from '@mui/material';
 import type { CheckboxProps } from '@mui/material';
-import dayjs from 'dayjs';
-import type { Dayjs } from 'dayjs';
+import type {
+	EditableProps,
+	EditableTextProps,
+	EditableBooleanProps,
+	EditableMultiSelectProps,
+	IconName,
+} from '../../types';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Icon } from '../../../../NX/DesignSystem';
+import { toDayjsOrNull, toHumanDateLabel, textFieldSx, selectMenuItemSx } from '../../../Leida';
 
-type IconName = React.ComponentProps<typeof Icon>['icon'];
-
-type EditableBaseProps = {
-	id?: string;
-	label?: string;
-	placeholder?: string;
-	disabled?: boolean;
-	required?: boolean;
-	autoFocus?: boolean;
-	multiline?: boolean;
-	minRows?: number;
-	variant?: 'standard' | 'outlined' | 'filled';
-	startAdornment?: IconName;
-	endAdornment?: IconName;
-	editableType?: 'text' | 'date' | 'select' | 'chips';
-	options?: readonly string[];
-	checkboxProps?: Omit<CheckboxProps, 'checked' | 'onChange' | 'disabled' | 'required'>;
-};
-
-type EditableTextProps = EditableBaseProps & {
-	value?: string | number;
-	onChange?: (value: string) => void;
-	checkboxProps?: never;
-};
-
-type EditableMultiSelectProps = EditableBaseProps & {
-	value: string[];
-	onChange?: (value: string[]) => void;
-	checkboxProps?: never;
-};
-
-type EditableBooleanProps = EditableBaseProps & {
-	value: boolean;
-	onChange?: (value: boolean) => void;
-	checkboxProps?: Omit<CheckboxProps, 'checked' | 'onChange' | 'disabled' | 'required'>;
-};
-
-export type EditableProps = EditableTextProps | EditableBooleanProps | EditableMultiSelectProps;
-
-const toDayjsOrNull = (value: string): Dayjs | null => {
-	if (!value.trim()) {
-		return null;
-	}
-
-	const parsed = dayjs(value);
-	if (!parsed.isValid()) {
-		return null;
-	}
-
-	return parsed;
-};
-
-const toHumanDateLabel = (value: string): string => {
-	if (!value.trim()) {
-		return 'Select date';
-	}
-
-	const parsed = dayjs(value);
-	if (!parsed.isValid()) {
-		return value;
-	}
-
-	return parsed.format('D MMMM YYYY');
-};
 
 export default function Editable({
 	id,
@@ -105,19 +48,6 @@ export default function Editable({
 	endAdornment,
 }: EditableProps) {
 	const [dateAnchorEl, setDateAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-	const textFieldSx = {
-		'& .MuiInputBase-input': {
-			fontSize: { xs: '1rem', sm: '2rem' },
-		},
-		'& .MuiSelect-select': {
-			fontSize: { xs: '1rem', sm: '2rem' },
-		},
-	};
-
-	const selectMenuItemSx = {
-		fontSize: { xs: '1rem', sm: '2rem' },
-	};
 
 	const handleOpenDatePicker = (event: React.MouseEvent<HTMLButtonElement>) => {
 		setDateAnchorEl(event.currentTarget);
@@ -290,8 +220,6 @@ export default function Editable({
 		);
 	}
 
-	const isEmpty = normalizedValue.trim().length === 0;
-
 	return (
 		<FormControl fullWidth>
 			{label ? (
@@ -301,13 +229,6 @@ export default function Editable({
 			) : null}
 			<TextField
 				id={id}
-				// sx={{
-				// 	'& .MuiInputBase-root': {
-				// 		backgroundColor: isEmpty
-				// 			? 'rgba(255, 255, 255, 0.25)'
-				// 			: 'rgba(255, 255, 255, 0.75)',
-				// 	},
-				// }}
 				fullWidth
 				variant={variant}
 				placeholder={placeholder}
@@ -322,7 +243,9 @@ export default function Editable({
 					input: {
 						startAdornment: startAdornment ? (
 							<InputAdornment position="start">
-								<Icon icon={startAdornment} />
+								<Box sx={{ mr: 2 }}>
+									<Icon icon={startAdornment} />
+								</Box>
 							</InputAdornment>
 						) : undefined,
 						endAdornment: endAdornment ? (
