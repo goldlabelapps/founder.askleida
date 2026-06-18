@@ -40,9 +40,14 @@ const Practitioners = () => {
 		<Grid container spacing={2} sx={{ }}>
 			<Grid size={{
 				xs: 12,
-			}}>
+			}}
+				sx={{
+					display: 'flex',
+				}}
+			>
+				<Box sx={{ flexGrow: 1 }} />
 				<Button
-					variant="outlined"
+					variant="contained"
 					startIcon={<Icon icon="practitioner-add" />}
 					onClick={handleNewPractitioner}
 				>

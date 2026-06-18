@@ -1,7 +1,6 @@
 // Components
 import { PageRouter } from './PageRouter';
 import { DashNav, navItems, LoggedInAs } from './components/DashNav';
-import README from './components/README';
 import {
 	FounderDash,
 	initDash,
@@ -13,14 +12,13 @@ import {
 import DashAuth from './components/FounderDash/components/DashAuth';
 import Awin from './components/Awin/Awin';
 import AwinSearch from './components/Awin/components/AwinSearch';
+import Products from './components/Products/Products';
+import ListProducts from './components/Products/components/ListProducts';
+import RenderProduct from './components/Products/components/RenderProduct';
+import FindProduct from './components/Products/components/FindProduct';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
 import { PractitionerList, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners } from './components/Practitioners';
-import Products from './components/Products/Products';
-import ProductDash from './components/Products/components/ProductDash';
-import ProductCard from './components/Products/components/ProductCard';
-import ProductNew from './components/Products/components/ProductNew';
-import ProductUpdate from './components/Products/components/ProductUpdate';
 import Supabase from './components/Supabase/Supabase';
 import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
 import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
@@ -31,6 +29,7 @@ import { getLeidaContextPrompt, testProduct } from './components/Claude/prompts'
 import { useLeida, useLeidaBus } from './hooks/useLeida';
 import { useFounderAccess } from './hooks/useFounderAccess';
 import { useAwin } from './components/Awin/hooks/useAwin';
+import { useProducts } from './components/Products/hooks/useProducts';
 import { useClaude } from './components/Claude/hooks/useClaude';
 
 // Actions
@@ -38,13 +37,6 @@ import { initLeida } from './actions/initLeida';
 import { fetchLeida } from './actions/fetchLeida';
 import { setLeida } from './actions/setLeida';
 import { deletePractitioner } from './actions/deletePractitioner';
-import { deleteProduct } from './actions/deleteProduct';
-import { updateProduct } from './actions/updateProduct';
-import { awinCheckFeed } from './components/Products/actions/awinCheckFeed';
-import { awinIngestFeed } from './components/Products/actions/awinIngestFeed';
-import { awinSyncFeed } from './components/Products/actions/awinSyncFeed';
-import { searchAwinLookfantastic } from './components/Products/actions/searchAwinLookfantastic';
-import { setAwinLookfantasticSelection } from './components/Products/actions/setAwinLookfantasticSelection';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
@@ -53,6 +45,8 @@ import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRo
 import { saveSupabaseRecord } from './components/Supabase/actions/saveSupabaseRecord';
 import { initAwin } from './components/Awin/actions/initAwin';
 import { setAwin } from './components/Awin/actions/setAwin';
+import { initProducts } from './components/Products/actions/initProducts';
+import { setProducts } from './components/Products/actions/setProducts';
 import { initClaude } from './components/Claude/actions/initClaude';
 import { setClaude } from './components/Claude/actions/setClaude';
 import { submitClaudePrompt } from './components/Claude/actions/submitClaudePrompt';
@@ -72,13 +66,16 @@ export {
     DashNav,
     navItems,
     LoggedInAs,
-    README,
     FounderDash,
     DashAuth,
     DashCard,
     DashSurface,
     Awin,
     AwinSearch,
+    Products,
+    ListProducts,
+    RenderProduct,
+    FindProduct,
     Claude,
     ClaudePopup,
     PractitionerList,
@@ -86,11 +83,6 @@ export {
     PractitionerNew,
     PractitionerUpdate,
     Practitioners,
-    ProductDash,
-    ProductCard,
-    ProductNew,
-    ProductUpdate,
-    Products,
     Supabase,
     SupabasePostgres,
     SupabaseUsers,
@@ -102,6 +94,7 @@ export {
     useLeidaBus,
     useFounderAccess,
     useAwin,
+    useProducts,
     useClaude,
     useDash,
     useSupabase,
@@ -110,25 +103,20 @@ export {
     initDash,
     initSupabase,
     initAwin,
+    initProducts,
     initClaude,
     fetchLeida,
     fetchSupabaseRows,
     setLeida,
     setAwin,
+    setProducts,
     setClaude,
     saveSupabaseRecord,
     submitClaudePrompt,
     deletePractitioner,
-    deleteProduct,
-    awinCheckFeed,
-    awinIngestFeed,
-    awinSyncFeed,
-    searchAwinLookfantastic,
-    setAwinLookfantasticSelection,
     createPractitioner,
     updateAvatar,
     updatePractitioner,
-    updateProduct,
     setDash,
     // Lib
     normalizeLeidaRouteKey,
