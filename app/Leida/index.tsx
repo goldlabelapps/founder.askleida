@@ -1,7 +1,6 @@
 // Components
 import { PageRouter } from './PageRouter';
 import { DashNav, navItems, LoggedInAs } from './components/DashNav';
-import README from './components/README';
 import {
 	FounderDash,
 	initDash,
@@ -16,11 +15,6 @@ import AwinSearch from './components/Awin/components/AwinSearch';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
 import { PractitionerList, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners } from './components/Practitioners';
-import Products from './components/Products/Products';
-import ProductDash from './components/Products/components/ProductDash';
-import ProductCard from './components/Products/components/ProductCard';
-import ProductNew from './components/Products/components/ProductNew';
-import ProductUpdate from './components/Products/components/ProductUpdate';
 import Supabase from './components/Supabase/Supabase';
 import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
 import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
@@ -38,13 +32,6 @@ import { initLeida } from './actions/initLeida';
 import { fetchLeida } from './actions/fetchLeida';
 import { setLeida } from './actions/setLeida';
 import { deletePractitioner } from './actions/deletePractitioner';
-import { deleteProduct } from './actions/deleteProduct';
-import { updateProduct } from './actions/updateProduct';
-import { awinCheckFeed } from './components/Products/actions/awinCheckFeed';
-import { awinIngestFeed } from './components/Products/actions/awinIngestFeed';
-import { awinSyncFeed } from './components/Products/actions/awinSyncFeed';
-import { searchAwinLookfantastic } from './components/Products/actions/searchAwinLookfantastic';
-import { setAwinLookfantasticSelection } from './components/Products/actions/setAwinLookfantasticSelection';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
@@ -72,7 +59,6 @@ export {
     DashNav,
     navItems,
     LoggedInAs,
-    README,
     FounderDash,
     DashAuth,
     DashCard,
@@ -86,11 +72,6 @@ export {
     PractitionerNew,
     PractitionerUpdate,
     Practitioners,
-    ProductDash,
-    ProductCard,
-    ProductNew,
-    ProductUpdate,
-    Products,
     Supabase,
     SupabasePostgres,
     SupabaseUsers,
@@ -119,16 +100,9 @@ export {
     saveSupabaseRecord,
     submitClaudePrompt,
     deletePractitioner,
-    deleteProduct,
-    awinCheckFeed,
-    awinIngestFeed,
-    awinSyncFeed,
-    searchAwinLookfantastic,
-    setAwinLookfantasticSelection,
     createPractitioner,
     updateAvatar,
     updatePractitioner,
-    updateProduct,
     setDash,
     // Lib
     normalizeLeidaRouteKey,

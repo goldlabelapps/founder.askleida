@@ -13,9 +13,9 @@ import {
   AwinSearch,
   Awin,
   PractitionerNew,
-  Products,
-  ProductNew,
-  ProductUpdate,
+  // Products,
+  // ProductNew,
+  // ProductUpdate,
 } from '../Leida';
 
 interface I_PageRouter {
@@ -28,7 +28,7 @@ export function PageRouter({ active }: I_PageRouter) {
   if (!normalizedRoute) return <FounderDash />;
 
   if (normalizedRoute === 'practitioners/new') return <PractitionerNew />;
-  if (normalizedRoute === 'products/new') return <ProductNew />;
+  // if (normalizedRoute === 'products/new') return <ProductNew />;
 
   const practitionerDetailMatch = normalizedRoute.match(/^(practitioners|pracitioners|paractitioners)\/([^/]+)$/);
   if (practitionerDetailMatch) {
@@ -39,12 +39,12 @@ export function PageRouter({ active }: I_PageRouter) {
 
   if (['practitioners', 'pracitioners', 'paractitioners'].includes(normalizedRoute)) return <Practitioners />;
 
-  const productDetailMatch = normalizedRoute.match(/^products\/([^/]+)$/);
-  if (productDetailMatch) {
-    const productId = productDetailMatch[1]?.toLowerCase();
-    if (productId === 'new') return <ProductNew />;
-    return <ProductUpdate />;
-  }
+  // const productDetailMatch = normalizedRoute.match(/^products\/([^/]+)$/);
+  // if (productDetailMatch) {
+  //   const productId = productDetailMatch[1]?.toLowerCase();
+  //   if (productId === 'new') return <ProductNew />;
+  //   return <ProductUpdate />;
+  // }
 
   switch (normalizedRoute) {
     case 'supabase':
@@ -59,8 +59,8 @@ export function PageRouter({ active }: I_PageRouter) {
       return <AwinSearch />;
     case 'claude':
       return <Claude />;
-    case 'products':
-      return <Products />;
+    // case 'products':
+    //   return <Products />;
     default:
       return <FounderDash />;
   }
