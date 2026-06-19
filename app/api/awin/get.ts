@@ -12,6 +12,7 @@ const ORDER_BY_MAP = {
   category_name: 'category_name',
   search_price: 'search_price',
 } as const;
+type T_OrderByKey = keyof typeof ORDER_BY_MAP | 'brand';
 
 function createSqlClient() {
   const databaseUrl =
@@ -42,8 +43,11 @@ function parseIntParam(value: string | null, fallback: number, min: number, max:
   return Math.min(Math.max(Math.floor(parsed), min), max);
 }
 
-function parseOrderBy(value: string | null): keyof typeof ORDER_BY_MAP {
+function parseOrderBy(value: string | null): T_OrderByKey {
   const input = (value || '').trim().toLowerCase();
+  if (input === 'brand') {
+    return 'brand';
+  }
   return (input in ORDER_BY_MAP ? input : 'created_at') as keyof typeof ORDER_BY_MAP;
 }
 
@@ -71,12 +75,6 @@ export async function GET(req: Request) {
     const filter = normalizedQuery
       ? sql`(
           lower(coalesce(product_name, '')) like ${like}
-          or lower(coalesce(description, '')) like ${like}
-          or lower(coalesce(category_name, '')) like ${like}
-          or lower(coalesce(merchant_product_id, '')) like ${like}
-          or lower(coalesce(aw_product_id, '')) like ${like}
-          or lower(coalesce(ean, '')) like ${like}
-          or lower(coalesce(data->>'brand_name', '')) like ${like}
         )`
       : sql`true`;
 
@@ -89,31 +87,54 @@ export async function GET(req: Request) {
       : sql`true`;
 
     const whereClause = sql`${filter} and ${categoryFilter} and ${brandFilter}`;
-    const orderColumn = ORDER_BY_MAP[orderBy];
     const direction = orderDir === 'asc' ? sql`asc` : sql`desc`;
 
+    const rowsPromise = orderBy === 'brand'
+      ? sql`
+          select
+            id,
+            unique_key,
+            product_name,
+            description,
+            category_name,
+            search_price,
+            currency,
+            ean,
+            aw_product_id,
+            merchant_product_id,
+            aw_deep_link,
+            created_at,
+            data
+          from public.${sql(safeTable)}
+          where ${whereClause}
+          order by lower(coalesce(data->>'brand_name', '')) ${direction}
+          limit ${limit}
+          offset ${offset}
+        `
+      : sql`
+          select
+            id,
+            unique_key,
+            product_name,
+            description,
+            category_name,
+            search_price,
+            currency,
+            ean,
+            aw_product_id,
+            merchant_product_id,
+            aw_deep_link,
+            created_at,
+            data
+          from public.${sql(safeTable)}
+          where ${whereClause}
+          order by ${sql(ORDER_BY_MAP[orderBy])} ${direction}
+          limit ${limit}
+          offset ${offset}
+        `;
+
     const [rows, countRows] = await Promise.all([
-      sql`
-        select
-          id,
-          unique_key,
-          product_name,
-          description,
-          category_name,
-          search_price,
-          currency,
-          ean,
-          aw_product_id,
-          merchant_product_id,
-          aw_deep_link,
-          created_at,
-          data
-        from public.${sql(safeTable)}
-        where ${whereClause}
-        order by ${sql(orderColumn)} ${direction}
-        limit ${limit}
-        offset ${offset}
-      `,
+      rowsPromise,
       sql<Array<{ count: number }>>`
         select count(*)::int as count
         from public.${sql(safeTable)}

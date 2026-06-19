@@ -24,3 +24,27 @@ export type T_AwinProduct = {
     data?: T_AwinProductData | null;
     [key: string]: unknown;
 };
+
+export type T_AwinOrderBy = 'created_at' | 'id' | 'product_name' | 'category_name' | 'search_price' | 'brand';
+
+export interface I_ListAwin {
+    products: T_AwinProduct[];
+    query?: string;
+    onSelect?: (product: T_AwinProduct) => void;
+}
+
+export type T_RenderAwinMode = 'card' | 'list' | 'button';
+
+export interface I_RenderAwin {
+    awin: T_AwinProduct;
+    mode?: T_RenderAwinMode;
+    query?: string;
+    onClick?: (product: T_AwinProduct) => void;
+    buttonLabel?: string;
+}
+
+export interface I_AwinDetail {
+    open: boolean;
+    awin?: T_AwinProduct | null;
+    onClose: () => void;
+}

@@ -11,7 +11,11 @@ import {
 } from './components/FounderDash';
 import DashAuth from './components/FounderDash/components/DashAuth';
 import Awin from './components/Awin/Awin';
+import AwinDetail from './components/Awin/components/AwinDetail';
 import AwinSearch from './components/Awin/components/AwinSearch';
+import ListAwin from './components/Awin/components/ListAwin';
+import Query from './components/Awin/components/Query';
+import RenderAwin from './components/Awin/components/RenderAwin';
 import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
@@ -71,7 +75,11 @@ export {
     DashCard,
     DashSurface,
     Awin,
+    AwinDetail,
     AwinSearch,
+    ListAwin,
+    Query,
+    RenderAwin,
     Products,
     ListProducts,
     RenderProduct,
