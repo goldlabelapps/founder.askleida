@@ -12,12 +12,7 @@ export const navItems: DashNavItem[] = [
     route: '/',
     activeRoutes: ['/'],
   },
-  {
-    label: 'Practitioners',
-    icon: 'practitioner',
-    route: '/practitioners',
-    activeRoutes: ['/practitioners'],
-  },
+
   {
     label: 'Awin',
     icon: 'awin',
@@ -30,5 +25,10 @@ export const navItems: DashNavItem[] = [
     route: '/products',
     activeRoutes: ['/products'],
   },
-
+  {
+    label: 'Practitioners',
+    icon: 'practitioner',
+    route: '/practitioners',
+    activeRoutes: ['/practitioners'],
+  },
 ];
