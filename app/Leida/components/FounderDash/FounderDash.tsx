@@ -27,11 +27,19 @@ export default function FounderDash() {
 
     const dashboardActions = [
         {
+            title: 'Awin',
+            description: 'Affiliate marketing',
+            icon: 'awin',
+            route: '/awin',
+        },
+        
+        {
             title: 'Products',
             description: 'Browse and manage the product catalog.',
             icon: 'products',
             route: '/products',
         },
+
         {
             title: 'Practitioners',
             description: 'Manage practitioner profiles.',
