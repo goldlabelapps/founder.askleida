@@ -53,29 +53,46 @@ Notes:
 - `AWIN_LOOKFANTASTIC_TABLE` defaults to `awin_lookfantastic`.
 - `AWIN_SYNC_LIMIT` optionally caps ingested rows.
 
-## 1) Status/Discovery Route
+## 1) Search Route (Primary)
 
 `GET /api/awin`
 
 Purpose:
 
-- Quick health/status check.
-- Returns whether required AWIN env vars are present.
-- Returns discovered child routes.
+- Query the `AWIN_LOOKFANTASTIC_TABLE` (defaults to `awin_lookfantastic`).
+- Return filtered, searched, and ordered results for UI consumption.
 
-Success status:
+- Supported query params:
 
-- `200` when token and publisher id are present.
+- `q` (optional): case-insensitive text search across product_name, description, category_name, merchant_product_id, aw_product_id, ean, and data.brand_name.
+- `category` (optional): exact case-insensitive category filter.
+- `brand` (optional): exact case-insensitive brand filter (`data.brand_name`).
+- `limit` (optional): result page size, clamped `1..100`, default `25`.
+- `offset` (optional): pagination offset, clamped `0..20000`, default `0`.
+- `orderBy` (optional): one of `created_at`, `id`, `product_name`, `category_name`, `search_price`. Default `created_at`.
+- `orderDir` (optional): `asc` or `desc`. Default `desc`.
 
-Warning status:
+- Response data shape:
 
-- `500` when one or both required env vars are missing.
+- `table`, `query`, `category`, `brand`
+- `limit`, `offset`, `orderBy`, `orderDir`
+- `count` (total rows matching filter)
+- `rows` (paged row set)
 
 Example:
 
 ```bash
-curl "http://localhost:3000/api/awin"
+curl "http://localhost:3000/api/awin?q=vitamin%20c&category=skincare&limit=25&orderBy=created_at&orderDir=desc"
 ```
+
+## 1b) Search Alias Route
+
+`GET /api/awin/lookfantastic/search`
+
+Purpose:
+
+- Alias for the root search route.
+- Uses the same query params and returns the same response as `GET /api/awin`.
 
 ## 2) Programmes Route
 

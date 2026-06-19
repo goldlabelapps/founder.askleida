@@ -14,7 +14,6 @@ import {
 import { useDispatch } from '../../../../NX/Uberedux';
 import { setNXAdmin } from '../../../../NX/NXAdmin';
 import {
-    initAwin,
     setAwin,
     useDash,
     useAwin,
@@ -95,12 +94,6 @@ export default function AwinSearch() {
             setPractitionerId(uid);
         }
     }, [paywall?.uid, paywall?.user?.uid, practitionerId]);
-
-    React.useEffect(() => {
-        if (!awin?.initted) {
-            dispatch(initAwin());
-        }
-    }, [dispatch, awin?.initted]);
 
     React.useEffect(() => {
         if (dash && dash.title) {
