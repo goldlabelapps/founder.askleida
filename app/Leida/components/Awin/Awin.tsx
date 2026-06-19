@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../NX/Uberedux';
 import { setNXAdmin } from '../../../NX/NXAdmin';
+import ListAwin from './components/ListAwin';
 import {
     useAwin,
     useDash,
@@ -17,6 +18,7 @@ export default function Awin() {
     const dispatch = useDispatch();
     const dash = useDash();
     const awin = useAwin();
+    const products = Array.isArray(awin?.products) ? awin.products : [];
 
     React.useEffect(() => {
         if (dash && dash.title) {
@@ -34,6 +36,9 @@ export default function Awin() {
                 <Typography variant="body2" color="text.secondary">
                     Redux key: leida.awin
                 </Typography>
+
+                <ListAwin products={products} />
+
                 <Paper variant="outlined" sx={{ p: 2, overflowX: 'auto' }}>
                     <Box
                         component="pre"
