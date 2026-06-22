@@ -104,9 +104,14 @@ const PractitionerCard = ({
 		return null;
 	})();
 
+	// isOnboard = practitioner has set their password (past the 'invited' stage)
+	const isOnboard = onboardingStatus && onboardingStatus !== 'invited';
+	
+	// isOnboardingComplete = practitioner has fully completed onboarding
 	const isOnboardingComplete = onboardingStatus === 'completed' || onboardingStatus === 'onboarded';
-	const statusIcon = isOnboardingComplete ? 'tick' : 'warning';
-	const statusColor = isOnboardingComplete ? 'success' : 'warning';
+	
+	const statusIcon = isOnboardingComplete ? 'tick' : isOnboard ? 'info' : 'warning';
+	const statusColor = isOnboardingComplete ? 'success' : isOnboard ? 'info' : 'warning';
 
 	const handleEdit = () => {
 		if (!canEdit) return;
@@ -145,7 +150,7 @@ const PractitionerCard = ({
 					</Box>
 					<Box sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
 						<Icon 
-							icon={statusIcon as any} 
+							icon={statusIcon} 
 							color="primary"
 						/>
 					</Box>
