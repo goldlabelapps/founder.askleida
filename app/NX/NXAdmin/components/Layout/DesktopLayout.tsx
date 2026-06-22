@@ -12,6 +12,7 @@ import {
     Box,
     Toolbar,
     IconButton,
+    ButtonBase,
     Container,
 } from '@mui/material';
 import { 
@@ -126,6 +127,10 @@ export default function DesktopLayout({ config }: { config: any }) {
         setOpen(false);
     };
 
+    const handleDrawerToggle = () => {
+        setOpen((prev) => !prev);
+    };
+
     React.useEffect(() => {
         const activeFromPath = getActiveFromPathname(pathname);
         const nextActive = activeFromPath || null;
@@ -161,21 +166,27 @@ export default function DesktopLayout({ config }: { config: any }) {
                             edge="start"
                             sx={{ marginRight: 3 }}
                         >
-                            {theme.direction === 'rtl' ? 
-                            <Icon icon="left" /> : <Icon icon="right" />}
+                            <Icon icon="leida" />
                         </IconButton>
                     )}
                     <Header />
                 </Toolbar>
             </AppBar>
 
-            <Drawer variant="permanent" open={open} sx={{ border: 0, }}>
+            <Drawer variant="permanent" open={open} sx={{ border: 0, marginRight: 3 }}>
                 <DrawerHeader sx={{ border: 0 }}>
-                    {open && (
-                        <IconButton color="primary" onClick={handleDrawerClose}>
-                            {theme.direction === 'rtl' ? <Icon icon="right" /> : <Icon icon="left" />}
-                        </IconButton>
-                    )}
+                    {open && <>
+                        <Box sx={{ maxWidth: 150, mx: 'auto' }}>
+                            <ButtonBase
+                                onClick={handleDrawerToggle}
+                                sx={{
+                                }}
+                            >
+                                <img src="/nxadmin/svg/leidaLogo.svg" alt="Leida Logo" style={{ width: '100%' }} />
+                            </ButtonBase>
+                        </Box>
+                    </>}
+                    
                 </DrawerHeader>  
                 <DashNav />
 
