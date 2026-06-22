@@ -4,7 +4,6 @@ import {useRouter} from 'next/navigation';
 import {
 	Avatar,
 	ButtonBase,
-	LinearProgress,
 	Paper,
 	Box,
 	Typography,
@@ -146,15 +145,11 @@ const PractitionerCard = ({
 					</Box>
 					<Box sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
 						<Icon 
-							icon={statusIcon} 
-							sx={{ 
-								color: statusColor === 'success' ? 'success.main' : 'warning.main',
-								fontSize: '1.25rem'
-							}} 
+							icon={statusIcon as any} 
+							color="primary"
 						/>
 					</Box>
 				</Box>
-				
 			</Paper>
 		</ButtonBase>
 	);

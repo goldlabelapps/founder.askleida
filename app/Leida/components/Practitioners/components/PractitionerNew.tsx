@@ -39,8 +39,8 @@ const PractitionerNew = () => {
 
 	React.useEffect(() => {
 		dispatch(setNXAdmin('header', {
-			title: 'Add Practitioner',
-			icon: 'practitioner',
+			title: 'Invite Practitioner',
+			icon: 'practitioner-add',
 		}));
 	}, [dispatch]);
 		
@@ -50,7 +50,7 @@ const PractitionerNew = () => {
 
 		const email = inviteEmail.trim().toLowerCase();
 		if (!email) {
-			setCreateError('Practitioners need emails');
+			setCreateError('Email required');
 			focusEmailField();
 			return;
 		}
@@ -75,25 +75,18 @@ const PractitionerNew = () => {
 
 	return (
 		<>
-			{createError || createSuccess ? (
-				<Box sx={{ mb: 2 }}>
-					{createError && <Alert severity="error">{createError}</Alert>}
-					{createSuccess && <Alert severity="success">{createSuccess}</Alert>}
-				</Box>
-			) : null}
-		
 			<Paper variant="outlined" sx={{ p: 1.5, width: '100%' }}>
-
-				<Typography
-					variant="body1"
-					sx={{ mb: 2 }}>
-					Just enter an email. Practitioners receive an email to set up their account. They'll be asked to create a password and complete onboarding by creating their first client
-				</Typography>
-
 				<Box sx={{ mx: 0 }}>
+					
+					{createError || createSuccess ? (
+						<Box sx={{ mb: 2 }}>
+							{createError && <Alert severity="error">{createError}</Alert>}
+							{createSuccess && <Alert severity="success">{createSuccess}</Alert>}
+						</Box>
+					) : null}
+					
 					<Editable
 						key={`invite-email-${emailFocusKey}`}
-						label="Practitioner's Email"
 						startAdornment={"email"}
 						variant="outlined"
 						value={inviteEmail}
@@ -102,14 +95,16 @@ const PractitionerNew = () => {
 						autoFocus
 						placeholder="name@example.com"
 					/>
+					
 					<Button
-						sx={{my: 4}}
+						sx={{mt: 2}}
 						variant="contained"
-						endIcon={<Icon icon="add" />}
+						endIcon={<Icon icon="send" />}
 						onClick={handleCreatePractitioner}
 						disabled={createLoading}
+						size="large"
 					>
-						{createLoading ? 'Adding...' : 'Invite'}
+						{createLoading ? 'Sending...' : 'Send Invite'}
 					</Button>
 					
 				</Box>
