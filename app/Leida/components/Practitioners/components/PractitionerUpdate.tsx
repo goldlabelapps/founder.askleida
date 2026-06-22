@@ -11,6 +11,8 @@ import {
 	Button,
 	IconButton,
 	Box,
+	Menu,
+	MenuItem,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { Icon, ConfirmAction, navigateTo } from '../../../../NX/DesignSystem';
@@ -21,7 +23,6 @@ import {
 	
 } from '../../../../Leida';
 import { 
-	OptionSelect,
 	setNXAdmin, 
 	Editable, 
 	AvatarUpload,
@@ -78,12 +79,18 @@ const PractitionerUpdate = () => {
 	const [savingDisplayName, setSavingDisplayName] = React.useState(false);
 	const [displayNameError, setDisplayNameError] = React.useState<string | null>(null);
 	const [confirmOpen, setConfirmOpen] = React.useState(false);
+	const [accessMenuAnchorEl, setAccessMenuAnchorEl] = React.useState<null | HTMLElement>(null);
 	const hasEmailChanges = email.trim() !== currentEmail;
 	const hasDisplayNameChanges = displayName.trim() !== currentDisplayName;
 	const hasClinicChanges = clinic.trim() !== currentClinic;
 	const hasWebsiteChanges = website.trim() !== currentWebsite;
 	const hasAccessLevelChanges = accessLevel !== currentAccessLevel;
 	const canSave = hasEmailChanges || hasDisplayNameChanges || hasClinicChanges || hasWebsiteChanges || hasAccessLevelChanges || avatarChanged;
+	const isAccessMenuOpen = Boolean(accessMenuAnchorEl);
+	const accessLevelLabel = React.useMemo(() => {
+		const match = ACCESS_LEVEL_OPTIONS.find((option) => String(option.index) === accessLevel);
+		return match?.label || 'Access Level';
+	}, [accessLevel]);
 
 	React.useEffect(() => {
 		setEmail(currentEmail);
@@ -132,6 +139,19 @@ const PractitionerUpdate = () => {
 
 	const handleCloseConfirm = () => {
 		setConfirmOpen(false);
+	};
+
+	const handleOpenAccessMenu = (event: React.MouseEvent<HTMLElement>) => {
+		setAccessMenuAnchorEl(event.currentTarget);
+	};
+
+	const handleCloseAccessMenu = () => {
+		setAccessMenuAnchorEl(null);
+	};
+
+	const handleSelectAccessLevel = (nextAccessLevel: number) => {
+		setAccessLevel(String(nextAccessLevel));
+		handleCloseAccessMenu();
 	};
 
 	const handleSaveDisplayName = async () => {
@@ -248,6 +268,29 @@ const PractitionerUpdate = () => {
 							<Box sx={{ flexGrow: 1 }} />
 							<IconButton 
 								color="primary"
+								disabled={deleting || savingDisplayName}
+								onClick={handleOpenAccessMenu}
+								title={accessLevelLabel}
+							>
+								<Icon icon="admin" />
+							</IconButton>
+							<Menu
+								anchorEl={accessMenuAnchorEl}
+								open={isAccessMenuOpen}
+								onClose={handleCloseAccessMenu}
+							>
+								{ACCESS_LEVEL_OPTIONS.map((option) => (
+									<MenuItem
+										key={option.index}
+										selected={String(option.index) === accessLevel}
+										onClick={() => handleSelectAccessLevel(option.index)}
+									>
+										{option.label}
+									</MenuItem>
+								))}
+							</Menu>
+							<IconButton 
+								color="primary"
 								disabled={deleting}
 								onClick={handleDelete}
 							>
@@ -305,16 +348,9 @@ const PractitionerUpdate = () => {
 									sm: 8,
 								}} sx={{ order: { xs: 2, sm: 1 } }}>
 									<Stack spacing={2} sx={{m:2}}>
-										<Box sx={{ m: 3 }}>
-											<OptionSelect
-												// label="Access Level"
-												startAdornment="admin"
-												options={ACCESS_LEVEL_OPTIONS}
-												value={accessLevel}
-												onChange={setAccessLevel}
-												disabled={savingDisplayName}
-											/>
-										</Box>
+										<Typography variant="caption" color="text.secondary" sx={{ px: 1 }}>
+											Access level: {accessLevelLabel}
+										</Typography>
 										<Editable
 											placeholder="Name"
 											value={displayName}

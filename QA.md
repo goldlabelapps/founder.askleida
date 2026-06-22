@@ -6,8 +6,6 @@ Oakwell Skin Clinic
 fiona@goldlabel.pro
 Eden Dermatology & Skincare
 
-
-
 Here are 10 realistic, professional skincare clinic names that would 
 fit well as businesses using a skincare therapy platform
 
