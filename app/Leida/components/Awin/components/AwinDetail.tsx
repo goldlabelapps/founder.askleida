@@ -135,37 +135,7 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 						)}
 					</Box>
 
-					<Box>
-						<Typography variant="caption" color="text.secondary">
-							Merchant image
-						</Typography>
-						{merchantImageUrl ? (
-							<>
-								<CardMedia
-									component="img"
-									image={merchantImageUrl}
-									alt={`${title} merchant image`}
-									sx={{ mt: 0.5, width: '100%', maxHeight: 280, objectFit: 'contain', borderRadius: 1 }}
-									onLoad={(event) => {
-										const img = event.currentTarget;
-										setMerchantMeta({ status: 'loaded', width: img.naturalWidth, height: img.naturalHeight });
-									}}
-									onError={() => setMerchantMeta({ status: 'error', width: 0, height: 0 })}
-								/>
-								<Typography variant="caption" color="text.secondary">
-									{merchantMeta.status === 'loaded'
-										? `Loaded ${merchantMeta.width}x${merchantMeta.height}`
-										: merchantMeta.status === 'error'
-											? 'Broken image link'
-											: 'Loading image...'}
-								</Typography>
-							</>
-						) : (
-							<Typography variant="caption" color="text.secondary">
-								No merchant image URL
-							</Typography>
-						)}
-					</Box>
+					
 				</Stack>
 
 				<Typography variant="body1">
@@ -184,7 +154,7 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
                         Cancel
                 </Button>
 			</DialogActions>
-            
+            x
 		</Dialog>
 	);
 }
