@@ -12,6 +12,7 @@ import {
 import DashAuth from './components/FounderDash/components/DashAuth';
 import Awin from './components/Awin/Awin';
 import AwinDetail from './components/Awin/components/AwinDetail';
+import AwinProcess from './components/Awin/components/AwinProcess';
 import AwinSearch from './components/Awin/components/AwinSearch';
 import ListAwin from './components/Awin/components/ListAwin';
 import Query from './components/Awin/components/Query';
@@ -76,6 +77,7 @@ export {
     DashSurface,
     Awin,
     AwinDetail,
+    AwinProcess,
     AwinSearch,
     ListAwin,
     Query,
