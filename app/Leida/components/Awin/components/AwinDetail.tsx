@@ -1,19 +1,21 @@
 'use client';
 import * as React from 'react';
 import {
-    Box,
+	Box,
 	Button,
 	CardMedia,
 	Dialog,
 	DialogActions,
 	DialogContent,
 	DialogTitle,
+	IconButton,
 	Stack,
 	Typography,
 	useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import {Icon} from '../../../../NX/DesignSystem';
+import { AwinProcess } from '../../../index';
 import type { I_AwinDetail } from '../../../types';
 
 type T_ImageMeta = {
@@ -35,8 +37,8 @@ function getString(value: unknown): string {
 export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-	const [thumbMeta, setThumbMeta] = React.useState<T_ImageMeta>(INITIAL_IMAGE_META);
-	const [merchantMeta, setMerchantMeta] = React.useState<T_ImageMeta>(INITIAL_IMAGE_META);
+	const [imageMeta, setImageMeta] = React.useState<T_ImageMeta>(INITIAL_IMAGE_META);
+	const [isProcessing, setIsProcessing] = React.useState(false);
 
 	const preferredData = awin?.data && typeof awin.data === 'object'
 		? (awin.data as Record<string, unknown>)
@@ -50,7 +52,7 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 			data: awin.data,
 		}
 		: null;
-    const preferredRecord = preferredAwin as Record<string, unknown> | null;
+	const preferredRecord = preferredAwin as Record<string, unknown> | null;
 
 	const title = typeof preferredAwin?.product_name === 'string' && preferredAwin.product_name.trim()
 		? preferredAwin.product_name
@@ -60,14 +62,24 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 		? preferredAwin.description
 		: 'No description available.';
 
-	const thumbUrl = getString(preferredRecord?.aw_image_url);
-	const merchantImageUrl = getString(preferredRecord?.merchant_image_url);
+	const imageUrl = [
+		getString(preferredRecord?.large_image),
+		getString(preferredRecord?.image_url),
+		getString(preferredRecord?.merchant_image_url),
+		getString(preferredRecord?.aw_image_url),
+		getString(preferredRecord?.merchant_thumb_url),
+	].find(Boolean) || '';
 	const deepLink = getString(preferredRecord?.merchant_deep_link) || getString(preferredRecord?.aw_deep_link);
 
 	React.useEffect(() => {
-		setThumbMeta(INITIAL_IMAGE_META);
-		setMerchantMeta(INITIAL_IMAGE_META);
-	}, [thumbUrl, merchantImageUrl, open]);
+		setImageMeta(INITIAL_IMAGE_META);
+	}, [imageUrl, open]);
+
+	React.useEffect(() => {
+		if (!open) {
+			setIsProcessing(false);
+		}
+	}, [open]);
 
 	return (
 		<Dialog
@@ -78,83 +90,141 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 			fullScreen={isMobile}
 			sx={{ zIndex: (muiTheme) => muiTheme.zIndex.modal + 100 }}
 		>
-			<DialogTitle>{title}</DialogTitle>
+			<DialogTitle sx={{ pb: 1.5, pr: 7 }}>
+				<IconButton
+					aria-label="close dialog"
+					onClick={onClose}
+					sx={{
+						position: 'absolute',
+						right: 12,
+						top: 12,
+					}}
+				>
+					<Icon icon="cancel" />
+				</IconButton>
+				<Typography
+					variant="h4"
+					sx={{
+						fontWeight: 900,
+						lineHeight: 1.15,
+						fontSize: { xs: '1.65rem', sm: '2.15rem' },
+					}}
+				>
+					{title}
+				</Typography>
+			</DialogTitle>
 			<DialogContent dividers>
-                <Box sx={{ mb: 2 }}>
-					{deepLink ? (
-						<Button
-							variant="contained"
-							startIcon={<Icon icon="link" />}
-							href={deepLink}
-							target="_blank"
-							rel="noreferrer"
-						>
-							Deep Link
-						</Button>
-					) : (
-						<Button
-							variant="contained"
-							startIcon={<Icon icon="link" />}
-							disabled
-						>
-							Deep Link
-						</Button>
-					)}
-                </Box>
-
-				<Stack spacing={1.25} sx={{ mb: 2 }}>
-					<Box>
-						<Typography variant="caption" color="text.secondary">
-							AWIN thumbnail
-						</Typography>
-						{thumbUrl ? (
-							<>
-								<CardMedia
-									component="img"
-									image={thumbUrl}
-									alt={`${title} thumbnail`}
-									sx={{ mt: 0.5, maxHeight: 160, objectFit: 'contain', borderRadius: 1 }}
-									onLoad={(event) => {
-										const img = event.currentTarget;
-										setThumbMeta({ status: 'loaded', width: img.naturalWidth, height: img.naturalHeight });
-									}}
-									onError={() => setThumbMeta({ status: 'error', width: 0, height: 0 })}
-								/>
-								<Typography variant="caption" color="text.secondary">
-									{thumbMeta.status === 'loaded'
-										? `Loaded ${thumbMeta.width}x${thumbMeta.height}`
-										: thumbMeta.status === 'error'
-											? 'Broken image link'
-											: 'Loading image...'}
-								</Typography>
-							</>
-						) : (
-							<Typography variant="caption" color="text.secondary">
-								No thumbnail URL
+				{isProcessing ? (
+					<AwinProcess />
+				) : (
+					<Box
+						sx={{
+							display: 'grid',
+							gridTemplateColumns: { xs: '1fr', md: '1.15fr 0.85fr' },
+							gap: { xs: 2, md: 3 },
+							alignItems: 'start',
+						}}
+					>
+						<Stack spacing={1.25}>
+							<Typography
+								variant="body1"
+								sx={{
+									fontSize: { xs: '1rem', md: '1.05rem' },
+									lineHeight: 1.75,
+									color: 'text.primary',
+								}}
+							>
+								{description}
 							</Typography>
-						)}
+							<Box sx={{ mb: 2.5 }}>
+								{deepLink ? (
+									<Button
+										variant="contained"
+										startIcon={<Icon icon="link" />}
+										href={deepLink}
+										target="_blank"
+										rel="noreferrer"
+									>
+										Deep Link
+									</Button>
+								) : (
+									<Button
+										variant="contained"
+										startIcon={<Icon icon="link" />}
+										disabled
+									>
+										Deep Link
+									</Button>
+								)}
+							</Box>
+						</Stack>
+
+						<Box>
+							{imageUrl ? (
+								<>
+									<CardMedia
+										component="img"
+										image={imageUrl}
+										alt={title}
+										sx={{
+											width: '100%',
+											maxHeight: { xs: 260, md: 360 },
+											objectFit: 'contain',
+											borderRadius: 2,
+											bgcolor: 'grey.100',
+											p: 1,
+										}}
+										onLoad={(event) => {
+											const img = event.currentTarget;
+											setImageMeta({ status: 'loaded', width: img.naturalWidth, height: img.naturalHeight });
+										}}
+										onError={() => setImageMeta({ status: 'error', width: 0, height: 0 })}
+									/>
+									<Typography variant="caption" color="text.secondary" sx={{ mt: 0.75, display: 'block' }}>
+										{imageMeta.status === 'loaded'
+											? `Loaded ${imageMeta.width}x${imageMeta.height}`
+											: imageMeta.status === 'error'
+												? 'Broken image link'
+												: 'Loading image...'}
+									</Typography>
+								</>
+							) : (
+								<Box
+									sx={{
+										height: { xs: 220, md: 320 },
+										display: 'grid',
+										placeItems: 'center',
+										bgcolor: 'grey.100',
+										borderRadius: 2,
+									}}
+								>
+									<Typography variant="body2" color="text.secondary">
+										No image available
+									</Typography>
+								</Box>
+							)}
+						</Box>
 					</Box>
-
-					
-				</Stack>
-
-				<Typography variant="body1">
-                    {description}
-                </Typography>
-                
-                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                    {JSON.stringify(preferredAwin, null, 2)}
-                </pre>
+				)}
 			</DialogContent>
-			<DialogActions>
-				<Button 
-                    variant="contained"
-                    startIcon={<Icon icon="cancel" />}
-                    onClick={onClose}>
-                        Cancel
-                </Button>
+			<DialogActions sx={{ px: 3, pb: 2.5, pt: 2 }}>
+				<Button
+					fullWidth
+					variant={isProcessing ? 'outlined' : 'contained'}
+					startIcon={<Icon icon={isProcessing ? 'left' : 'claude'} />}
+					onClick={() => setIsProcessing((prev) => !prev)}
+				>
+					{isProcessing ? 'Back to product details' : 'Process product'}
+				</Button>
 			</DialogActions>
-            x
 		</Dialog>
 	);
 }
+
+
+
+/*
+<pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+	{JSON.stringify(preferredAwin, null, 2)}
+</pre>
+*/
