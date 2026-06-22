@@ -136,27 +136,7 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 							>
 								{description}
 							</Typography>
-							<Box sx={{ mb: 2.5 }}>
-								{deepLink ? (
-									<Button
-										variant="contained"
-										startIcon={<Icon icon="link" />}
-										href={deepLink}
-										target="_blank"
-										rel="noreferrer"
-									>
-										Deep Link
-									</Button>
-								) : (
-									<Button
-										variant="contained"
-										startIcon={<Icon icon="link" />}
-										disabled
-									>
-										Deep Link
-									</Button>
-								)}
-							</Box>
+							
 						</Stack>
 
 						<Box>
@@ -180,13 +160,13 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 										}}
 										onError={() => setImageMeta({ status: 'error', width: 0, height: 0 })}
 									/>
-									<Typography variant="caption" color="text.secondary" sx={{ mt: 0.75, display: 'block' }}>
-										{imageMeta.status === 'loaded'
-											? `Loaded ${imageMeta.width}x${imageMeta.height}`
-											: imageMeta.status === 'error'
-												? 'Broken image link'
-												: 'Loading image...'}
-									</Typography>
+										{/* <Typography variant="caption" color="text.secondary" sx={{ mt: 0.75, display: 'block' }}>
+											{imageMeta.status === 'loaded'
+												? `Loaded ${imageMeta.width}x${imageMeta.height}`
+												: imageMeta.status === 'error'
+													? 'Broken image link'
+													: 'Loading image...'}
+										</Typography> */}
 								</>
 							) : (
 								<Box
@@ -208,14 +188,16 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 				)}
 			</DialogContent>
 			<DialogActions sx={{ px: 3, pb: 2.5, pt: 2 }}>
-				<Button
-					fullWidth
-					variant={isProcessing ? 'outlined' : 'contained'}
-					startIcon={<Icon icon={isProcessing ? 'left' : 'claude'} />}
-					onClick={() => setIsProcessing((prev) => !prev)}
-				>
-					{isProcessing ? 'Back to product details' : 'Process product'}
-				</Button>
+				{!isProcessing && <>
+					<Button
+						fullWidth
+						variant={isProcessing ? 'outlined' : 'contained'}
+						startIcon={<Icon icon={isProcessing ? 'left' : 'claude'} />}
+						onClick={() => setIsProcessing((prev) => !prev)}
+					>
+						{isProcessing ? 'Back to product details' : 'Process product'}
+					</Button></>}
+				
 			</DialogActions>
 		</Dialog>
 	);

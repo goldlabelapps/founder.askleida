@@ -17,6 +17,7 @@ type T_RenderProductProps = {
 	product: T_Product;
 	onAddToCart?: (product: T_Product) => void | Promise<void>;
 	addingToCart?: boolean;
+	viewMode?: 'card' | 'list';
 };
 
 function getName(product: T_Product): string {
@@ -65,7 +66,7 @@ function getCategoryLabel(product: T_Product): string | null {
 	return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
-const RenderProduct = ({ product, onAddToCart, addingToCart = false }: T_RenderProductProps) => {
+const RenderProduct = ({ product, onAddToCart, addingToCart = false, viewMode = 'card' }: T_RenderProductProps) => {
 	const [added, setAdded] = React.useState(false);
 
 	const name = getName(product);
@@ -80,6 +81,55 @@ const RenderProduct = ({ product, onAddToCart, addingToCart = false }: T_RenderP
 		await onAddToCart?.(product);
 		setAdded(true);
 	};
+
+	if (viewMode === 'list') {
+		return (
+			<Card variant="outlined" sx={{ display: 'flex', flexDirection: 'row' }}>
+				{imageUrl ? (
+					<CardMedia
+						component="img"
+						sx={{ width: 140, height: 140, objectFit: 'cover', bgcolor: 'grey.100' }}
+						image={imageUrl}
+						alt={name}
+					/>
+				) : (
+					<Box
+						sx={{
+							width: 140,
+							height: 140,
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							bgcolor: 'grey.100',
+						}}
+					>
+						<Typography variant="body2" color="text.secondary">
+							No image
+						</Typography>
+					</Box>
+				)}
+
+				<CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+					<Stack spacing={1}>
+						<Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+							{name}
+						</Typography>
+
+						<Stack direction="row" spacing={1}>
+							{priceLabel ? <Chip size="small" label={priceLabel} /> : null}
+							{categoryLabel ? <Chip size="small" variant="outlined" label={categoryLabel} /> : null}
+						</Stack>
+
+						{description ? (
+							<Typography variant="body2" color="text.secondary" sx={{ lineClamp: 2 }}>
+								{description}
+							</Typography>
+						) : null}
+					</Stack>
+				</CardContent>
+			</Card>
+		);
+	}
 
 	return (
 		<Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -125,17 +175,6 @@ const RenderProduct = ({ product, onAddToCart, addingToCart = false }: T_RenderP
 					) : null}
 				</Stack>
 			</CardContent>
-
-			<CardActions>
-				<Button
-					variant="contained"
-					size="small"
-					onClick={handleAddToCart}
-					disabled={addingToCart}
-				>
-					{addingToCart ? 'Adding...' : added ? 'Added' : 'Add to cart'}
-				</Button>
-			</CardActions>
 		</Card>
 	);
 };

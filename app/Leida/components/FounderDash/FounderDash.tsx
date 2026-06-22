@@ -25,28 +25,19 @@ export default function FounderDash() {
     const dash = useDash();
     const didInit = React.useRef(false);
 
-    const dashboardActions = [
-        {
-            title: 'Awin',
-            description: 'Affiliate marketing',
-            icon: 'awin',
-            route: '/awin',
-        },
-        
+    const dashboardActions = [        
         {
             title: 'Products',
             description: 'Browse and manage the product catalog.',
             icon: 'products',
             route: '/products',
         },
-
         {
             title: 'Practitioners',
             description: 'Manage practitioner profiles.',
             icon: 'practitioner',
             route: '/practitioners',
         },
-        
     ] as const;
     
     React.useEffect(() => {
@@ -119,24 +110,13 @@ export default function FounderDash() {
                                     justifyContent: 'space-between',
                                 }}
                             >
-                                <Box
-                                    sx={{
-                                        width: 56,
-                                        height: 56,
-                                        borderRadius: 2,
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        bgcolor: 'action.hover',
-                                    }}
-                                >
-                                    <Icon icon={action.icon as any} />
-                                </Box>
-
                                 <Stack spacing={1}>
-                                    <Typography variant="h4">
-                                        {action.title}
-                                    </Typography>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <Icon icon={action.icon as any} color="primary" />
+                                        <Typography variant="h4">
+                                            {action.title}
+                                        </Typography>
+                                    </Stack>
                                     <Typography variant="body1" color="text.secondary">
                                         {action.description}
                                     </Typography>

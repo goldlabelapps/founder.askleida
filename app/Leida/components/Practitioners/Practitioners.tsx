@@ -3,8 +3,12 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
 	Box,
 	Button,
+	Paper,
+	Stack,
+	Typography,
 	Grid,
 	LinearProgress,
+	Fab,
 } from '@mui/material';
 import { useDispatch } from '../../../NX/Uberedux';
 import { Icon, navigateTo } from '../../../NX/DesignSystem';
@@ -14,6 +18,7 @@ import {
 	PractitionerList,
 } from '../../../Leida';
 import { setNXAdmin } from '../../../NX/NXAdmin';
+import { FeedbackBtn } from '../../../NX/Shortcodes';
 
 
 const Practitioners = () => {
@@ -37,30 +42,43 @@ const Practitioners = () => {
 	}
 
 	return <>
-		<Grid container spacing={2} sx={{ }}>
-			<Grid size={{
-				xs: 12,
-			}}
-				sx={{
-					display: 'flex',
-				}}
-			>
-				<Box sx={{ flexGrow: 1 }} />
-				<Button
-					variant="contained"
-					startIcon={<Icon icon="practitioner-add" />}
-					onClick={handleNewPractitioner}
-				>
-					New
-				</Button>
-			</Grid>
-			<Grid size={{
-				xs: 12,
-			}}>
-				<PractitionerList />
-			</Grid>
-		</Grid>
-		
+
+
+			<Box sx={{ p: 2 }}>
+				<Paper variant="outlined" sx={{ p: 2 }}>
+					<Stack spacing={2}>
+						<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+							<Typography variant="h4">
+								Practitioners
+							</Typography>
+							<Fab
+								color="primary"
+								onClick={handleNewPractitioner}
+							>
+								<Icon icon="practitioner-add" />
+							</Fab>
+						</Box>
+					</Stack>
+
+				<Grid container spacing={2} sx={{}}>
+					<Grid size={{
+						xs: 12,
+					}}
+						sx={{
+							display: 'flex',
+						}}
+					>
+						<Box sx={{ flexGrow: 1 }} />
+						
+					</Grid>
+					<Grid size={{
+						xs: 12,
+					}}>
+						<PractitionerList />
+					</Grid>
+				</Grid>
+				</Paper>
+			</Box>		
 	</>;
 };
 

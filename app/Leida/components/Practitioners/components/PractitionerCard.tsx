@@ -8,8 +8,9 @@ import {
 	Paper,
 	Box,
 	Typography,
+	Chip,
 } from '@mui/material';
-import { navigateTo } from '../../../../NX/DesignSystem';
+import { navigateTo, Icon } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 
 type T_PractitionerData = {
@@ -96,6 +97,18 @@ const PractitionerCard = ({
 	const practitionerId = typeof practitioner?.practitioner_id === 'string' ? practitioner.practitioner_id : 'N/A';
 	const canEdit = practitionerId !== 'N/A';
 
+	const onboardingStatus = (() => {
+		const onboarding = parsedData?.onboarding;
+		if (onboarding && typeof onboarding === 'object') {
+			return (onboarding as Record<string, unknown>).status;
+		}
+		return null;
+	})();
+
+	const isOnboardingComplete = onboardingStatus === 'completed' || onboardingStatus === 'onboarded';
+	const statusIcon = isOnboardingComplete ? 'tick' : 'warning';
+	const statusColor = isOnboardingComplete ? 'success' : 'warning';
+
 	const handleEdit = () => {
 		if (!canEdit) return;
 		dispatch(navigateTo(router, `/practitioners/${practitionerId}`));
@@ -111,21 +124,34 @@ const PractitionerCard = ({
 				
 				<Box sx={{
 					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'flex-start',
 				}}>
-					<Box>
-						<Avatar
-							src={avatar}
-							alt={displayName}
-							sx={{ alignSelf: 'flex-start', backgroundColor: 'common.white', mr: 1 }}
-						/>
+					<Box sx={{ display: 'flex', flex: 1 }}>
+						<Box>
+							<Avatar
+								src={avatar}
+								alt={displayName}
+								sx={{ alignSelf: 'flex-start', backgroundColor: 'common.white', mr: 1 }}
+							/>
+						</Box>
+						<Box sx={{mx: 1}}>
+							<Typography variant="body1">
+								{displayName}
+							</Typography>
+							<Typography variant="body2" color="textSecondary">
+								{email}
+							</Typography>
+						</Box>
 					</Box>
-					<Box sx={{mx: 1}}>
-						<Typography variant="body1">
-							{displayName}
-						</Typography>
-						<Typography variant="body2" color="textSecondary">
-							{email}
-						</Typography>
+					<Box sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+						<Icon 
+							icon={statusIcon} 
+							sx={{ 
+								color: statusColor === 'success' ? 'success.main' : 'warning.main',
+								fontSize: '1.25rem'
+							}} 
+						/>
 					</Box>
 				</Box>
 				
