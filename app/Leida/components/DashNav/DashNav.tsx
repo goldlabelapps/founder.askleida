@@ -54,11 +54,9 @@ export default function DashNav({
 
       <Box sx={{ height: 24 }} />
 
-
-      
-      <img src="/nxadmin/svg/leidaLogo.svg" alt="Leida Logo" />
-
-
+      <Box sx={{ maxWidth: 150, mx: 'auto' }}>
+        <img src="/nxadmin/svg/leidaLogo.svg" alt="Leida Logo" style={{ width: '100%' }} />
+      </Box>
 
       <Box sx={{ height: 24 }} />
       {navItems.map((item) => (

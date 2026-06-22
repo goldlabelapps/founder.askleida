@@ -291,16 +291,13 @@ const PractitionerUpdate = () => {
 										m:2
 									 }}>
 										<AvatarUpload
-											size={150}
+											size={125}
 											practitionerId={uuid}
 											currentAvatar={currentAvatar}
 											displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
 											onSuccess={handleAvatarSuccess}
 										/>
-
-										
 									</Box>
-											
 								</Grid>
 
 								<Grid size={{
@@ -308,7 +305,6 @@ const PractitionerUpdate = () => {
 									sm: 8,
 								}} sx={{ order: { xs: 2, sm: 1 } }}>
 									<Stack spacing={2} sx={{m:2}}>
-										
 										<Box sx={{ m: 3 }}>
 											<OptionSelect
 												// label="Access Level"
@@ -319,43 +315,30 @@ const PractitionerUpdate = () => {
 												disabled={savingDisplayName}
 											/>
 										</Box>
-
 										<Editable
 											placeholder="Name"
 											value={displayName}
-											variant="standard"
+											variant="outlined"
 											onChange={setDisplayName}
 											startAdornment="user"
 										/>
 										<Editable
 											placeholder="Clinic"
 											value={clinic}
-											variant="standard"
+											variant="outlined"
 											onChange={setClinic}
 											startAdornment="medical"
 										/>
-
-										{false && (
-											<Editable
-												label="Website"
-												value={website}
-												variant="standard"
-												onChange={setWebsite}
-												startAdornment="link"
-											/>
-										)}
-										
+									<Editable
+										placeholder="Website"
+										value={website}
+										variant="outlined"
+										onChange={setWebsite}
+										startAdornment="link"
+									/>
 									</Stack>
-									
 								</Grid>
-
 							</Grid>
-								
-								{displayNameError ? (
-									<Typography variant="body2" color="error">
-										{displayNameError}
-									</Typography>
-								) : null}
 							</>
 						)}
 					</>
