@@ -6,6 +6,8 @@ import {
 	Grid,
 	LinearProgress,
 	Stack,
+	ToggleButton,
+	ToggleButtonGroup,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
@@ -23,6 +25,7 @@ const ListProducts = () => {
 	const bus = useLeidaBus('/api/products');
 
 	const [visibleProducts, setVisibleProducts] = React.useState<T_Product[]>([]);
+	const [viewMode, setViewMode] = React.useState<'card' | 'list'>('list');
 
 	React.useEffect(() => {
 		dispatch(initProducts());
@@ -51,10 +54,23 @@ const ListProducts = () => {
 
 	return (
 		<Stack spacing={2}>
-			<FindProduct
-				products={sourceProducts}
-				onProductsChange={setVisibleProducts}
-			/>
+			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+				<FindProduct
+					products={sourceProducts}
+					onProductsChange={setVisibleProducts}
+				/>
+				<ToggleButtonGroup
+					value={viewMode}
+					exclusive
+					onChange={(_, newMode) => {
+						if (newMode !== null) setViewMode(newMode);
+					}}
+					size="small"
+				>
+					<ToggleButton value="card">Card</ToggleButton>
+					<ToggleButton value="list">List</ToggleButton>
+				</ToggleButtonGroup>
+			</Box>
 
 			<Box sx={{ height: 6 }}>
 				{loading ? <LinearProgress /> : null}
@@ -66,19 +82,35 @@ const ListProducts = () => {
 				<Alert severity="info">No products found.</Alert>
 			) : null}
 
-			<Grid container spacing={1.25}>
-				{visibleProducts.map((product, index) => {
-					const key = typeof product?.id === 'string' && product.id
-						? product.id
-						: `product-${index}`;
+			{viewMode === 'card' ? (
+				<Grid container spacing={1.25}>
+					{visibleProducts.map((product, index) => {
+						const key = typeof product?.id === 'string' && product.id
+							? product.id
+							: `product-${index}`;
 
-					return (
-						<Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
-							<RenderProduct product={product} />
-						</Grid>
-					);
-				})}
-			</Grid>
+						return (
+							<Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
+								<RenderProduct product={product} viewMode="card" />
+							</Grid>
+						);
+					})}
+				</Grid>
+			) : (
+				<Stack spacing={1.25}>
+					{visibleProducts.map((product, index) => {
+						const key = typeof product?.id === 'string' && product.id
+							? product.id
+							: `product-${index}`;
+
+						return (
+							<Box key={key}>
+								<RenderProduct product={product} viewMode="list" />
+							</Box>
+						);
+					})}
+				</Stack>
+			)}
 		</Stack>
 	);
 };
