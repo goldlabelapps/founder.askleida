@@ -49,8 +49,18 @@ export default function DashNav({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+
+      
+
       <Box sx={{ height: 24 }} />
 
+
+      
+      <img src="/nxadmin/svg/leidaLogo.svg" alt="Leida Logo" />
+
+
+
+      <Box sx={{ height: 24 }} />
       {navItems.map((item) => (
         <React.Fragment key={item.route}>
           <MiniListItem

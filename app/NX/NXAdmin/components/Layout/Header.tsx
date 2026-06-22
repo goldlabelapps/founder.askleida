@@ -30,6 +30,7 @@ export default function Header() {
             <CardHeader
                 sx={{ width: '100%' }}
                 avatar={<>
+                
                 {showBack ? <IconButton 
                 color="primary"
                 onClick={handleBack}>
@@ -37,18 +38,18 @@ export default function Header() {
                     </IconButton> : null }
                 
                 {icon ? <Box sx={{mt: 1 }}>
-                            <Icon icon={icon as any} />
+                            <Icon icon={icon as any} color="primary"/>
                         </Box>
                         : null}</>}
                 title={<Typography variant="h5" color="text.secondary">
                     {title}
                 </Typography>}
                 subheader={header?.subheader || null}
-                // action={
-                //     <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
-                //         v{pJSON.version}
-                //     </Typography>
-                // }
+                action={
+                    <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
+                        v{pJSON.version}
+                    </Typography>
+                }
                 
             />
         </>

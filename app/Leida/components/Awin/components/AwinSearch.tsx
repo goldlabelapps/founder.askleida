@@ -217,7 +217,7 @@ export default function AwinSearch() {
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     label="Search Lookfantastic products"
-                                    placeholder="e.g. vitamin c serum"
+                                    placeholder="e.g. Medik8"
                                     fullWidth
                                     value={query}
                                     onChange={(event) => setQuery(event.target.value)}

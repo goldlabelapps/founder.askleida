@@ -20,12 +20,12 @@
     "cartridges": {
         "designSystem": {
             "themeSwitching": true,
-            "defaultTheme": "dark",
+            "defaultTheme": "light",
             "themes": {
                 "light": {
                     "mode": "light",
-                    "primary": "#2C2C2A",
-                    "secondary": "#364450",
+                    "primary": "#6B3183",
+                    "secondary": "#8734AB",
                     "background": "#f6f6f6",
                     "paper": "#ededed",
                     "border": "#dcdcdc",
