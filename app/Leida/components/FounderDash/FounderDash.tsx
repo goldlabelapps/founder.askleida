@@ -25,19 +25,20 @@ export default function FounderDash() {
     const dash = useDash();
     const didInit = React.useRef(false);
 
-    const dashboardActions = [        
+    const dashboardActions = [    
+        {
+            title: 'Practitioners',
+            description: '',
+            icon: 'practitioner',
+            route: '/practitioners',
+        },    
         {
             title: 'Products',
-            description: 'Browse and manage the product catalog.',
+            description: 'Browse and manage the products and add more from Awin',
             icon: 'products',
             route: '/products',
         },
-        {
-            title: 'Practitioners',
-            description: 'Manage practitioner profiles.',
-            icon: 'practitioner',
-            route: '/practitioners',
-        },
+        
     ] as const;
     
     React.useEffect(() => {
@@ -81,8 +82,6 @@ export default function FounderDash() {
                         key={action.route}
                         elevation={0}
                         sx={{
-                            minHeight: { xs: 180, md: '100%' },
-                            height: '100%',
                             borderRadius: 3,
                             border: '1px solid',
                             borderColor: 'divider',

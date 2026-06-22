@@ -65,7 +65,8 @@ const PractitionerCard = ({
 	const displayName = typeof parsedData?.display_name === 'string' && parsedData.display_name.trim()
 		? parsedData.display_name.trim()
 		: (email || 'Unknown practitioner');
-	const clinic = typeof parsedData?.clinic === 'string' ? parsedData.clinic : '';
+	const clinic = typeof parsedData?.clinic === 'string' ? parsedData.clinic.trim() : '';
+	const secondaryText = clinic || email;
 	const website = typeof parsedData?.website === 'string' ? parsedData.website.trim() : '';
 	const avatar = typeof parsedData?.avatar === 'string' ? parsedData.avatar : '';
 	const accessLevel = (() => {
@@ -144,16 +145,16 @@ const PractitionerCard = ({
 								{displayName}
 							</Typography>
 							<Typography variant="body2" color="textSecondary">
-								{email}
+								{secondaryText}
 							</Typography>
 						</Box>
 					</Box>
-					<Box sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+					{/* <Box sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
 						<Icon 
 							icon={statusIcon} 
 							color="primary"
 						/>
-					</Box>
+					</Box> */}
 				</Box>
 			</Paper>
 		</ButtonBase>

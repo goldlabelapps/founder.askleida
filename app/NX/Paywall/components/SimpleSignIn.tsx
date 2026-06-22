@@ -40,9 +40,11 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
     return (
         <form onSubmit={handleSubmit}>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                <img src={`/nxadmin/svg/favicon.svg`} alt="Logo" style={{ height: 48 }} />
-            </Box>
+            
+
+            <Box sx={{ maxWidth: 150, mx: 'auto' }}>
+                    <img src="/nxadmin/svg/leidaLogo.svg" alt="Leida Logo" style={{ width: '100%' }} />
+                  </Box>
             
             <Box sx={{}}>
                 <TextField
