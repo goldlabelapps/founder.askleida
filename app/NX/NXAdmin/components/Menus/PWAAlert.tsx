@@ -3,11 +3,11 @@ import * as React from 'react';
 import { Badge, IconButton, Tooltip } from '@mui/material';
 import { Icon } from '../../../DesignSystem';
 import { useDispatch } from '../../../Uberedux';
-import { useNXAdmin, triggerPwaInstall } from '../../../NXAdmin';
+import { useLeidaAdmin, triggerPwaInstall } from '../../../NXAdmin';
 
 export default function PWAAlert() {
     const dispatch = useDispatch();
-    // const nxAdmin = useNXAdmin();
+    // const nxAdmin = useLeidaAdmin();
     // const pwa = nxAdmin?.pwa || {};
     // const { supported, installed, installable } = pwa;
 

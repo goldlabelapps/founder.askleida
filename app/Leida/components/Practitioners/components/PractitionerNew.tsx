@@ -13,9 +13,10 @@ import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	createPractitioner,
 	initSupabase,
+	setLeida,
 	useSupabase,
 } from '../../../../Leida';
-import { Editable, setNXAdmin } from '../../../../NX/NXAdmin';
+import { Editable } from '../../../../NX/NXAdmin';
 
 const PractitionerNew = () => {
 	const dispatch = useDispatch();
@@ -38,7 +39,7 @@ const PractitionerNew = () => {
 	}, [dispatch, supabase?.initted]);
 
 	React.useEffect(() => {
-		dispatch(setNXAdmin('header', {
+		dispatch(setLeida('header', {
 			title: 'Invite Practitioner',
 			icon: 'practitioner-add',
 		}));

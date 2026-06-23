@@ -1,14 +1,14 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../Uberedux';
-import { setNXAdmin } from '../../../../NXAdmin';
+import { setLeidaAdmin } from '../../../../NXAdmin';
 import { setPractitioners } from './setPractitioners';
 
 export const fetchPractitioners = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {
         try {
-            const nxAdmin = getState()?.redux?.nxAdmin || {};
+            const nxAdmin = getState()?.redux?.leida || {};
             if (!nxAdmin.practitioners) {
-                await dispatch(setNXAdmin('practitioners', {
+                await dispatch(setLeidaAdmin('practitioners', {
                     slice: 'practitioners',
                 }));
             }

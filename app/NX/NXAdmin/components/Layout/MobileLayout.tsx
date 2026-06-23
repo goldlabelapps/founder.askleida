@@ -13,9 +13,9 @@ import { Icon } from '../../../DesignSystem';
 import {
     Header,
     pwaAlert,
-    setNXAdmin,
+    setLeidaAdmin,
     useNotifications,
-    useNXAdmin,
+    useLeidaAdmin,
 } from '../../../NXAdmin';    
 import { DashNav, PageRouter } from '../../../../Leida';
 import { NAV_ROUTES, sanitizePath, getActiveFromPathname } from '../PageRouter';
@@ -85,7 +85,7 @@ export default function MobileLayout(props: Props) {
     const { window } = props;
     const dispatch = useDispatch();
     const pathname = usePathname() || FALLBACK_ADMIN_BASE_PATH;
-    const nxAdmin = useNXAdmin();
+    const nxAdmin = useLeidaAdmin();
     const { active } = nxAdmin;
     const [open, setOpen] = React.useState(false);
 
@@ -104,7 +104,7 @@ export default function MobileLayout(props: Props) {
         const activeFromPath = getActiveFromPathname(pathname);
         const nextActive = activeFromPath || null;
         if (active !== nextActive) {
-            dispatch(setNXAdmin('active', nextActive));
+            dispatch(setLeidaAdmin('active', nextActive));
         }
     }, [active, dispatch, pathname]);
 

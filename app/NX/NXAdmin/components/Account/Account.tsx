@@ -4,14 +4,14 @@ import {
     Grid,
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
-import { setNXAdmin, useNXAdmin } from '../../../NXAdmin';
+import { setLeidaAdmin, useLeidaAdmin } from '../../../NXAdmin';
 import { usePaywall } from '../../../Paywall';
 import { initAccount, setAccount, useAccount } from '../Account';
 import { useDash } from '../MegaDash';
 export default function Account() {
     
     const dispatch = useDispatch();
-    const nxAdmin = useNXAdmin();
+    const nxAdmin = useLeidaAdmin();
     const dash = useDash();
     const paywall = usePaywall();
     const account = useAccount();
@@ -27,7 +27,7 @@ export default function Account() {
 
     React.useEffect(() => {
         if (dash && dash.title) {
-            dispatch(setNXAdmin('header', {
+            dispatch(setLeidaAdmin('header', {
                 title: 'Account°',
                 icon: 'account',
             }));

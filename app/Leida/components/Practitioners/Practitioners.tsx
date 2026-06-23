@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { 
 	Box,
 	Paper,
@@ -10,21 +10,26 @@ import {
 import { useDispatch } from '../../../NX/Uberedux';
 import { Icon, navigateTo } from '../../../NX/DesignSystem';
 import {
-	
-	useLeidaBus,
+	setLeida,
+	initPractitioners,
+	usePractitioners,
 	PractitionerList,
 } from '../../../Leida';
-import { setNXAdmin } from '../../../NX/NXAdmin';
 
 const Practitioners = () => {
 
 	const dispatch = useDispatch();
 	const router = useRouter();
-	const pathname = usePathname();
-	const uuid = pathname?.split('/').pop() ?? '';
+	const practitioners = usePractitioners();
 
 	React.useEffect(() => {
-		dispatch(setNXAdmin('header', {
+		if (typeof practitioners === 'undefined') {
+			dispatch(initPractitioners());
+		}
+	}, [dispatch, practitioners]);
+
+	React.useEffect(() => {
+		dispatch(setLeida('header', {
 			title: 'Practitioners',
 			icon: 'practitioner',
 		}));

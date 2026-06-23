@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { navigateTo } from '../../../../DesignSystem';
 import { useDispatch } from '../../../../Uberedux';
-import { setNXAdmin } from '../../../../NXAdmin';
+import { setLeidaAdmin } from '../../../../NXAdmin';
 import { usePractitioners } from '../hooks/usePractitioners';
 import { setPractitioners } from '../actions/setPractitioners';
 import Editable from '../../UI/Editable';
@@ -56,7 +56,7 @@ export default function PractitionerDetail({ practitionerId }: I_PractitionerDet
     }, []);
 
     React.useEffect(() => {
-        dispatch(setNXAdmin('header', {
+        dispatch(setLeidaAdmin('header', {
             title: 'Practitioner',
             icon: 'visitor'
         }));

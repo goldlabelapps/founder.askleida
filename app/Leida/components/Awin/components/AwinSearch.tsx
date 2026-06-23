@@ -12,8 +12,8 @@ import {
     Typography,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { setNXAdmin } from '../../../../NX/NXAdmin';
 import {
+    setLeida,
     setAwin,
     useDash,
     useAwin,
@@ -97,7 +97,7 @@ export default function AwinSearch() {
 
     React.useEffect(() => {
         if (dash && dash.title) {
-            dispatch(setNXAdmin('header', {
+            dispatch(setLeida('header', {
                 title: 'Awin',
                 icon: 'awin',
             }));

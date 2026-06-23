@@ -19,8 +19,8 @@ import {
     Icon,
 } from '../../../DesignSystem';
 import {
-    useNXAdmin,
-    setNXAdmin,
+    useLeidaAdmin,
+    setLeidaAdmin,
     pwaAlert,
     useNotifications,
     Header,
@@ -112,7 +112,7 @@ export default function DesktopLayout({ config }: { config: any }) {
     const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
     // set drawer open by default on md+ screens, closed on smaller screens
     const [open, setOpen] = React.useState(isMdUp);
-    const nxAdmin = useNXAdmin();
+    const nxAdmin = useLeidaAdmin();
     const { active } = nxAdmin;
 
     React.useEffect(() => {
@@ -135,7 +135,7 @@ export default function DesktopLayout({ config }: { config: any }) {
         const activeFromPath = getActiveFromPathname(pathname);
         const nextActive = activeFromPath || null;
         if (active !== nextActive) {
-            dispatch(setNXAdmin('active', nextActive));
+            dispatch(setLeidaAdmin('active', nextActive));
         }
     }, [active, dispatch, pathname]);
 

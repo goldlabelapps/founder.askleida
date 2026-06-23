@@ -5,7 +5,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { setNXAdmin } from '../../../NXAdmin'
+import { setLeidaAdmin } from '../../../NXAdmin'
 import { Icon } from '../../../../NX/DesignSystem';
 
 export default function CancelActive({ 
@@ -19,7 +19,7 @@ export default function CancelActive({
   const dispatch = useDispatch();
 
   const handleClick = () => {
-    dispatch(setNXAdmin('active', null));
+    dispatch(setLeidaAdmin('active', null));
     router.push('/');
   };
 

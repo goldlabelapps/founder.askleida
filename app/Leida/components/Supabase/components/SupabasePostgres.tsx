@@ -9,8 +9,8 @@ import {
     Typography,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { setNXAdmin } from '../../../../NX/NXAdmin';
 import {
+    setLeida,
     useDash,
 } from '../../../../Leida';
 import { initSupabase } from '../actions/initSupabase';
@@ -53,7 +53,7 @@ export default function SupabasePostgres() {
 
     React.useEffect(() => {
         if (dash && dash.title) {
-            dispatch(setNXAdmin('header', {
+            dispatch(setLeida('header', {
                 title: 'Supabase Postgres',
                 icon: 'supabase',
             }));

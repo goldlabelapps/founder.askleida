@@ -8,8 +8,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { Icon, navigateTo } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
-import { setNXAdmin } from '../../../NX/NXAdmin';
-import { useDash, DashCard } from '../../../Leida';
+import { useDash, setLeida, DashCard } from '../../../Leida';
 
 export default function Supabase() {
     const dispatch = useDispatch();
@@ -17,7 +16,7 @@ export default function Supabase() {
     const dash = useDash();
 
     React.useEffect(() => {
-        dispatch(setNXAdmin('header', {
+        dispatch(setLeida('header', {
             title: 'Supabase',
             icon: 'supabase',
         }));

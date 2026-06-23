@@ -6,9 +6,9 @@ export const setDash =
         async (dispatch: Dispatch, getState: () => any) => {
             try {
                 const state = getState();
-                const current = (state?.redux?.nxAdmin?.dash) || {};
+                const current = (state?.redux?.leida?.dash) || {};
                 const updated = { ...current, [key]: value };
-                dispatch(setUbereduxKey({ key: 'nxAdmin.dash', value: updated }));
+                dispatch(setUbereduxKey({ key: 'leida.dash', value: updated }));
             } catch (e: unknown) {
                 const msg = e instanceof Error ? e.message : String(e);
                 dispatch(setUbereduxKey({ key: 'error', value: msg }));

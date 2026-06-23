@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import type { I_JSONInput } from '../../types';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { setNXAdmin, setCRUD, useCRUD } from '../../../NXAdmin'
+import { setLeidaAdmin, setCRUD, useCRUD } from '../../../NXAdmin'
 
 export type { I_JSONInput };
 

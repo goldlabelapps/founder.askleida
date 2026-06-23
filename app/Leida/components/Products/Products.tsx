@@ -11,8 +11,8 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../NX/Uberedux';
 import { Icon } from '../../../NX/DesignSystem';
-import { setNXAdmin } from '../../../NX/NXAdmin';
 import {
+	setLeida,
 	useDash,
 	ListProducts,
 } from '../../../Leida';
@@ -24,7 +24,7 @@ export default function Products() {
 
 	React.useEffect(() => {
 		if (dash && dash.title) {
-			dispatch(setNXAdmin('header', {
+			dispatch(setLeida('header', {
 				title: 'Products',
 				icon: 'products',
 			}));

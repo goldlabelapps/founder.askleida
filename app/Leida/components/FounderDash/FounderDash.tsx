@@ -10,22 +10,22 @@ import {
 } from '@mui/material';
 import { Icon, navigateTo } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
-import { setNXAdmin, useNXAdmin } from '../../../NX/NXAdmin';
 import { 
+    setLeida,
+    useLeida,
     initDash, 
+    initPractitioners, 
     useDash,
     usePractitioners,
 } from '../../../Leida';
-
 
 export default function FounderDash() {
     
     const dispatch = useDispatch();
     const router = useRouter();
-    const nxAdmin = useNXAdmin();
+    const leida = useLeida();
     const dash = useDash();
     const practitioners = usePractitioners();
-    console.log('practitioners', practitioners);
     const didInit = React.useRef(false);
 
     const numberOfPractitioners = Array.isArray(practitioners?.list) ? practitioners.list.length : 0;
@@ -33,13 +33,13 @@ export default function FounderDash() {
     const dashboardActions = [    
         {
             title: 'Practitioners',
-            // description: `Total ${numberOfPractitioners}`,
+            description: `Total ${numberOfPractitioners}`,
             icon: 'practitioner',
             route: '/practitioners',
         },    
         {
             title: 'Products',
-            description: 'Browse and manage the products and add more from Awin',
+            description: 'Browse/manage Leida products & add from Awin',
             icon: 'products',
             route: '/products',
         },
@@ -48,14 +48,20 @@ export default function FounderDash() {
     
     React.useEffect(() => {
         if (!didInit.current) {
-            if (!nxAdmin || !nxAdmin.dash) dispatch(initDash());
+            if (!leida || !leida.dash) dispatch(initDash());
             didInit.current = true;
         }
-    }, [dispatch, nxAdmin]);
+    }, [dispatch, leida]);
+
+    React.useEffect(() => {
+        if (typeof practitioners === 'undefined') {
+            dispatch(initPractitioners());
+        }
+    }, [dispatch, practitioners]);
 
     React.useEffect(() => {
         if (dash && dash.title) {
-            dispatch(setNXAdmin('header', {
+            dispatch(setLeida('header', {
                 title: 'Dashboard',
                 icon: 'dashboard',
             }));

@@ -13,9 +13,9 @@ export const requestNotifications = (): any =>
         if (typeof window === 'undefined') return;
 
         const setNotif = (patch: Record<string, any>) => {
-            const current = getState()?.redux?.nxAdmin?.notifications || {};
+            const current = getState()?.redux?.leida?.notifications || {};
             dispatch(setUbereduxKey({
-                key: 'nxAdmin.notifications',
+                key: 'leida.notifications',
                 value: { ...current, ...patch },
             }));
         };
