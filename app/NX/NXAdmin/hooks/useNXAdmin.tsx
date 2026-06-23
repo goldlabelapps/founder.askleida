@@ -9,4 +9,4 @@ export function useLeidaAdmin() {
 }
 
 // Backward-compatible alias.
-export const useLeidaAdmin = useLeidaAdmin;
+export const useNXAdmin = useLeidaAdmin;

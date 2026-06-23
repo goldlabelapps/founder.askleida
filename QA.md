@@ -5,8 +5,8 @@
 
 ```sh
 # Test Practitioner Login Credentials
-email: practitioner-1@goldlabel.pro
-password: Founder:)
+practitioner-1@goldlabel.pro
+Founder:)
 ```
 
 Jane Doe

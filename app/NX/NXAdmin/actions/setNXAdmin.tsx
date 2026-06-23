@@ -19,4 +19,4 @@ export const setLeidaAdmin =
         };
 
 // Backward-compatible alias.
-export const setLeidaAdmin = setLeidaAdmin;
+export const setNXAdmin = setLeidaAdmin;
