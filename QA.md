@@ -1,13 +1,24 @@
 
+## QA Cheat Sheet
+
+#### Accounts
+
+```sh
+# Test Practitioner Login Credentials
+email: practitioner-1@goldlabel.pro
+password: Founder:)
+```
+
 Jane Doe
 Oakwell Skin Clinic
+oakwell@goldlabel.pro
 
-
-fiona@goldlabel.pro
+Fiona
 Eden Dermatology & Skincare
+fiona@goldlabel.pro
+___
 
-Here are 10 realistic, professional skincare clinic names that would 
-fit well as businesses using a skincare therapy platform
+#### Clinic names
 
 The Skin Practice
 Radiance Skin Clinic
@@ -16,13 +27,7 @@ Pure Skin Therapy
 Willow Skin Clinic
 The Complexion Studio
 Lumière Skin Health
-
 Revive Skin Specialists
-
-
-If you're targeting independent practitioners rather than larger medical clinics, 
-these feel slightly more boutique:
-
 Bloom Skin Therapy
 The Skin Room
 Bare Skin Studio
@@ -33,4 +38,3 @@ Serene Skin
 SkinLab
 Renew Skin Studio
 The Facialist Clinic
-
