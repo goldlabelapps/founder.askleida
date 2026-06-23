@@ -35,7 +35,7 @@ import AdminNav from './components/Menus/AdminNav';
 import {MegaDash} from './components/MegaDash';
 
 // Actions
-import { setNXAdmin } from './actions/setNXAdmin';
+import { setLeidaAdmin, setNXAdmin } from './actions/setLeidaAdmin';
 import { setCRUD } from './actions/setCRUD';
 import { saveNewDoc } from './actions/saveNewDoc';
 import { edit } from './actions/edit';
@@ -47,7 +47,7 @@ import { pwaAlert, triggerPwaInstall } from './actions/pwaAlert';
 import { requestNotifications } from './actions/requestNotifications';
 
 // Hooks
-import { useNXAdmin } from './hooks/useNXAdmin';
+import { useLeidaAdmin, useNXAdmin } from './hooks/useLeidaAdmin';
 import { useCRUD } from './hooks/useCRUD';
 import { useCollection } from './hooks/useCollection';
 import { useActive } from './hooks/useActive';
@@ -92,6 +92,7 @@ export {
     AdminNav,
     
     // Actions
+    setLeidaAdmin,
     setNXAdmin,
     setCRUD,
     saveNewDoc,
@@ -105,6 +106,7 @@ export {
     requestNotifications,
 
     // Hooks
+    useLeidaAdmin,
     useNXAdmin,
     useCRUD,
     useCollection,

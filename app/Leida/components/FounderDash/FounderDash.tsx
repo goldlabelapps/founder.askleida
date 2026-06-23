@@ -10,8 +10,9 @@ import {
 } from '@mui/material';
 import { Icon, navigateTo } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
-import { setNXAdmin, useNXAdmin } from '../../../NX/NXAdmin';
 import { 
+    setLeida,
+    useLeida,
     initDash, 
     initPractitioners, 
     useDash,
@@ -22,7 +23,7 @@ export default function FounderDash() {
     
     const dispatch = useDispatch();
     const router = useRouter();
-    const nxAdmin = useNXAdmin();
+    const leida = useLeida();
     const dash = useDash();
     const practitioners = usePractitioners();
     const didInit = React.useRef(false);
@@ -47,10 +48,10 @@ export default function FounderDash() {
     
     React.useEffect(() => {
         if (!didInit.current) {
-            if (!nxAdmin || !nxAdmin.dash) dispatch(initDash());
+            if (!leida || !leida.dash) dispatch(initDash());
             didInit.current = true;
         }
-    }, [dispatch, nxAdmin]);
+    }, [dispatch, leida]);
 
     React.useEffect(() => {
         if (typeof practitioners === 'undefined') {
@@ -60,7 +61,7 @@ export default function FounderDash() {
 
     React.useEffect(() => {
         if (dash && dash.title) {
-            dispatch(setNXAdmin('header', {
+            dispatch(setLeida('header', {
                 title: 'Dashboard',
                 icon: 'dashboard',
             }));

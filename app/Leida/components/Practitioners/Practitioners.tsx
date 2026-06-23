@@ -10,10 +10,11 @@ import {
 import { useDispatch } from '../../../NX/Uberedux';
 import { Icon, navigateTo } from '../../../NX/DesignSystem';
 import {
+	setLeida,
+	initPractitioners,
 	usePractitioners,
 	PractitionerList,
 } from '../../../Leida';
-import { setNXAdmin } from '../../../NX/NXAdmin';
 
 const Practitioners = () => {
 
@@ -23,14 +24,12 @@ const Practitioners = () => {
 
 	React.useEffect(() => {
 		if (typeof practitioners === 'undefined') {
-			dispatch(setNXAdmin('practitioners', {
-				list: [],
-			}));
+			dispatch(initPractitioners());
 		}
 	}, [dispatch, practitioners]);
 
 	React.useEffect(() => {
-		dispatch(setNXAdmin('header', {
+		dispatch(setLeida('header', {
 			title: 'Practitioners',
 			icon: 'practitioner',
 		}));

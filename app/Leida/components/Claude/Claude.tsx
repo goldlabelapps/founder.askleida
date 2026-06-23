@@ -25,7 +25,6 @@ import {
     useLeida,
     useDash,
 } from '../../../Leida';
-import { setNXAdmin } from '../../../NX/NXAdmin';
 import ClaudePromptAccordion from './components/ClaudePromptAccordion';
 
 export default function Claude() {
@@ -49,7 +48,7 @@ export default function Claude() {
 
     React.useEffect(() => {
         if (dash && dash.title) {
-            dispatch(setNXAdmin('header', {
+            dispatch(setLeida('header', {
                 title: 'Claude',
                 icon: 'claude',
             }));

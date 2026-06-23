@@ -6,9 +6,9 @@ export const setPractitioners =
         async (dispatch: Dispatch, getState: () => any) => {
             try {
                 const state = getState();
-                const current = (state?.redux?.nxAdmin?.practitioners) || {};
+                const current = (state?.redux?.leida?.practitioners) || {};
                 const updated = { ...current, [key]: value };
-                dispatch(setUbereduxKey({ key: 'nxAdmin.practitioners', value: updated }));
+                dispatch(setUbereduxKey({ key: 'leida.practitioners', value: updated }));
             } catch (e: unknown) {
                 const msg = e instanceof Error ? e.message : String(e);
                 dispatch(setUbereduxKey({ key: 'error', value: msg }));

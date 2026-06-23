@@ -1,12 +1,12 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../Uberedux';
-import { setNXAdmin } from '../../../../NXAdmin';
+import { setLeidaAdmin } from '../../../../NXAdmin';
 
 export const initAccount = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {
         try {
-            const nxAdmin = getState()?.redux?.nxAdmin || {};
-            if (!nxAdmin.account) await dispatch(setNXAdmin('account', {
+            const nxAdmin = getState()?.redux?.leida || {};
+            if (!nxAdmin.account) await dispatch(setLeidaAdmin('account', {
                 slice: 'account',
             }));
         } catch (e: unknown) {

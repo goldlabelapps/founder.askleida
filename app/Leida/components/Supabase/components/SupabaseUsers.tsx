@@ -19,8 +19,7 @@ import {
 import { Icon } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { navigateTo } from '../../../../NX/DesignSystem';
-import { setNXAdmin } from '../../../../NX/NXAdmin';
-import { useDash } from '../../../../Leida';
+import { setLeida, useDash } from '../../../../Leida';
 import { initSupabase } from '../actions/initSupabase';
 import { fetchSupabaseAuthUsers } from '../actions/fetchSupabaseAuthUsers';
 import { saveSupabaseRecord } from '../actions/saveSupabaseRecord';
@@ -111,7 +110,7 @@ export default function SupabaseUsers() {
 
     React.useEffect(() => {
         if (dash && dash.title) {
-            dispatch(setNXAdmin('header', {
+            dispatch(setLeida('header', {
                 title: 'Supabase Users',
                 icon: 'supabase',
             }));

@@ -17,7 +17,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { navigateTo } from '../../../DesignSystem';
 import { useDispatch } from '../../../Uberedux';
-import { setNXAdmin, useNXAdmin } from '../../../NXAdmin';
+import { setLeidaAdmin, useLeidaAdmin } from '../../../NXAdmin';
 import { initPractitioners, usePractitioners } from '../Practitioners';
 import { useDash } from '../MegaDash';
 
@@ -34,7 +34,7 @@ export default function Practitioners() {
 
     const dispatch = useDispatch();
     const router = useRouter();
-    const nxAdmin = useNXAdmin();
+    const nxAdmin = useLeidaAdmin();
     const dash = useDash();
     const practitioners = usePractitioners();
     const didInit = React.useRef(false);
@@ -50,7 +50,7 @@ export default function Practitioners() {
 
     React.useEffect(() => {
         if (dash && dash.title) {
-            dispatch(setNXAdmin('header', {
+            dispatch(setLeidaAdmin('header', {
                 title: 'Practitioners',
                 icon: 'visitor',
             }));

@@ -1,20 +1,20 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../Uberedux';
-import { setNXAdmin } from '../../../../NXAdmin';
+import { setLeidaAdmin } from '../../../../NXAdmin';
 import { fetchPractitioners } from './fetchPractitioners';
 
 export const initPractitioners = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {
         try {
-            const nxAdmin = getState()?.redux?.nxAdmin || {};
+            const nxAdmin = getState()?.redux?.leida || {};
             if (!nxAdmin.practitioners) {
-                await dispatch(setNXAdmin('practitioners', {
+                await dispatch(setLeidaAdmin('practitioners', {
                     slice: 'practitioners',
                     list: [],
                     loading: true,
                 }));
             } else {
-                await dispatch(setNXAdmin('practitioners', {
+                await dispatch(setLeidaAdmin('practitioners', {
                     ...nxAdmin.practitioners,
                     loading: true,
                 }));
@@ -23,8 +23,8 @@ export const initPractitioners = (): any =>
             await dispatch(fetchPractitioners());
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);
-            dispatch(setNXAdmin('practitioners', {
-                ...(getState()?.redux?.nxAdmin?.practitioners || {}),
+            dispatch(setLeidaAdmin('practitioners', {
+                ...(getState()?.redux?.leida?.practitioners || {}),
                 loading: false,
             }));
             dispatch(setUbereduxKey({ key: 'error', value: msg }));

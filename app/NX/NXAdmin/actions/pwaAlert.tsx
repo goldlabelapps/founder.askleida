@@ -19,14 +19,14 @@ export const pwaAlert = (): any =>
         try {
             if (typeof window === 'undefined') return;
 
-            const currentPwa = getState()?.redux?.nxAdmin?.pwa;
+            const currentPwa = getState()?.redux?.leida?.pwa;
             if (currentPwa?.initialized) return;
 
             const supported = window.isSecureContext && 'serviceWorker' in navigator;
             const installed = isStandalone();
 
             dispatch(setUbereduxKey({
-                key: 'nxAdmin.pwa',
+                key: 'leida.pwa',
                 value: {
                     initialized: true,
                     supported,
@@ -43,15 +43,15 @@ export const pwaAlert = (): any =>
                 installEvent.preventDefault();
                 deferredInstallPrompt = installEvent;
 
-                dispatch(setUbereduxKey({ key: 'nxAdmin.pwa.installable', value: true }));
-                dispatch(setUbereduxKey({ key: 'nxAdmin.pwa.lastOutcome', value: null }));
+                dispatch(setUbereduxKey({ key: 'leida.pwa.installable', value: true }));
+                dispatch(setUbereduxKey({ key: 'leida.pwa.lastOutcome', value: null }));
             });
 
             window.addEventListener('appinstalled', () => {
                 deferredInstallPrompt = null;
-                dispatch(setUbereduxKey({ key: 'nxAdmin.pwa.installable', value: false }));
-                dispatch(setUbereduxKey({ key: 'nxAdmin.pwa.installed', value: true }));
-                dispatch(setUbereduxKey({ key: 'nxAdmin.pwa.lastOutcome', value: 'accepted' }));
+                dispatch(setUbereduxKey({ key: 'leida.pwa.installable', value: false }));
+                dispatch(setUbereduxKey({ key: 'leida.pwa.installed', value: true }));
+                dispatch(setUbereduxKey({ key: 'leida.pwa.lastOutcome', value: 'accepted' }));
             });
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);
@@ -68,11 +68,11 @@ export const triggerPwaInstall = (): any =>
             const choice = await deferredInstallPrompt.userChoice;
             const accepted = choice.outcome === 'accepted';
 
-            dispatch(setUbereduxKey({ key: 'nxAdmin.pwa.lastOutcome', value: choice.outcome }));
-            dispatch(setUbereduxKey({ key: 'nxAdmin.pwa.installable', value: false }));
+            dispatch(setUbereduxKey({ key: 'leida.pwa.lastOutcome', value: choice.outcome }));
+            dispatch(setUbereduxKey({ key: 'leida.pwa.installable', value: false }));
 
             if (accepted) {
-                dispatch(setUbereduxKey({ key: 'nxAdmin.pwa.installed', value: true }));
+                dispatch(setUbereduxKey({ key: 'leida.pwa.installed', value: true }));
             }
 
             deferredInstallPrompt = null;

@@ -18,12 +18,12 @@ import { useDispatch } from '../../../../NX/Uberedux';
 import { Icon, ConfirmAction, navigateTo } from '../../../../NX/DesignSystem';
 import { 
 	fetchLeida,
+	setLeida,
 	useLeidaBus,
 	deletePractitioner,
 	
 } from '../../../../Leida';
 import { 
-	setNXAdmin, 
 	Editable, 
 	AvatarUpload,
 } from '../../../../NX/NXAdmin';
@@ -231,7 +231,7 @@ const PractitionerUpdate = () => {
 	}, [dispatch, route]);
 
 	React.useEffect(() => {
-		dispatch(setNXAdmin('header', {
+		dispatch(setLeida('header', {
 			title: data?.[0]?.data?.display_name || 'Practitioner',
 			icon: 'practitioner',
 		}));

@@ -17,13 +17,13 @@ const setCollectionState = (
     typescript: any,
 ) => {
     dispatch(setUbereduxKey({
-        key: 'nxAdmin',
+        key: 'leida',
         value: {
-            ...getState().redux.nxAdmin,
+            ...getState().redux.leida,
             crud: {
-                ...getState().redux.nxAdmin.crud,
+                ...getState().redux.leida.crud,
                 [collection]: {
-                    ...getState().redux.nxAdmin.crud[collection],
+                    ...getState().redux.leida.crud[collection],
                     docs,
                     typescript,
                 },
@@ -57,11 +57,11 @@ export const initCollection = (
                 selected: null
             };
             const state = getState();
-            const currentNxAdmin = (state?.redux?.nxAdmin) || {};
+            const currentNxAdmin = (state?.redux?.leida) || {};
             const currentCRUD = currentNxAdmin.crud || {};
             const updatedCRUD = { ...currentCRUD, [collection]: newCRUD };
             const updatedNxAdmin = { ...currentNxAdmin, crud: updatedCRUD };
-            dispatch(setUbereduxKey({ key: 'nxAdmin', value: updatedNxAdmin }));
+            dispatch(setUbereduxKey({ key: 'leida', value: updatedNxAdmin }));
 
             if (!subscribe) {
                 const { docs, typescript } = await fetchCollectionDocs(collection, {

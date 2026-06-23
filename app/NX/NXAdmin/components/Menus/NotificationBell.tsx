@@ -4,13 +4,13 @@ import { Badge, IconButton, Tooltip } from '@mui/material';
 import { Icon } from '../../../DesignSystem';
 import { useDispatch } from '../../../Uberedux';
 import { setUbereduxKey } from '../../../Uberedux';
-import { useNXAdmin } from '../../../NXAdmin';
+import { useLeidaAdmin } from '../../../NXAdmin';
 import { requestNotifications } from '../../../NXAdmin';
 
 export default function NotificationBell() {
 
     const dispatch = useDispatch();
-    const nxAdmin = useNXAdmin();
+    const nxAdmin = useLeidaAdmin();
     const notifications = nxAdmin?.notifications || {};
     const { permission, unreadCount = 1, fcmToken } = notifications as {
         permission?: string;
@@ -31,7 +31,7 @@ export default function NotificationBell() {
             return;
         }
         // Clear unread count and OS badge
-        dispatch(setUbereduxKey({ key: 'nxAdmin.notifications.unreadCount', value: 0 }));
+        dispatch(setUbereduxKey({ key: 'leida.notifications.unreadCount', value: 0 }));
         if ('clearAppBadge' in navigator) {
             (navigator as Navigator & { clearAppBadge: () => Promise<void> })
                 .clearAppBadge()

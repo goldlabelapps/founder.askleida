@@ -4,13 +4,13 @@ import {
     Grid,
 } from '@mui/material';
 import { useDispatch } from '../../../Uberedux';
-import { setNXAdmin, useNXAdmin } from '../../../NXAdmin';
+import { setLeidaAdmin, useLeidaAdmin } from '../../../NXAdmin';
 import { initDash, useDash } from '../MegaDash';
 
 export default function MegaDash() {
     
     const dispatch = useDispatch();
-    const nxAdmin = useNXAdmin();
+    const nxAdmin = useLeidaAdmin();
     const dash = useDash();
     const didInit = React.useRef(false);
     
@@ -23,7 +23,7 @@ export default function MegaDash() {
 
     React.useEffect(() => {
         if (dash && dash.title) {
-            dispatch(setNXAdmin('header', {
+            dispatch(setLeidaAdmin('header', {
                 title: 'Founder Dashboard',
                 icon: 'dashboard',
             }));

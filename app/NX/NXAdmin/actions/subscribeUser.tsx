@@ -1,6 +1,6 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../Uberedux';
-import { setNXAdmin } from '../../NXAdmin';
+import { setLeidaAdmin } from '../../NXAdmin';
 import { supabase } from '../../lib/supabase';
 
 const activeSubscriptions: Record<string, boolean> = {};
@@ -8,13 +8,13 @@ const activeSubscriptions: Record<string, boolean> = {};
 export const subscribeUser = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {
         try {
-            const { subscribedUser } = getState().redux.nxadmin || {};
+            const { subscribedUser } = getState().redux.leida || {};
             const { uid } = getState().redux.paywall || {};
             if (!uid) return;
 
             // Guard: only subscribe if not already subscribed to this uid
             if (!subscribedUser || subscribedUser.uid !== uid) {
-                dispatch(setNXAdmin('subscribedUser', { uid }));
+                dispatch(setLeidaAdmin('subscribedUser', { uid }));
                 if (!activeSubscriptions[uid]) {
                     activeSubscriptions[uid] = true;
                     const { data, error } = await supabase
@@ -24,7 +24,7 @@ export const subscribeUser = (): any =>
                         .limit(1);
 
                     if (error) throw error;
-                    dispatch(setNXAdmin('subscribedUser', data?.[0] || null));
+                    dispatch(setLeidaAdmin('subscribedUser', data?.[0] || null));
                 }
             }
         } catch (e: unknown) {
