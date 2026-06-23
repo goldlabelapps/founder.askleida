@@ -17,7 +17,6 @@ import {
     usePractitioners,
 } from '../../../Leida';
 
-
 export default function FounderDash() {
     
     const dispatch = useDispatch();
@@ -25,7 +24,6 @@ export default function FounderDash() {
     const nxAdmin = useNXAdmin();
     const dash = useDash();
     const practitioners = usePractitioners();
-    console.log('practitioners', practitioners);
     const didInit = React.useRef(false);
 
     const numberOfPractitioners = Array.isArray(practitioners?.list) ? practitioners.list.length : 0;
@@ -33,13 +31,13 @@ export default function FounderDash() {
     const dashboardActions = [    
         {
             title: 'Practitioners',
-            // description: `Total ${numberOfPractitioners}`,
+            description: `Total ${numberOfPractitioners}`,
             icon: 'practitioner',
             route: '/practitioners',
         },    
         {
             title: 'Products',
-            description: 'Browse and manage the products and add more from Awin',
+            description: 'Browse/manage Leida products & add from Awin',
             icon: 'products',
             route: '/products',
         },
@@ -52,6 +50,14 @@ export default function FounderDash() {
             didInit.current = true;
         }
     }, [dispatch, nxAdmin]);
+
+    React.useEffect(() => {
+        if (typeof practitioners === 'undefined') {
+            dispatch(setNXAdmin('practitioners', {
+                list: [],
+            }));
+        }
+    }, [dispatch, practitioners]);
 
     React.useEffect(() => {
         if (dash && dash.title) {

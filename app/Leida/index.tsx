@@ -45,6 +45,7 @@ import { deletePractitioner } from './actions/deletePractitioner';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
+import { initPractitioners } from './components/Practitioners/actions/initPractitioners';
 import { initSupabase } from './components/Supabase/actions/initSupabase';
 import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRows';
 import { saveSupabaseRecord } from './components/Supabase/actions/saveSupabaseRecord';
@@ -128,6 +129,7 @@ export {
     createPractitioner,
     updateAvatar,
     updatePractitioner,
+    initPractitioners,
     setDash,
     // Lib
     normalizeLeidaRouteKey,
