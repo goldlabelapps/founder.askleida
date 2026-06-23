@@ -3,11 +3,10 @@ import * as React from 'react';
 import {
 	Alert,
 	Box,
+	Collapse,
 	Grid,
 	LinearProgress,
 	Stack,
-	ToggleButton,
-	ToggleButtonGroup,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
@@ -19,11 +18,15 @@ import {
 } from '../../../../Leida';
 import type { T_Product } from './FindProduct';
 
-const ListProducts = () => {
+type T_ListProductsProps = {
+	showFindProduct?: boolean;
+};
+
+const ListProducts = ({ showFindProduct = true }: T_ListProductsProps) => {
+
 	const dispatch = useDispatch();
 	const productsSlice = useProducts();
 	const bus = useLeidaBus('/api/products');
-
 	const [visibleProducts, setVisibleProducts] = React.useState<T_Product[]>([]);
 	const [viewMode, setViewMode] = React.useState<'card' | 'list'>('list');
 
@@ -41,6 +44,7 @@ const ListProducts = () => {
 
 		if (fromSlice.length > 0) return fromSlice;
 		return fromBus;
+
 	}, [productsSlice?.products, bus?.data]);
 
 	React.useEffect(() => {
@@ -54,23 +58,14 @@ const ListProducts = () => {
 
 	return (
 		<Stack spacing={2}>
-			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+			<Collapse in={showFindProduct} timeout="auto" unmountOnExit>
 				<FindProduct
 					products={sourceProducts}
 					onProductsChange={setVisibleProducts}
+					viewMode={viewMode}
+					onViewModeChange={(nextMode) => setViewMode(nextMode)}
 				/>
-				<ToggleButtonGroup
-					value={viewMode}
-					exclusive
-					onChange={(_, newMode) => {
-						if (newMode !== null) setViewMode(newMode);
-					}}
-					size="small"
-				>
-					<ToggleButton value="card">Card</ToggleButton>
-					<ToggleButton value="list">List</ToggleButton>
-				</ToggleButtonGroup>
-			</Box>
+			</Collapse>
 
 			<Box sx={{ height: 6 }}>
 				{loading ? <LinearProgress /> : null}

@@ -49,15 +49,6 @@ export default function DashNav({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-
-      
-
-      <Box sx={{ height: 24 }} />
-
-      <Box sx={{ maxWidth: 150, mx: 'auto' }}>
-        <img src="/nxadmin/svg/leidaLogo.svg" alt="Leida Logo" style={{ width: '100%' }} />
-      </Box>
-
       <Box sx={{ height: 24 }} />
       {navItems.map((item) => (
         <React.Fragment key={item.route}>

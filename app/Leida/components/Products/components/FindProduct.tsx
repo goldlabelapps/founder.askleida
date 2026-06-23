@@ -10,7 +10,10 @@ import {
 	TextField,
 	Typography,
 	MenuItem,
+	ToggleButton,
+	ToggleButtonGroup,
 } from '@mui/material';
+import {Icon} from '../../../../NX/DesignSystem';
 
 export type T_Product = {
 	id?: string;
@@ -37,6 +40,8 @@ type T_SortBy = 'relevance' | 'name-asc' | 'name-desc' | 'price-asc' | 'price-de
 type T_FindProductProps = {
 	products: T_Product[];
 	onProductsChange?: (nextProducts: T_Product[]) => void;
+	viewMode?: 'card' | 'list';
+	onViewModeChange?: (nextMode: 'card' | 'list') => void;
 };
 
 const SORT_OPTIONS: Array<{ value: T_SortBy; label: string }> = [
@@ -107,7 +112,12 @@ function includesQuery(product: T_Product, normalizedQuery: string): boolean {
 	return haystack.includes(normalizedQuery);
 }
 
-export default function FindProduct({ products, onProductsChange }: T_FindProductProps) {
+export default function FindProduct({
+	products,
+	onProductsChange,
+	viewMode = 'list',
+	onViewModeChange,
+}: T_FindProductProps) {
 	const [query, setQuery] = React.useState('');
 	const [selectedCategory, setSelectedCategory] = React.useState('all');
 	const [selectedBrand, setSelectedBrand] = React.useState('all');
@@ -195,9 +205,6 @@ export default function FindProduct({ products, onProductsChange }: T_FindProduc
 	return (
 		<Paper variant="outlined" sx={{ p: 2 }}>
 			<Stack spacing={2}>
-				<Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-					Find products
-				</Typography>
 
 				<Grid container spacing={1.5}>
 					<Grid size={{ xs: 12, md: 4 }}>
@@ -247,6 +254,7 @@ export default function FindProduct({ products, onProductsChange }: T_FindProduc
 					<Grid size={{ xs: 12, sm: 6, md: 2 }}>
 						<TextField
 							select
+							
 							label="Sort"
 							value={sortBy}
 							onChange={(event) => setSortBy(event.target.value as T_SortBy)}
@@ -262,11 +270,32 @@ export default function FindProduct({ products, onProductsChange }: T_FindProduc
 				</Grid>
 
 				<Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
-					<Button variant="outlined" onClick={handleReset}>
+					<Button 
+						startIcon={<Icon icon="reset" />}
+						variant="outlined" 
+						onClick={handleReset}>
 						Reset
 					</Button>
-					<Chip label={`${filteredProducts.length} shown`} variant="outlined" />
-					<Chip label={`${products.length} total`} variant="outlined" />
+					
+					<Chip 
+						color="primary" 
+						label={`Showing ${filteredProducts.length} of ${products.length}`} 
+					/>
+
+					<Box sx={{ ml: 'auto', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+						<ToggleButtonGroup
+							color="primary"
+							value={viewMode}
+							exclusive
+							onChange={(_, newMode) => {
+								if (newMode !== null) onViewModeChange?.(newMode);
+							}}
+							size="small"
+						>
+							<ToggleButton value="card">Card</ToggleButton>
+							<ToggleButton value="list">List</ToggleButton>
+						</ToggleButtonGroup>
+					</Box>
 				</Box>
 			</Stack>
 		</Paper>

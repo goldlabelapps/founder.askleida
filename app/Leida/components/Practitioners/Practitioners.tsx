@@ -2,12 +2,9 @@ import React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
 	Box,
-	Button,
 	Paper,
 	Stack,
 	Typography,
-	Grid,
-	LinearProgress,
 	Fab,
 } from '@mui/material';
 import { useDispatch } from '../../../NX/Uberedux';
@@ -18,8 +15,6 @@ import {
 	PractitionerList,
 } from '../../../Leida';
 import { setNXAdmin } from '../../../NX/NXAdmin';
-import { FeedbackBtn } from '../../../NX/Shortcodes';
-
 
 const Practitioners = () => {
 
@@ -27,8 +22,6 @@ const Practitioners = () => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const uuid = pathname?.split('/').pop() ?? '';
-	const route = uuid ? `practitioners/${uuid}` : '';
-	const { loading, error, data } = useLeidaBus(route);
 
 	React.useEffect(() => {
 		dispatch(setNXAdmin('header', {
@@ -42,8 +35,6 @@ const Practitioners = () => {
 	}
 
 	return <>
-
-
 			<Box sx={{ p: 2 }}>
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Stack spacing={2}>
@@ -59,12 +50,8 @@ const Practitioners = () => {
 							</Fab>
 						</Box>
 					</Stack>
-
-				
 				</Paper>
-
 				<PractitionerList />
-
 			</Box>		
 	</>;
 };

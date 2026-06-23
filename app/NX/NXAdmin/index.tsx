@@ -9,7 +9,6 @@ import PageRouter from './components/PageRouter';
 // Page components
 import { Account } from './components/Account';
 import { Practitioners } from './components/Practitioners';
-import { Products } from './components/Products';
 
 // UI components
 import {
@@ -54,6 +53,7 @@ import { useCollection } from './hooks/useCollection';
 import { useActive } from './hooks/useActive';
 import { useNotifications } from './hooks/useNotifications';
 import { useHeader } from './hooks/useHeader';
+import { usePractitioners } from './components/Practitioners';
 
 export {
     // Main component
@@ -70,7 +70,6 @@ export {
     // Page components
     Account,
     Practitioners,
-    Products,
 
 
     // UI components
@@ -112,4 +111,5 @@ export {
     useActive,
     useNotifications,
     useHeader,
+    usePractitioners,
 };

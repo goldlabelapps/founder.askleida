@@ -20,7 +20,7 @@ export default function Header() {
     const header = useHeader();
     const title = header?.title || '';
     const icon = header?.icon || null;
-    const showBack = true;
+    const showBack = false;
 
     const handleBack = () => {
         dispatch(navigateTo(router, '/'));
@@ -30,13 +30,11 @@ export default function Header() {
             <CardHeader
                 sx={{ width: '100%' }}
                 avatar={<>
-                
                 {showBack ? <IconButton 
                 color="primary"
                 onClick={handleBack}>
                     <Icon icon="leida" />
                     </IconButton> : null }
-                
                 {icon ? <Box sx={{mt: 1 }}>
                             <Icon icon={icon as any} color="primary"/>
                         </Box>
@@ -50,7 +48,6 @@ export default function Header() {
                         v{pJSON.version}
                     </Typography>
                 }
-                
             />
         </>
     );
