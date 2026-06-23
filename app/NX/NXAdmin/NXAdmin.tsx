@@ -29,7 +29,6 @@ import {
 import {
   DesktopLayout,
   MobileLayout,
-  README,
   requestNotifications,
 } from '../NXAdmin';
 import {

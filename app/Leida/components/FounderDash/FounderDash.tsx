@@ -13,6 +13,7 @@ import { useDispatch } from '../../../NX/Uberedux';
 import { setNXAdmin, useNXAdmin } from '../../../NX/NXAdmin';
 import { 
     initDash, 
+    initPractitioners, 
     useDash,
     usePractitioners,
 } from '../../../Leida';
@@ -53,9 +54,7 @@ export default function FounderDash() {
 
     React.useEffect(() => {
         if (typeof practitioners === 'undefined') {
-            dispatch(setNXAdmin('practitioners', {
-                list: [],
-            }));
+            dispatch(initPractitioners());
         }
     }, [dispatch, practitioners]);
 
