@@ -8,6 +8,9 @@ import {
 	CardContent,
 	CardMedia,
 	Chip,
+	ListItemButton,
+	ListItemText,
+	ListItemAvatar,
 	Stack,
 	Typography,
 } from '@mui/material';
@@ -84,49 +87,13 @@ const RenderProduct = ({ product, onAddToCart, addingToCart = false, viewMode = 
 
 	if (viewMode === 'list') {
 		return (
-			<Card variant="outlined" sx={{ display: 'flex', flexDirection: 'row' }}>
-				{imageUrl ? (
-					<CardMedia
-						component="img"
-						sx={{ width: 140, height: 140, objectFit: 'cover', bgcolor: 'grey.100' }}
-						image={imageUrl}
-						alt={name}
+			<Card variant="outlined">
+				<ListItemButton sx={{ alignItems: 'flex-start'}}>
+					<ListItemText 
+						primary={name}
+						// secondary={"description"}
 					/>
-				) : (
-					<Box
-						sx={{
-							width: 140,
-							height: 140,
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							bgcolor: 'grey.100',
-						}}
-					>
-						<Typography variant="body2" color="text.secondary">
-							No image
-						</Typography>
-					</Box>
-				)}
-
-				<CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-					<Stack spacing={1}>
-						<Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-							{name}
-						</Typography>
-
-						<Stack direction="row" spacing={1}>
-							{priceLabel ? <Chip size="small" label={priceLabel} /> : null}
-							{categoryLabel ? <Chip size="small" variant="outlined" label={categoryLabel} /> : null}
-						</Stack>
-
-						{description ? (
-							<Typography variant="body2" color="text.secondary" sx={{ lineClamp: 2 }}>
-								{description}
-							</Typography>
-						) : null}
-					</Stack>
-				</CardContent>
+				</ListItemButton>
 			</Card>
 		);
 	}

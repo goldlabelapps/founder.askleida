@@ -14,6 +14,7 @@ import { setNXAdmin, useNXAdmin } from '../../../NX/NXAdmin';
 import { 
     initDash, 
     useDash,
+    usePractitioners,
 } from '../../../Leida';
 
 
@@ -23,12 +24,16 @@ export default function FounderDash() {
     const router = useRouter();
     const nxAdmin = useNXAdmin();
     const dash = useDash();
+    const practitioners = usePractitioners();
+    console.log('practitioners', practitioners);
     const didInit = React.useRef(false);
+
+    const numberOfPractitioners = Array.isArray(practitioners?.list) ? practitioners.list.length : 0;
 
     const dashboardActions = [    
         {
             title: 'Practitioners',
-            description: '',
+            // description: `Total ${numberOfPractitioners}`,
             icon: 'practitioner',
             route: '/practitioners',
         },    

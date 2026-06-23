@@ -23,7 +23,7 @@ import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
-import { PractitionerList, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners } from './components/Practitioners';
+import { PractitionerList, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners, usePractitioners } from './components/Practitioners';
 import Supabase from './components/Supabase/Supabase';
 import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
 import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
@@ -93,6 +93,7 @@ export {
     PractitionerNew,
     PractitionerUpdate,
     Practitioners,
+    usePractitioners,
     Supabase,
     SupabasePostgres,
     SupabaseUsers,

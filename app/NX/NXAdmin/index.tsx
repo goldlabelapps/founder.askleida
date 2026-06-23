@@ -53,6 +53,7 @@ import { useCollection } from './hooks/useCollection';
 import { useActive } from './hooks/useActive';
 import { useNotifications } from './hooks/useNotifications';
 import { useHeader } from './hooks/useHeader';
+import { usePractitioners } from './components/Practitioners';
 
 export {
     // Main component
@@ -110,4 +111,5 @@ export {
     useActive,
     useNotifications,
     useHeader,
+    usePractitioners,
 };

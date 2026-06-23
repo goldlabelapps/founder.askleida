@@ -6,4 +6,5 @@ export { default as PractitionerUpdate } from './components/PractitionerUpdate';
 export { createPractitioner } from './actions/createPractitioner';
 export { updateAvatar } from './actions/updateAvatar';
 export { updatePractitioner } from './actions/updatePractitioner';
+export { usePractitioners } from './hooks/usePractitioners';
 export type { T_PractitionerRecord } from './components/PractitionerCard';
