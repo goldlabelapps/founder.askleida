@@ -58,14 +58,7 @@ const ListProducts = ({ showFindProduct = true }: T_ListProductsProps) => {
 
 	return (
 		<Stack spacing={2}>
-			<Collapse in={showFindProduct} timeout="auto" unmountOnExit>
-				<FindProduct
-					products={sourceProducts}
-					onProductsChange={setVisibleProducts}
-					viewMode={viewMode}
-					onViewModeChange={(nextMode) => setViewMode(nextMode)}
-				/>
-			</Collapse>
+			
 
 			<Box sx={{ height: 6 }}>
 				{loading ? <LinearProgress /> : null}
