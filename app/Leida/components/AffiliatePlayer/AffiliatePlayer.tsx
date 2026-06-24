@@ -33,47 +33,192 @@ type AffiliatePlayerProps = {
     products?: T_Product[];
 };
 
+type T_Record = Record<string, unknown>;
+
+const isRecord = (value: unknown): value is T_Record => {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+};
+
+const parseJsonObject = (value: unknown): unknown => {
+    if (isRecord(value) || Array.isArray(value)) return value;
+    if (typeof value !== 'string') return value;
+
+    const trimmed = value.trim();
+    if (!trimmed || (trimmed[0] !== '{' && trimmed[0] !== '[')) return value;
+
+    try {
+        return JSON.parse(trimmed);
+    } catch {
+        return value;
+    }
+};
+
 const toText = (value: unknown): string => {
-    return typeof value === 'string' ? value.trim() : '';
+    if (typeof value !== 'string') return '';
+    const trimmed = value.trim();
+    if (!trimmed) return '';
+
+    const lowered = trimmed.toLowerCase();
+    if (lowered === 'null' || lowered === 'undefined') return '';
+
+    return trimmed;
+};
+
+const getPathValue = (source: unknown, path: string): unknown => {
+    const parts = path.split('.');
+    let cursor: unknown = parseJsonObject(source);
+
+    for (const part of parts) {
+        cursor = parseJsonObject(cursor);
+
+        if (Array.isArray(cursor)) {
+            const index = Number(part);
+            if (!Number.isInteger(index) || index < 0 || index >= cursor.length) return undefined;
+            cursor = cursor[index];
+            continue;
+        }
+
+        if (!isRecord(cursor)) return undefined;
+        cursor = cursor[part];
+    }
+
+    return cursor;
+};
+
+const pickFirstText = (source: unknown, paths: string[]): string => {
+    for (const path of paths) {
+        const value = toText(getPathValue(source, path));
+        if (value) return value;
+    }
+    return '';
+};
+
+const normalizeUrl = (value: string): string => {
+    const raw = toText(value);
+    if (!raw) return '';
+
+    if (raw.startsWith('//')) return `https:${raw}`;
+    if (/^https?:\/\//i.test(raw)) return raw;
+    if (/^www\./i.test(raw)) return `https://${raw}`;
+    if (/^[^\s]+\.[^\s]+/.test(raw)) return `https://${raw}`;
+
+    return raw;
+};
+
+const findNestedTextByKeys = (source: unknown, keys: string[]): string => {
+    const queue: unknown[] = [parseJsonObject(source)];
+    const targetKeys = new Set(keys.map((key) => key.toLowerCase()));
+    const seen = new Set<unknown>();
+
+    while (queue.length) {
+        const current = queue.shift();
+        if (!current || seen.has(current)) continue;
+        seen.add(current);
+
+        const parsedCurrent = parseJsonObject(current);
+
+        if (Array.isArray(parsedCurrent)) {
+            for (const item of parsedCurrent) queue.push(item);
+            continue;
+        }
+
+        if (!isRecord(parsedCurrent)) continue;
+
+        for (const [key, value] of Object.entries(parsedCurrent)) {
+            const keyLower = key.toLowerCase();
+            const textValue = toText(value);
+            if (targetKeys.has(keyLower) && textValue) {
+                return textValue;
+            }
+
+            if (isRecord(value) || Array.isArray(value) || typeof value === 'string') {
+                queue.push(value);
+            }
+        }
+    }
+
+    return '';
 };
 
 const getTitle = (product: T_Product | undefined): string => {
     if (!product) return 'Untitled product';
-    return toText(product.name)
-        || toText(product.title)
-        || toText(product.product_name)
+    return pickFirstText(product, [
+        'name',
+        'title',
+        'product_name',
+        'data.name',
+        'data.title',
+        'data.product_name',
+        'data.awin.product_name',
+        'data.awin.product_basic.title',
+        'data.awin.product_basic.name',
+    ])
         || 'Untitled product';
 };
 
 const getDescription = (product: T_Product | undefined): string => {
     if (!product) return '';
-    return toText(product.description);
+    return pickFirstText(product, [
+        'description',
+        'data.description',
+        'data.awin.description',
+        'data.awin.product_basic.description',
+    ]);
 };
 
 const getCategory = (product: T_Product | undefined): string => {
     if (!product) return 'Uncategorized';
-    return toText(product.category)
-        || toText(product.category_name)
-        || toText(product.merchant_category)
+    return pickFirstText(product, [
+        'category',
+        'category_name',
+        'merchant_category',
+        'data.category',
+        'data.category_name',
+        'data.merchant_category',
+        'data.awin.category_name',
+        'data.awin.product_basic.category',
+    ])
         || 'Uncategorized';
 };
 
 const getImageUrl = (product: T_Product | undefined): string => {
     if (!product) return 'https://via.placeholder.com/1200x630?text=No+Image';
 
-    const candidates = [
-        product.image,
-        product.image_url,
-        product.merchant_image_url,
-        product.aw_image_url,
-        product.merchant_thumb_url,
-        product.large_image,
-    ];
+    const image = pickFirstText(product, [
+        'image',
+        'image_url',
+        'merchant_image_url',
+        'aw_image_url',
+        'merchant_thumb_url',
+        'large_image',
+        'data.image',
+        'data.image_url',
+        'data.images.0',
+        'data.aw_image_url',
+        'data.merchant_image_url',
+        'data.awinProduct.data.merchant_image_url',
+        'data.awinProduct.data.aw_image_url',
+        'data.awinProduct.product_basic.merchant_image_url',
+        'data.awinProduct.product_basic.aw_image_url',
+        'data.awinRow.data.merchant_image_url',
+        'data.awinRow.data.aw_image_url',
+        'data.awin.data.merchant_image_url',
+        'data.awin.data.aw_image_url',
+        'data.awin.product_basic.merchant_image_url',
+        'data.awin.product_basic.aw_image_url',
+    ]);
 
-    for (const candidate of candidates) {
-        const value = toText(candidate);
-        if (value) return value;
-    }
+    const deepImage = image || findNestedTextByKeys(product, [
+        'merchant_image_url',
+        'aw_image_url',
+        'image_url',
+        'image',
+        'thumbnail',
+        'thumb_url',
+    ]);
+
+    const normalizedImage = normalizeUrl(deepImage);
+    if (normalizedImage) return normalizedImage;
 
     return 'https://via.placeholder.com/1200x630?text=No+Image';
 };
@@ -81,17 +226,41 @@ const getImageUrl = (product: T_Product | undefined): string => {
 const getMerchantLink = (product: T_Product | undefined): string => {
     if (!product) return '';
 
-    const candidates = [
-        product.aw_deep_link,
-        product.merchant_deep_link,
-    ];
+    const link = pickFirstText(product, [
+        'aw_deep_link',
+        'merchant_deep_link',
+        'deeplink',
+        'deep_link',
+        'url',
+        'product_url',
+        'data.awinDeepLink',
+        'data.merchant_deep_link',
+        'data.aw_deep_link',
+        'data.deeplink',
+        'data.deep_link',
+        'data.url',
+        'data.product_url',
+        'data.awinProduct.merchant_deep_link',
+        'data.awinProduct.aw_deep_link',
+        'data.awinProduct.data.merchant_deep_link',
+        'data.awinProduct.data.aw_deep_link',
+        'data.awinRow.data.merchant_deep_link',
+        'data.awinRow.data.aw_deep_link',
+        'data.awin.merchant_deep_link',
+        'data.awin.aw_deep_link',
+        'data.awin.product_basic.aw_deep_link',
+    ]);
 
-    for (const candidate of candidates) {
-        const value = toText(candidate);
-        if (value) return value;
-    }
+    const deepLink = link || findNestedTextByKeys(product, [
+        'merchant_deep_link',
+        'aw_deep_link',
+        'deeplink',
+        'deep_link',
+        'product_url',
+        'url',
+    ]);
 
-    return '';
+    return normalizeUrl(deepLink);
 };
 
 const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
@@ -302,7 +471,7 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
                     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 >
                     <MenuItem disabled>
-                        Product actions coming soon
+                        {merchantLink || 'No product link available'}
                     </MenuItem>
                     <MenuItem onClick={handleMenuClose}>Close</MenuItem>
                 </Menu>
