@@ -21,6 +21,7 @@ import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
+import { AffiliatePlayer } from './components/AffiliatePlayer';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
 import { PractitionerList, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners, usePractitioners } from './components/Practitioners';
@@ -87,6 +88,7 @@ export {
     ListProducts,
     RenderProduct,
     FindProduct,
+    AffiliatePlayer,
     Claude,
     ClaudePopup,
     PractitionerList,

@@ -48,3 +48,28 @@ export interface I_AwinDetail {
     awin?: T_AwinProduct | null;
     onClose: () => void;
 }
+
+export type Product = {
+    name?: string;
+    cadence?: string;
+};
+
+export type ExampleProduct = {
+    title?: string;
+    data?: {
+        name?: string;
+        image?: string;
+        category?: string;
+        description?: string;
+        awinRow?: {
+            data?: {
+                merchant_deep_link?: string;
+                merchant_image_url?: string;
+            };
+        };
+    };
+};
+
+export type RenderProductsProps = {
+    products?: ExampleProduct[];
+};
