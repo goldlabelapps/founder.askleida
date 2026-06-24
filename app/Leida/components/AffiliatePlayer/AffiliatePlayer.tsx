@@ -24,11 +24,6 @@ import { useLeidaBus } from '../../hooks/useLeida';
 const CARD_HEIGHT = 420;
 const SWIPE_THRESHOLD_PX = 50;
 
-const shorten = (value: string, max = 140): string => {
-    if (value.length <= max) return value;
-    return `${value.slice(0, max).trimEnd()}...`;
-};
-
 type AffiliatePlayerProps = {
     products?: T_Product[];
 };
@@ -364,22 +359,14 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
     }
 
     const title = getTitle(currentProduct);
-    const description = shorten(getDescription(currentProduct));
+    const description = getDescription(currentProduct);
     const category = getCategory(currentProduct);
     const imageUrl = getImageUrl(currentProduct);
     const merchantLink = getMerchantLink(currentProduct);
     const isMenuOpen = Boolean(menuAnchorEl);
 
     return (
-        <Box
-            sx={{
-                p: 2,
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.paper',
-            }}
-        >
+        <Box>
 
             <Card
                 variant="outlined"
@@ -501,11 +488,11 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
                 }
             />
 
-            {/* <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
+            <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
                 {enableSwipe
                     ? 'Swipe left or right on the card'
                     : 'Use Back/Next buttons'}
-            </Typography> */}
+            </Typography>
         </Box>
     );
 };
