@@ -43,11 +43,11 @@ export default function Header() {
                     {title}
                 </Typography>}
                 subheader={header?.subheader || null}
-                action={
-                    <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
-                        v{pJSON.version}
-                    </Typography>
-                }
+                // action={
+                //     <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
+                //         v{pJSON.version}
+                //     </Typography>
+                // }
             />
         </>
     );

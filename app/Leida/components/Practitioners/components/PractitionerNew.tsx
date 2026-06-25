@@ -99,6 +99,7 @@ const PractitionerNew = () => {
 					
 					<Button
 						sx={{mt: 2}}
+						fullWidth
 						variant="contained"
 						endIcon={<Icon icon="send" />}
 						onClick={handleCreatePractitioner}

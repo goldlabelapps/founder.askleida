@@ -49,11 +49,11 @@ const Practitioners = () => {
 								Practitioners
 							</Typography>
 							<MightyButton
-								kind="button"
-								variant="contained"
+								kind="icon"
+								// variant="contained"
 								color="primary"
 								onClick={handleNewPractitioner}
-								endIcon="add"
+								icon="add"
 							>
 								Add
 							</MightyButton>
