@@ -67,8 +67,7 @@ export default function FounderDash() {
 
     return (
         <Box>
-            <AffiliatePlayer />
-            <ListProducts />
+            Dash
         </Box>
     );
 }
