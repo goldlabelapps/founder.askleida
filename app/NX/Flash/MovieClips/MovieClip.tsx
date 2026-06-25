@@ -59,6 +59,7 @@ const movieClipBaseStyle: React.CSSProperties = {
     left: '50%',
     top: '50%',
     transform: 'translate(-50%, -50%)',
+    transformOrigin: 'center center',
     overflow: 'hidden',
     margin: 0,
     padding: 0,
@@ -106,7 +107,7 @@ export const MovieClip = React.forwardRef<HTMLDivElement, I_MovieClip>(({
     className,
     width,
     height,
-    border,
+    border = false,
     pos,
     align,
     offsetX = 0,
@@ -138,7 +139,9 @@ export const MovieClip = React.forwardRef<HTMLDivElement, I_MovieClip>(({
         ...movieClipBaseStyle,
         ...(width ? { width } : {}),
         ...(height ? { height } : {}),
-        ...(border ? { border: '2px solid #888' } : { border: 'none' }),
+        ...(border
+            ? { outline: '1px dashed rgba(255, 59, 48, 0.85)', outlineOffset: '-1px' }
+            : { outline: 'none' }),
         ...(minWidth ? { minWidth } : {}),
         ...(maxWidth ? { maxWidth } : {}),
         ...(zIndex !== undefined ? { zIndex } : {}),

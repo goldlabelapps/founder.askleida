@@ -38,14 +38,15 @@ export default function Products() {
 			<Paper variant="outlined" sx={{ p: 2 }}>
 				<Stack spacing={2}>
 					<Box sx={{ display: 'flex', alignItems: 'center' }}>
-						<Typography variant="h4">
+
+						<Typography variant="h5">
 							Products
 						</Typography>
 						
 						<Box sx={{ flexGrow: 1 }} />
 						<MightyButton
 							kind="button"
-							variant="contained"
+							variant="outlined"
 							color="primary"
 						// onClick={handleNewPractitioner}
 							startIcon="awin"
@@ -56,7 +57,7 @@ export default function Products() {
 					</Box>
 				</Stack>
 			</Paper>
-			<AffiliatePlayer />
+			{/* <AffiliatePlayer /> */}
 			<ListProducts showFindProduct={showFindProduct} />
 		</Box>
 	);
