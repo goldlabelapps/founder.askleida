@@ -38,7 +38,7 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const [imageMeta, setImageMeta] = React.useState<T_ImageMeta>(INITIAL_IMAGE_META);
-	const [isProcessing, setIsProcessing] = React.useState(false);
+	const [isProcessing, setIsProcessing] = React.useState(true);
 
 	const preferredData = awin?.data && typeof awin.data === 'object'
 		? (awin.data as Record<string, unknown>)
@@ -76,8 +76,8 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 	}, [imageUrl, open]);
 
 	React.useEffect(() => {
-		if (!open) {
-			setIsProcessing(false);
+		if (open) {
+			setIsProcessing(true);
 		}
 	}, [open]);
 
@@ -90,7 +90,7 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 			fullScreen={isMobile}
 			sx={{ zIndex: (muiTheme) => muiTheme.zIndex.modal + 100 }}
 		>
-			<DialogTitle sx={{ pb: 1.5, pr: 7 }}>
+			<DialogTitle sx={{  }}>
 				<IconButton
 					aria-label="close dialog"
 					onClick={onClose}
@@ -102,21 +102,10 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 				>
 					<Icon icon="cancel" />
 				</IconButton>
-				<Typography
-					variant="h4"
-					component="span"
-					sx={{
-						fontWeight: 900,
-						lineHeight: 1.15,
-						fontSize: { xs: '1.65rem', sm: '2.15rem' },
-					}}
-				>
-					{title}
-				</Typography>
 			</DialogTitle>
 			<DialogContent dividers>
 				{isProcessing ? (
-					<AwinProcess />
+					<AwinProcess awin={awin} />
 				) : (
 					<Box
 						sx={{
@@ -161,13 +150,6 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 										}}
 										onError={() => setImageMeta({ status: 'error', width: 0, height: 0 })}
 									/>
-										{/* <Typography variant="caption" color="text.secondary" sx={{ mt: 0.75, display: 'block' }}>
-											{imageMeta.status === 'loaded'
-												? `Loaded ${imageMeta.width}x${imageMeta.height}`
-												: imageMeta.status === 'error'
-													? 'Broken image link'
-													: 'Loading image...'}
-										</Typography> */}
 								</>
 							) : (
 								<Box
@@ -203,11 +185,3 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 		</Dialog>
 	);
 }
-
-
-
-/*
-<pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-	{JSON.stringify(preferredAwin, null, 2)}
-</pre>
-*/
