@@ -6,7 +6,7 @@ import { updatePractitioner } from './updatePractitioner';
 import { setFeedback } from '../../../../NX/DesignSystem'
 
 const PRACTITIONERS_TABLE = 'practitioners';
-const ACCESS_LEVEL = 2;
+const ACCESS_LEVEL = 3;
 const DEFAULT_AVATAR_URL = 'https://app.askleida.com/askleida/png/default-logo.png';
 
 type T_CreatePractitionerArgs = {

@@ -14,6 +14,7 @@ import {
 	initPractitioners,
 	usePractitioners,
 	PractitionerList,
+	MightyButton,
 } from '../../../Leida';
 
 const Practitioners = () => {
@@ -47,12 +48,16 @@ const Practitioners = () => {
 							<Typography variant="h4">
 								Practitioners
 							</Typography>
-							<Fab
+							<MightyButton
+								kind="button"
+								variant="contained"
 								color="primary"
 								onClick={handleNewPractitioner}
+								endIcon="add"
 							>
-								<Icon icon="practitioner-add" />
-							</Fab>
+								Add
+							</MightyButton>
+
 						</Box>
 					</Stack>
 				</Paper>

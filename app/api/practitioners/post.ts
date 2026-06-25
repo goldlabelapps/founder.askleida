@@ -61,6 +61,7 @@ export async function POST(req: Request) {
     : typeof rawAccessLevel === 'string' && /^[0-5]$/.test(rawAccessLevel.trim())
       ? Number(rawAccessLevel.trim())
       : undefined;
+  const defaultAccessLevel = typeof accessLevel === 'number' ? accessLevel : 3;
 
   if (!name) {
     const res = makeRes({ tenant, message: 'name is required', severity: 'error' });
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
       category,
       description,
       notes,
-      ...(typeof accessLevel === 'number' ? { access_level: accessLevel } : {}),
+      access_level: defaultAccessLevel,
     },
     ...(body.created ? { created: body.created } : {}),
     ...(body.updated ? { updated: body.updated } : {}),

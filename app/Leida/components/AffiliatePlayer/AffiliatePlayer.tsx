@@ -1,4 +1,5 @@
 import React from 'react';
+import type { T_Product } from '../Products/components/FindProduct';
 import {
     Box,
     Button,
@@ -11,17 +12,18 @@ import {
     MobileStepper,
     Typography,
     useMediaQuery,
-
+    useTheme,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { Icon } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
-import type { T_Product } from '../Products/components/FindProduct';
-import { initProducts } from '../Products/actions/initProducts';
-import { useProducts } from '../Products/hooks/useProducts';
-import { useLeidaBus } from '../../hooks/useLeida';
+import { 
+    useLeidaBus,
+    useProducts,
+    initProducts,
+    MightyButton,
+} from '../../../Leida';
 
-const CARD_HEIGHT = 420;
+const CARD_HEIGHT = 375;
 const SWIPE_THRESHOLD_PX = 50;
 
 type AffiliatePlayerProps = {
@@ -397,13 +399,13 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
                         {title}
                     </Typography>
 
-                    <Button 
-                        size="large" 
-                        variant="contained" 
-                        startIcon={<Icon icon="menu" />}
-                        onClick={handleMenuToggle}>
-                        Menu
-                    </Button>
+                    <MightyButton
+                        kind="icon"
+                        size="large"
+                        icon="menu"
+                        onClick={handleMenuToggle}
+                    />
+
                 </Box>
 
                 <Box
@@ -449,7 +451,6 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
                         </Typography>
                     </CardContent>
                 </Box>
-
                 <Menu
                     anchorEl={menuAnchorEl}
                     open={isMenuOpen}
@@ -463,7 +464,6 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
                     <MenuItem onClick={handleMenuClose}>Close</MenuItem>
                 </Menu>
             </Card>
-
             <MobileStepper
                 variant="text"
                 steps={maxSteps}
@@ -475,24 +475,33 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
                     bgcolor: 'transparent',
                 }}
                 nextButton={
-                    <Button variant="contained" size="large" onClick={handleNext} disabled={activeStep === maxSteps - 1}>
+                    <MightyButton 
+                        kind="button"
+                        endIcon="right"
+                        size="large" 
+                        onClick={handleNext} 
+                        disabled={activeStep === maxSteps - 1}    
+                    >
                         Next
-                        {theme.direction === 'rtl' ? <Icon icon="left" /> : <Icon icon="right" />}
-                    </Button>
+                    </MightyButton>
                 }
                 backButton={
-                    <Button variant="contained" size="large" onClick={handleBack} disabled={activeStep === 0}>
-                        {theme.direction === 'rtl' ? <Icon icon="right" /> : <Icon icon="left" />}
-                        Back
-                    </Button>
+                    <MightyButton 
+                        kind="button"
+                        startIcon="left"
+                        size="large" 
+                        onClick={handleBack} 
+                        disabled={activeStep === 0}    
+                    >
+                        Next
+                    </MightyButton>
                 }
             />
-
-            <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
+            {/* <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
                 {enableSwipe
                     ? 'Swipe left or right on the card'
                     : 'Use Back/Next buttons'}
-            </Typography>
+            </Typography> */}
         </Box>
     );
 };

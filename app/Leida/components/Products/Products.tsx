@@ -15,6 +15,8 @@ import {
 	setLeida,
 	useDash,
 	ListProducts,
+	MightyButton,
+	AffiliatePlayer,
 } from '../../../Leida';
 
 export default function Products() {
@@ -40,25 +42,21 @@ export default function Products() {
 							Products
 						</Typography>
 						
-						<Tooltip title={showFindProduct ? 'Hide filters' : 'Show filters'}>
-							<IconButton
-								color="primary"
-								onClick={() => setShowFindProduct((prev) => !prev)}
-								sx={{ ml: 'auto' }}
-								aria-label={showFindProduct ? 'Hide filters' : 'Show  filters'}
-							>
-								{showFindProduct ? <Icon icon="up" /> : <Icon icon="search" />}
-							</IconButton>
-						</Tooltip>
-						<Fab
+						<Box sx={{ flexGrow: 1 }} />
+						<MightyButton
+							kind="button"
+							variant="contained"
 							color="primary"
 						// onClick={handleNewPractitioner}
+							startIcon="awin"
+							endIcon="add"
 						>
-							<Icon icon="awin" />
-						</Fab>
+							Awin
+						</MightyButton>
 					</Box>
 				</Stack>
 			</Paper>
+			<AffiliatePlayer />
 			<ListProducts showFindProduct={showFindProduct} />
 		</Box>
 	);
