@@ -1,3 +1,12 @@
+import type * as React from 'react';
+import type {
+    ButtonProps,
+    FabProps,
+    IconButtonProps,
+    ListItemButtonProps,
+} from '@mui/material';
+import type { I_Icon } from '../NX/types';
+
 export type T_AwinProductData = {
     display_price?: string | null;
     merchant_name?: string | null;
@@ -73,3 +82,36 @@ export type ExampleProduct = {
 export type RenderProductsProps = {
     products?: ExampleProduct[];
 };
+
+export type MightyButtonKind = 'button' | 'icon' | 'fab' | 'listItem';
+
+type MightyButtonBaseProps = {
+    icon?: React.ReactElement | I_Icon['icon'];
+    startIcon?: I_Icon['icon'];
+    endIcon?: I_Icon['icon'];
+    size?: 'small' | 'medium' | 'large';
+    onClick?: React.MouseEventHandler<HTMLElement>;
+    children?: React.ReactNode;
+};
+
+type MightyButtonButtonProps = MightyButtonBaseProps & ButtonProps & {
+    kind?: 'button';
+};
+
+type MightyButtonIconProps = MightyButtonBaseProps & IconButtonProps & {
+    kind: 'icon';
+};
+
+type MightyButtonFabProps = MightyButtonBaseProps & FabProps & {
+    kind: 'fab';
+};
+
+type MightyButtonListItemProps = MightyButtonBaseProps & ListItemButtonProps & {
+    kind: 'listItem';
+};
+
+export type MightyButtonProps =
+    | MightyButtonButtonProps
+    | MightyButtonIconProps
+    | MightyButtonFabProps
+    | MightyButtonListItemProps;

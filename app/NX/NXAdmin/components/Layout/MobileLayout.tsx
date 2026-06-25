@@ -17,7 +17,11 @@ import {
     useNotifications,
     useLeidaAdmin,
 } from '../../../NXAdmin';    
-import { DashNav, PageRouter } from '../../../../Leida';
+import { 
+    DashNav, 
+    PageRouter,
+    MightyButton,
+} from '../../../../Leida';
 import { NAV_ROUTES, sanitizePath, getActiveFromPathname } from '../PageRouter';
 
 const FALLBACK_ADMIN_BASE_PATH = '/';
@@ -132,16 +136,13 @@ export default function MobileLayout(props: Props) {
                     zIndex: (theme) => theme.zIndex.modal + 1,
                 }}
             >
-                <Fab
-                    sx={{
-                        boxShadow: 0,
-                    }}
-                    color="secondary"
+                <MightyButton 
+                    kind="icon"
+                    icon={open ? 'close' : 'menu'}
                     aria-label={open ? 'Close NX Admin navigation' : 'Open NX Admin navigation'}
                     onClick={handleMenuClick}
-                >
-                    <Icon icon={open ? 'close' : 'menu'} />
-                </Fab>
+                />
+
             </Box>
 
             <SwipeableEdgeDrawer

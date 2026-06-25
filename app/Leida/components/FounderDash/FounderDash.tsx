@@ -3,10 +3,6 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Box,
-    ButtonBase,
-    Paper,
-    Stack,
-    Typography,
 } from '@mui/material';
 import { Icon, navigateTo } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
@@ -17,8 +13,7 @@ import {
     initPractitioners, 
     useDash,
     usePractitioners,
-    AffiliatePlayer,
-    ListProducts,
+    MightyButton,
 } from '../../../Leida';
 
 export default function FounderDash() {
@@ -30,18 +25,6 @@ export default function FounderDash() {
     const practitioners = usePractitioners();
     const didInit = React.useRef(false);
 
-    const numberOfPractitioners = Array.isArray(practitioners?.list) ? practitioners.list.length : 0;
-
-    const dashboardActions = [    
-        
-        {
-            title: 'Products',
-            description: 'Browse/manage Leida products & add from Awin',
-            icon: 'products',
-            route: '/products',
-        },
-        
-    ] as const;
     
     React.useEffect(() => {
         if (!didInit.current) {
@@ -67,12 +50,22 @@ export default function FounderDash() {
 
     return (
         <Box>
-            <AffiliatePlayer />
-            <ListProducts />
+
+            <MightyButton
+                kind="listItem"
+                icon="practitioner"
+                onClick={() => dispatch(navigateTo(router, '/practitioners'))}
+            >
+                Create and mangage practitioners
+            </MightyButton>
+
+            <MightyButton
+                kind="listItem"
+                icon="products"
+                onClick={() => dispatch(navigateTo(router, '/products'))}
+            >
+                Browse & manage Leida products & add from Awin
+            </MightyButton>
         </Box>
     );
 }
-
-/*
-
-*/
