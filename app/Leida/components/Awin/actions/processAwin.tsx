@@ -1,5 +1,5 @@
 import type { Dispatch } from 'redux';
-import type { T_AwinProduct } from '../../../../types';
+import type { T_AwinProduct } from '../../../types';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
 
 export const processAwin =
