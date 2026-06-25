@@ -1,5 +1,6 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
+import { setFeedback } from '../../../../NX/DesignSystem';
 import { setLeida } from '../../../../Leida';
 
 type T_UpdatePractitionerInput = {
@@ -78,6 +79,10 @@ export const updatePractitioner = ({ practitioner_id, key, value }: T_UpdatePrac
 			});
 
 			await dispatch(setLeida('bus', latestBus));
+			dispatch(setFeedback({
+				severity: 'success',
+				title: 'Practitioner updated successfully',
+			}))
 			dispatch(setUbereduxKey({ key: 'success', value: 'Practitioner updated successfully' }));
 
 			return json?.data;

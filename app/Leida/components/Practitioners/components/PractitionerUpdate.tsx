@@ -259,12 +259,7 @@ const PractitionerUpdate = () => {
 							>
 								<Icon icon="left" />
 							</IconButton>
-							
-							{email ? (
-								<Typography variant="caption" sx={{m:1}}>
-									{email}
-								</Typography>
-							) : null}
+
 							<Box sx={{ flexGrow: 1 }} />
 							<IconButton 
 								color="primary"
@@ -348,9 +343,12 @@ const PractitionerUpdate = () => {
 									sm: 8,
 								}} sx={{ order: { xs: 2, sm: 1 } }}>
 									<Stack spacing={2} sx={{m:2}}>
-										<Typography variant="caption" color="text.secondary" sx={{ px: 1 }}>
-											Access level: {accessLevelLabel}
-										</Typography>
+
+												<Typography variant="caption" color="text.secondary">
+													{email ? `${email}` : 'No email provided'},
+													Access level <strong>{accessLevelLabel}</strong>
+												</Typography>
+										
 										<Editable
 											placeholder="Name"
 											value={displayName}
@@ -358,6 +356,9 @@ const PractitionerUpdate = () => {
 											onChange={setDisplayName}
 											startAdornment="user"
 										/>
+
+										
+										
 										<Editable
 											placeholder="Clinic"
 											value={clinic}
@@ -365,13 +366,31 @@ const PractitionerUpdate = () => {
 											onChange={setClinic}
 											startAdornment="medical"
 										/>
-									<Editable
-										placeholder="Website"
-										value={website}
-										variant="outlined"
-										onChange={setWebsite}
-										startAdornment="link"
-									/>
+										
+										<Editable
+											placeholder="Website"
+											value={website}
+											variant="outlined"
+											onChange={setWebsite}
+											startAdornment="link"
+										/>
+
+										<Collapse
+											in={canSave || savingDisplayName}
+											orientation="vertical"
+											unmountOnExit>
+											<Button
+												fullWidth
+												variant="contained"
+												startIcon={<Icon icon="save" />}
+												color="primary"
+												onClick={handleSaveDisplayName}
+												disabled={savingDisplayName || !canSave}
+												sx={{ pointerEvents: 'auto' }}
+											>
+												{savingDisplayName ? 'Saving...' : 'Save'}
+											</Button>
+										</Collapse>
 									</Stack>
 								</Grid>
 							</Grid>
@@ -385,49 +404,11 @@ const PractitionerUpdate = () => {
 			<ConfirmAction
 				open={confirmOpen}
 				icon="delete"
-				title="Delete Practitioner"
-				body="Are you sure you want to delete this practitioner? This action cannot be undone."
+				title={`Delete ${displayName}?`}
+				// body={`This action cannot be undone.`}
 				handleConfirm={handleConfirmDelete}
 				handleClose={handleCloseConfirm}
-			/>
-
-			<Box
-				sx={{
-					position: 'fixed',
-					left: 0,
-					right: 0,
-					bottom: 0,
-					zIndex: (theme) => theme.zIndex.appBar + 123,
-					// borderTop: 1,
-					// borderColor: 'divider',
-					// backgroundColor: 'background.paper',
-					px: 2,
-					py: 1.5,
-					pb: 'calc(12px + env(safe-area-inset-bottom))',
-					pointerEvents: 'none',
-				}}
-			>
-				
-					<Collapse 
-						in={canSave || savingDisplayName} 
-						orientation="vertical" 
-						unmountOnExit>
-						<Button
-							fullWidth
-							variant="contained"
-							startIcon={<Icon icon="save" />}
-							color="primary"
-							onClick={handleSaveDisplayName}
-							disabled={savingDisplayName || !canSave}
-							sx={{ pointerEvents: 'auto' }}
-						>
-							{savingDisplayName ? 'Saving...' : 'Save'}
-						</Button>
-					</Collapse>
-			</Box>
-
-			{/* <pre>{JSON.stringify({ email, displayName, clinic, accessLevel }, null, 2)}</pre> */}
-		
+			/>		
 		</Box>
 	);
 };
