@@ -69,7 +69,6 @@ export default function FounderDash() {
         <Box>
             <AffiliatePlayer />
             <ListProducts />
-            
         </Box>
     );
 }

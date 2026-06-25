@@ -15,19 +15,40 @@ import type {
 	ListItemButtonProps,
 } from '@mui/material';
 import type { I_Icon } from '../../../NX/types';
-import Icon from '../../../NX/DesignSystem/components/Icon';
+import {Icon} from '../../../NX/DesignSystem';
 
 export type MightyButtonKind = 'button' | 'icon' | 'fab' | 'listItem';
 
-export type MightyButtonProps = Partial<ButtonProps> &
-	Partial<FabProps> &
-	Partial<IconButtonProps> &
-	Partial<ListItemButtonProps> & {
-	kind?: MightyButtonKind;
+type MightyButtonBaseProps = {
 	icon?: React.ReactElement | I_Icon['icon'];
+	startIcon?: I_Icon['icon'];
+	endIcon?: I_Icon['icon'];
+	size?: 'small' | 'medium' | 'large';
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	children?: React.ReactNode;
 };
+
+type MightyButtonButtonProps = MightyButtonBaseProps & ButtonProps & {
+	kind: 'button';
+};
+
+type MightyButtonIconProps = MightyButtonBaseProps & IconButtonProps & {
+	kind: 'icon';
+};
+
+type MightyButtonFabProps = MightyButtonBaseProps & FabProps & {
+	kind: 'fab';
+};
+
+type MightyButtonListItemProps = MightyButtonBaseProps & ListItemButtonProps & {
+	kind: 'listItem';
+};
+
+export type MightyButtonProps =
+	| MightyButtonButtonProps
+	| MightyButtonIconProps
+	| MightyButtonFabProps
+	| MightyButtonListItemProps;
 
 const renderIcon = (icon: MightyButtonProps['icon']) => {
 	if (!icon) return null;
@@ -36,6 +57,8 @@ const renderIcon = (icon: MightyButtonProps['icon']) => {
 	return <Icon icon={icon} />;
 };
 
+const renderNamedIcon = (icon?: I_Icon['icon']) => (icon ? <Icon icon={icon} /> : undefined);
+
 const MightyButton = ({
 	kind = 'button',
 	icon,
@@ -43,15 +66,18 @@ const MightyButton = ({
 	children,
 	startIcon,
 	endIcon,
+	size = 'large',
 	...props
 }: MightyButtonProps) => {
 	const resolvedIcon = renderIcon(icon);
+	const resolvedStartIcon = renderNamedIcon(startIcon) ?? (resolvedIcon && !endIcon ? resolvedIcon : undefined);
+	const resolvedEndIcon = renderNamedIcon(endIcon);
 
 	if (kind === 'icon') {
 		const iconButtonProps = props as IconButtonProps;
 
 		return (
-			<IconButton {...iconButtonProps} onClick={onClick}>
+			<IconButton {...iconButtonProps} size={size} onClick={onClick}>
 				{resolvedIcon || children}
 			</IconButton>
 		);
@@ -61,7 +87,7 @@ const MightyButton = ({
 		const fabProps = props as FabProps;
 
 		return (
-			<Fab {...fabProps} onClick={onClick}>
+			<Fab {...fabProps} size={size} onClick={onClick}>
 				{resolvedIcon || children}
 			</Fab>
 		);
@@ -79,14 +105,14 @@ const MightyButton = ({
 	}
 
 	const buttonProps = props as ButtonProps;
-	const resolvedStartIcon = startIcon ?? (resolvedIcon && !endIcon ? resolvedIcon : undefined);
 
 	return (
 		<Button
 			{...buttonProps}
+			size={size}
 			onClick={onClick}
 			startIcon={resolvedStartIcon}
-			endIcon={endIcon}
+			endIcon={resolvedEndIcon}
 		>
 			{children}
 		</Button>
