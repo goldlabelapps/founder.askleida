@@ -2,8 +2,8 @@
 import * as React from 'react';
 import {
 	Box,
+	CircularProgress,
 	IconButton,
-	LinearProgress,
 	Menu,
 	MenuItem,
 	Pagination,
@@ -145,9 +145,6 @@ export default function Query() {
 
 			setLoading(true);
 			setError(null);
-			await dispatch(setAwin('rows', []));
-			await dispatch(setAwin('products', []));
-			await dispatch(setAwin('scanned', 0));
 
 			try {
 				const res = await fetch(route, {
@@ -204,21 +201,9 @@ export default function Query() {
 
 	return (
 		<>
-            <Box sx={{ height: 8 }}>
-				{loading ? <LinearProgress /> : null}
-            </Box>  
-			{!loading ? (
-				<>
+			<>
 					<Stack direction="row" justifyContent="center">
-						<Box sx={{ mt: 1 }}>
-							<Pagination
-								page={page}
-								count={totalPages}
-								color="primary"
-								shape="rounded"
-								onChange={(_event, value) => setPage(value)}
-							/>
-						</Box>
+						
 						<Box sx={{ mt: 0.5 }}>
 							<IconButton
 								size="small"
@@ -319,12 +304,26 @@ export default function Query() {
 							</MenuItem>
 						))}
 					</Menu>
-				</>
-			) : null}
+			</>
+
+			<Box sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}>
+				<Pagination
+					page={page}
+					count={totalPages}
+					color="primary"
+					shape="rounded"
+					onChange={(_event, value) => setPage(value)}
+				/>
+			</Box>
                 
-                <Typography variant="caption" align="center">
-                    {statusMessage}
-                </Typography>
+				<Stack direction="row" spacing={0.75} alignItems="center" justifyContent="center">
+					{loading ? <CircularProgress size={12} thickness={6} /> : null}
+					<Typography variant="caption" align="center">
+						{statusMessage}
+					</Typography>
+				</Stack>
+
+				
                 
 				{error ? (
 					<Typography variant="body2" color="error.main">

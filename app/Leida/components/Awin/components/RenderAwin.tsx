@@ -61,7 +61,7 @@ function renderHighlightedText(text: string, query: string) {
 				<Box
 					component="mark"
 					key={`hl_${index}`}
-					sx={{ backgroundColor: 'warning.light', color: 'inherit', px: 0.25 }}
+					sx={{ backgroundColor: 'warning.light', color: 'common.white', px: 0.25 }}
 				>
 					{part}
 				</Box>
