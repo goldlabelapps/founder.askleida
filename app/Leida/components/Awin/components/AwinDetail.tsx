@@ -104,6 +104,7 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 				</IconButton>
 				<Typography
 					variant="h4"
+					component="span"
 					sx={{
 						fontWeight: 900,
 						lineHeight: 1.15,
