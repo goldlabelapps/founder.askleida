@@ -54,6 +54,7 @@ import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRo
 import { saveSupabaseRecord } from './components/Supabase/actions/saveSupabaseRecord';
 import { initAwin } from './components/Awin/actions/initAwin';
 import { setAwin } from './components/Awin/actions/setAwin';
+import { processAwin } from './components/Awin/actions/processAwin';
 import { initProducts } from './components/Products/actions/initProducts';
 import { setProducts } from './components/Products/actions/setProducts';
 import { initClaude } from './components/Claude/actions/initClaude';
@@ -123,6 +124,7 @@ export {
     initAwin,
     initProducts,
     initClaude,
+    processAwin,
     fetchLeida,
     fetchSupabaseRows,
     setLeida,
