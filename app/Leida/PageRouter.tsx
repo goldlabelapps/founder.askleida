@@ -13,6 +13,7 @@ import {
   Awin,
   PractitionerNew,
   Products,
+  LeidaFlash,
 } from '../Leida';
 
 interface I_PageRouter {
@@ -23,25 +24,14 @@ export function PageRouter({ active }: I_PageRouter) {
   const pathname = usePathname();
   const normalizedRoute = (pathname || active || '').trim().replace(/^\/+|\/+$/g, '');
   if (!normalizedRoute) return <FounderDash />;
-
   if (normalizedRoute === 'practitioners/new') return <PractitionerNew />;
-  // if (normalizedRoute === 'products/new') return <ProductNew />;
-
   const practitionerDetailMatch = normalizedRoute.match(/^(practitioners|pracitioners|paractitioners)\/([^/]+)$/);
   if (practitionerDetailMatch) {
     const practitionerId = practitionerDetailMatch[2]?.toLowerCase();
     if (practitionerId === 'new') return <PractitionerNew />;
     return <PractitionerUpdate />;
   }
-
   if (['practitioners', 'pracitioners', 'paractitioners'].includes(normalizedRoute)) return <Practitioners />;
-
-  // const productDetailMatch = normalizedRoute.match(/^products\/([^/]+)$/);
-  // if (productDetailMatch) {
-  //   const productId = productDetailMatch[1]?.toLowerCase();
-  //   if (productId === 'new') return <ProductNew />;
-  //   return <ProductUpdate />;
-  // }
 
   switch (normalizedRoute) {
     case 'supabase':
@@ -56,6 +46,8 @@ export function PageRouter({ active }: I_PageRouter) {
       return <AwinSearch />;
     case 'claude':
       return <Claude />;
+    case 'flash':
+      return <LeidaFlash />;
     case 'products':
       return <Products />;
     default:

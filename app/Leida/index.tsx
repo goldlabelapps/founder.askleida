@@ -23,6 +23,7 @@ import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
 import { AffiliatePlayer } from './components/AffiliatePlayer';
 import MightyButton from './components/MightyButton/MightyButton';
+import { LeidaFlash } from './components/LeidaFlash';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
 import { PractitionerList, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners, usePractitioners } from './components/Practitioners';
@@ -91,6 +92,7 @@ export {
     FindProduct,
     AffiliatePlayer,
     MightyButton,
+    LeidaFlash,
     Claude,
     ClaudePopup,
     PractitionerList,

@@ -14,6 +14,7 @@ import {
     useDash,
     usePractitioners,
     MightyButton,
+    LeidaFlash,
 } from '../../../Leida';
 
 export default function FounderDash() {
@@ -50,7 +51,7 @@ export default function FounderDash() {
 
     return (
         <Box>
-
+            <LeidaFlash />
             <MightyButton
                 kind="listItem"
                 icon="practitioner"

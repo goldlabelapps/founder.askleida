@@ -23,5 +23,11 @@ export const navItems: DashNavItem[] = [
     icon: 'products',
     route: '/products',
     activeRoutes: ['/products'],
+  },
+  {
+    label: 'Flash',
+    icon: 'flash',
+    route: '/flash',
+    activeRoutes: ['/flash'],
   }
 ];
