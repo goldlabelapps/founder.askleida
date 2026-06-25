@@ -69,7 +69,12 @@ function getCategoryLabel(product: T_Product): string | null {
 	return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
-const RenderProduct = ({ product, onAddToCart, addingToCart = false, viewMode = 'card' }: T_RenderProductProps) => {
+const RenderProduct = ({
+	product,
+	onAddToCart,
+	addingToCart = false,
+	viewMode = 'card',
+}: T_RenderProductProps) => {
 	const [added, setAdded] = React.useState(false);
 
 	const name = getName(product);
@@ -88,9 +93,12 @@ const RenderProduct = ({ product, onAddToCart, addingToCart = false, viewMode = 
 	if (viewMode === 'list') {
 		return (
 			<Card variant="outlined">
-				<ListItemButton sx={{ alignItems: 'flex-start'}}>
+				<ListItemButton
+					sx={{ alignItems: 'flex-start'}}
+					onClick={() => { void handleAddToCart(); }}
+				>
 					<ListItemText 
-						primary={name}
+						primary={<Typography variant="caption">{name}</Typography>}
 						// secondary={"description"}
 					/>
 				</ListItemButton>
@@ -99,7 +107,16 @@ const RenderProduct = ({ product, onAddToCart, addingToCart = false, viewMode = 
 	}
 
 	return (
-		<Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+		<Card
+			variant="outlined"
+			onClick={() => { void handleAddToCart(); }}
+			sx={{
+				height: '100%',
+				display: 'flex',
+				flexDirection: 'column',
+				cursor: onAddToCart ? 'pointer' : 'default',
+			}}
+		>
 			{imageUrl ? (
 				<CardMedia
 					component="img"

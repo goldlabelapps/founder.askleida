@@ -28,6 +28,7 @@ const SWIPE_THRESHOLD_PX = 50;
 
 type AffiliatePlayerProps = {
     products?: T_Product[];
+    selectedProduct?: T_Product | null;
 };
 
 type T_Record = Record<string, unknown>;
@@ -260,7 +261,26 @@ const getMerchantLink = (product: T_Product | undefined): string => {
     return normalizeUrl(deepLink);
 };
 
-const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
+const getProductIdentity = (product: T_Product | undefined): string => {
+    if (!product) return '';
+
+    return pickFirstText(product, [
+        'id',
+        'unique_key',
+        'aw_product_id',
+        'merchant_product_id',
+        'ean',
+        'name',
+        'title',
+        'product_name',
+        'data.id',
+        'data.unique_key',
+        'data.aw_product_id',
+        'data.merchant_product_id',
+    ]);
+};
+
+const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products, selectedProduct = null }) => {
     const dispatch = useDispatch();
     const theme = useTheme();
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));
@@ -305,6 +325,21 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
             setActiveStep(Math.max(0, maxSteps - 1));
         }
     }, [activeStep, maxSteps]);
+
+    React.useEffect(() => {
+        if (!selectedProduct || productsData.length === 0) return;
+
+        const selectedIdentity = getProductIdentity(selectedProduct);
+        const selectedIndex = productsData.findIndex((product) => {
+            if (product === selectedProduct) return true;
+            if (!selectedIdentity) return false;
+            return getProductIdentity(product) === selectedIdentity;
+        });
+
+        if (selectedIndex >= 0 && selectedIndex !== activeStep) {
+            setActiveStep(selectedIndex);
+        }
+    }, [selectedProduct, productsData, activeStep]);
 
     const handleNext = () => {
         setActiveStep((prev) => Math.min(prev + 1, maxSteps - 1));
@@ -395,10 +430,8 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
                         gap: 1,
                     }}
                 >
-                    <Typography variant="h6">
-                        {title}
-                    </Typography>
-
+                    <Box sx={{ flexGrow: 1 }} />
+                    
                     <MightyButton
                         kind="icon"
                         size="large"
@@ -417,38 +450,53 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products }) => {
                         flexDirection: 'row',
                     }}
                 >
-                    <CardMedia
-                        component="img"
-                        image={imageUrl}
-                        alt={title}
-                        sx={{
-                            width: '25%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            bgcolor: 'grey.100',
-                        }}
-                    />
+                    
 
                     <CardContent
                         sx={{
-                            width: '75%',
+                            width: '100%',
                             flexGrow: 1,
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 1,
+                            minHeight: 0,
                         }}
                     >
-                        <Typography variant="body2">
-                            {description || 'No description available.'}
+                        <Typography variant="h6">
+                            {title}
                         </Typography>
 
                         <Chip label={category} size="small" sx={{ alignSelf: 'flex-start' }} />
 
-                        <Typography variant="caption" sx={{ mt: 'auto' }}>
+                        <Box
+                            sx={{
+                                height: 170,
+                                overflowY: 'auto',
+                                overflowX: 'hidden',
+                                p: 1.25,
+                                borderRadius: 1,
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                bgcolor: 'background.default',
+                            }}
+                        >
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    whiteSpace: 'pre-line',
+                                    color: 'text.secondary',
+                                    lineHeight: 1.55,
+                                }}
+                            >
+                                {description || 'No description available.'}
+                            </Typography>
+                        </Box>
+
+                        {/* <Typography variant="caption" sx={{ mt: 'auto' }}>
                             {merchantLink
                                 ? 'Use the toggle to open the product menu'
                                 : 'No product link available'}
-                        </Typography>
+                        </Typography> */}
                     </CardContent>
                 </Box>
                 <Menu
