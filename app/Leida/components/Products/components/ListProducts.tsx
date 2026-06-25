@@ -12,17 +12,23 @@ import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	FindProduct,
 	initProducts,
-	RenderProduct,
 	useLeidaBus,
 	useProducts,
 } from '../../../../Leida';
+import RenderProduct from './RenderProduct';
 import type { T_Product } from './FindProduct';
 
 type T_ListProductsProps = {
 	showFindProduct?: boolean;
+	onVisibleProductsChange?: (products: T_Product[]) => void;
+	onProductSelect?: (product: T_Product) => void;
 };
 
-const ListProducts = ({ showFindProduct = true }: T_ListProductsProps) => {
+const ListProducts = ({
+	showFindProduct = true,
+	onVisibleProductsChange,
+	onProductSelect,
+}: T_ListProductsProps) => {
 
 	const dispatch = useDispatch();
 	const productsSlice = useProducts();
@@ -50,6 +56,10 @@ const ListProducts = ({ showFindProduct = true }: T_ListProductsProps) => {
 	React.useEffect(() => {
 		setVisibleProducts(sourceProducts);
 	}, [sourceProducts]);
+
+	React.useEffect(() => {
+		onVisibleProductsChange?.(visibleProducts);
+	}, [visibleProducts, onVisibleProductsChange]);
 
 	const loading = Boolean(productsSlice?.loading) || Boolean(bus?.loading);
 	const error = typeof productsSlice?.error === 'string' && productsSlice.error
@@ -79,7 +89,11 @@ const ListProducts = ({ showFindProduct = true }: T_ListProductsProps) => {
 
 						return (
 							<Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
-								<RenderProduct product={product} viewMode="card" />
+								<RenderProduct
+									product={product}
+									viewMode="card"
+									onAddToCart={onProductSelect}
+								/>
 							</Grid>
 						);
 					})}
@@ -93,7 +107,11 @@ const ListProducts = ({ showFindProduct = true }: T_ListProductsProps) => {
 
 						return (
 							<Box key={key}>
-								<RenderProduct product={product} viewMode="list" />
+								<RenderProduct
+									product={product}
+									viewMode="list"
+									onAddToCart={onProductSelect}
+								/>
 							</Box>
 						);
 					})}
