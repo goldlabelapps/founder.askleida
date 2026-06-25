@@ -25,7 +25,6 @@ export default function FounderDash() {
     const dash = useDash();
     const practitioners = usePractitioners();
     const didInit = React.useRef(false);
-
     
     React.useEffect(() => {
         if (!didInit.current) {
@@ -33,12 +32,6 @@ export default function FounderDash() {
             didInit.current = true;
         }
     }, [dispatch, leida]);
-
-    React.useEffect(() => {
-        if (typeof practitioners === 'undefined') {
-            dispatch(initPractitioners());
-        }
-    }, [dispatch, practitioners]);
 
     React.useEffect(() => {
         if (dash && dash.title) {
@@ -51,13 +44,12 @@ export default function FounderDash() {
 
     return (
         <Box>
-            <LeidaFlash />
             <MightyButton
                 kind="listItem"
                 icon="practitioner"
                 onClick={() => dispatch(navigateTo(router, '/practitioners'))}
             >
-                Create and mangage practitioners
+                Create & mangage practitioners
             </MightyButton>
 
             <MightyButton

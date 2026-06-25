@@ -1,7 +1,5 @@
 const loadingMessages = [
-	'Herding pandas...',
-    'Authorise Yoself...',
-    'Counting sheep...',
+	'loading...',
 ];
 
 const getRandomLoadingMessage = () => {

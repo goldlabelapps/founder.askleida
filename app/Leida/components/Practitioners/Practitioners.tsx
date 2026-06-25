@@ -45,7 +45,7 @@ const Practitioners = () => {
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Stack spacing={2}>
 						<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-							<Typography variant="h4">
+							<Typography variant="h5">
 								Practitioners
 							</Typography>
 							<MightyButton
