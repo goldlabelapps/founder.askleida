@@ -13,10 +13,6 @@ import DashAuth from './components/FounderDash/components/DashAuth';
 import Awin from './components/Awin/Awin';
 import AwinDetail from './components/Awin/components/AwinDetail';
 import AwinProcess from './components/Awin/components/AwinProcess';
-import AwinSearch from './components/Awin/components/AwinSearch';
-import ListAwin from './components/Awin/components/ListAwin';
-import Query from './components/Awin/components/Query';
-import RenderAwin from './components/Awin/components/RenderAwin';
 import Products from './components/Products/Products';
 import Queue from './components/Products/components/Queue';
 import ListProducts from './components/Products/components/ListProducts';
@@ -75,6 +71,8 @@ import { toHumanDateLabel } from './lib/toHumanDateLabel';
 import { textFieldSx } from './lib/textFieldSx';
 import { selectMenuItemSx } from './lib/selectMenuItemSx';
 
+const AwinSearch = Awin;
+
 export {
     // Components
     PageRouter,
@@ -89,9 +87,6 @@ export {
     AwinDetail,
     AwinProcess,
     AwinSearch,
-    ListAwin,
-    Query,
-    RenderAwin,
     Products,
     Queue,
     ListProducts,
