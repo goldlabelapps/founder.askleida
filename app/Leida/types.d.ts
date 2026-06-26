@@ -36,6 +36,13 @@ export type T_AwinProduct = {
 
 export type T_AwinOrderBy = 'created_at' | 'id' | 'product_name' | 'category_name' | 'search_price' | 'brand';
 
+export type T_AwinProcessDecision = 'queue' | 'delete';
+
+export type T_AwinProcessedPayload = {
+    decision: T_AwinProcessDecision;
+    awin: T_AwinProduct;
+};
+
 export interface I_ListAwin {
     products: T_AwinProduct[];
     query?: string;
@@ -56,6 +63,7 @@ export interface I_AwinDetail {
     open: boolean;
     awin?: T_AwinProduct | null;
     onClose: () => void;
+    onProcessed?: (payload: T_AwinProcessedPayload) => void | Promise<void>;
 }
 
 export type Product = {

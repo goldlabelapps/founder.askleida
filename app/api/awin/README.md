@@ -7,6 +7,7 @@ This folder exposes server-side proxy routes for AWIN data under:
 - `/api/awin/lookfantastic/products`
 - `/api/awin/lookfantastic/feed`
 - `/api/awin/lookfantastic/save`
+- `/api/awin/lookfantastic/queue`
 - `/api/awin/lookfantastic/sync`
 - `/api/awin/lookfantastic/ingest`
 
@@ -267,6 +268,51 @@ Example:
 
 ```bash
 curl "http://localhost:3000/api/awin/lookfantastic/sync"
+```
+
+## 6b) Queue Product Decision Route
+
+`POST /api/awin/lookfantastic/queue`
+
+Purpose:
+
+- Creates a row in `public.product_queue` recording a product decision.
+- Supports two decisions:
+  - `queue` (add to processing queue)
+  - `delete` (record delete decision and delete the matching row from `awin_lookfantastic`)
+
+Required body fields:
+
+- `practitioner_id` (string, uuid)
+- `decision` (`queue` or `delete`)
+- `awinProduct` (object)
+
+Identifier preference for `delete` source-row matching:
+
+- `id`
+- `unique_key`
+- `aw_product_id`
+- `merchant_product_id`
+
+Duplicate guard behavior:
+
+- A pending entry is treated as idempotent for the same practitioner + source product + decision.
+- If the same pending decision already exists, the route returns success with `existingPending: true` and the existing queue row.
+
+Example:
+
+```bash
+curl -X POST "http://localhost:3000/api/awin/lookfantastic/queue" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "practitioner_id": "00000000-0000-0000-0000-000000000000",
+    "decision": "queue",
+    "awinProduct": {
+      "id": "12345",
+      "product_name": "Sample Product",
+      "aw_product_id": "AW-123"
+    }
+  }'
 ```
 
 ## 7) Lookfantastic Feed Ingest Route

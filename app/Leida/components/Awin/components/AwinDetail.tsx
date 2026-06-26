@@ -34,7 +34,7 @@ function getString(value: unknown): string {
 	return typeof value === 'string' ? value : '';
 }
 
-export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
+export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinDetail) {
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const [imageMeta, setImageMeta] = React.useState<T_ImageMeta>(INITIAL_IMAGE_META);
@@ -87,7 +87,7 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 			onClose={onClose}
 			maxWidth="md"
 			fullWidth
-			fullScreen={isMobile}
+			fullScreen={true}
 			sx={{ zIndex: (muiTheme) => muiTheme.zIndex.modal + 100 }}
 		>
 			<DialogTitle sx={{  }}>
@@ -105,7 +105,13 @@ export default function AwinDetail({ open, awin, onClose }: I_AwinDetail) {
 			</DialogTitle>
 			<DialogContent dividers>
 				{isProcessing ? (
-					<AwinProcess awin={awin} />
+					<AwinProcess
+						awin={awin}
+						onProcessed={async (payload) => {
+							await onProcessed?.(payload);
+							onClose();
+						}}
+					/>
 				) : (
 					<Box
 						sx={{
