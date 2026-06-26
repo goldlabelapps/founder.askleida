@@ -4,7 +4,7 @@ import {
 	Alert,
 	Box,
 	Button,
-	Paper,
+	CircularProgress,
 	Stack,
 	Stepper,
 	Step,
@@ -12,11 +12,13 @@ import {
 	Typography,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
-import type { T_AwinProduct } from '../../../types';
+import { usePaywall } from '../../../../NX/Paywall';
+import type { T_AwinProcessDecision, T_AwinProduct } from '../../../types';
 import { processAwin } from '../actions/processAwin';
 
 type AwinProcessProps = {
 	awin?: T_AwinProduct | null;
+	onProcessed?: (payload: { decision: T_AwinProcessDecision; awin: T_AwinProduct }) => void | Promise<void>;
 };
 
 function asText(value: unknown): string {
@@ -34,19 +36,51 @@ function inferPrice(product: T_AwinProduct): string {
 	return '';
 }
 
-export default function AwinProcess({ awin = null }: AwinProcessProps) {
+export default function AwinProcess({ awin = null, onProcessed }: AwinProcessProps) {
 	const dispatch = useDispatch();
+	const paywall = usePaywall();
 	const steps = ['Confirm product'];
 	const productName = awin ? asText(awin.product_name) || 'Untitled product' : '';
 	const category = awin ? asText(awin.category_name) : '';
 	const price = awin ? inferPrice(awin) : '';
 	const currency = awin ? asText(awin.currency) || 'GBP' : 'GBP';
+	const [loadingDecision, setLoadingDecision] = React.useState<T_AwinProcessDecision | null>(null);
+	const [error, setError] = React.useState<string>('');
+	const [success, setSuccess] = React.useState<string>('');
 
-	const handleProcess = () => {
+	const practitionerId = asText(paywall?.uid) || asText(paywall?.user?.uid);
+
+	const handleProcess = async (decision: T_AwinProcessDecision) => {
 		if (!awin) {
 			return;
 		}
-		dispatch(processAwin(awin));
+
+		if (!practitionerId) {
+			setError('Practitioner ID is required before processing.');
+			return;
+		}
+
+		setError('');
+		setSuccess('');
+		setLoadingDecision(decision);
+
+		const result = await dispatch(
+			processAwin({
+				awin,
+				decision,
+				practitionerId,
+			}) as any,
+		);
+
+		setLoadingDecision(null);
+
+		if (!result?.ok) {
+			setError(typeof result?.error === 'string' ? result.error : 'Failed to process product.');
+			return;
+		}
+
+		setSuccess(decision === 'queue' ? 'Added to processing queue.' : 'Deleted from AWIN source list.');
+		await onProcessed?.({ decision, awin });
 	};
 
 	return (
@@ -63,7 +97,7 @@ export default function AwinProcess({ awin = null }: AwinProcessProps) {
 
 					<Stack spacing={1.25}>
 						<Typography variant="body1" sx={{ }}>
-							Step 1: Confirm this is the product you want to process
+							Step 1: Add to processing queue?
 						</Typography>
 
 						{awin ? (
@@ -86,13 +120,26 @@ export default function AwinProcess({ awin = null }: AwinProcessProps) {
 							<Alert severity="warning">No product selected for processing.</Alert>
 						)}
 
-						<Button
-							variant="contained"
-							onClick={handleProcess}
-							disabled={!awin}
-						>
-							Yes
-						</Button>
+						{error ? <Alert severity="error">{error}</Alert> : null}
+						{success ? <Alert severity="success">{success}</Alert> : null}
+
+						<Stack direction="row" spacing={1}>
+							<Button
+								variant="contained"
+								onClick={() => handleProcess('queue')}
+								disabled={!awin || Boolean(loadingDecision)}
+							>
+								{loadingDecision === 'queue' ? <CircularProgress size={18} color="inherit" /> : 'Yes'}
+							</Button>
+							<Button
+								variant="outlined"
+								color="error"
+								onClick={() => handleProcess('delete')}
+								disabled={!awin || Boolean(loadingDecision)}
+							>
+								{loadingDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : 'No, Delete'}
+							</Button>
+						</Stack>
 					</Stack>
 
 			</Stack>

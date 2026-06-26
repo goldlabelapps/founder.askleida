@@ -1,6 +1,8 @@
 'use client';
 import * as React from 'react';
 import {
+    Badge,
+    Box,
   ListItem,
   ListItemButton,
   ListItemIcon,
@@ -20,9 +22,10 @@ export default function MiniListItem({
     onClick: (route?: string) => void;
   options: {
     label: string;
-        icon?: string;
+    icon?: string;
     route?: string;
-        nested?: boolean;
+    nested?: boolean;
+    badgeContent?: number;
   }
 }) {
 
@@ -31,6 +34,7 @@ export default function MiniListItem({
         label = 'Dashboard',
         route,
         nested = false,
+        badgeContent,
     } = options;
 
   return (
@@ -57,13 +61,23 @@ export default function MiniListItem({
               )}
               <ListItemText
                   primary={
-                      <Typography
-                            variant="body2"
-                          color={selected ? 'text.primary' : 'text.secondary'}
-                          sx={{ ml: nested ? 3 : 0 }}
-                      >
-                          {label}
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                          <Typography
+                                variant="body2"
+                              color={selected ? 'text.primary' : 'text.secondary'}
+                              sx={{ ml: nested ? 3 : 0 }}
+                          >
+                              {label}
+                          </Typography>
+                          {typeof badgeContent === 'number' ? (
+                              <Badge
+                                  badgeContent={badgeContent}
+                                  color="primary"
+                                  max={999}
+                                  sx={{ mr: 1.5 }}
+                              />
+                          ) : null}
+                      </Box>
                   }
                   sx={[
                       open ? { opacity: 1 } : { opacity: 0 },
