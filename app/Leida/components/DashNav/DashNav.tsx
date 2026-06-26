@@ -8,6 +8,8 @@ import {
 import { useDispatch } from '../../../NX/Uberedux';
 import { MiniListItem } from '../../../NX/NXAdmin';
 import { useLeidaBus } from '../../hooks/useLeida';
+import { useAwin } from '../Awin/hooks/useAwin';
+import { initAwin } from '../Awin/actions/initAwin';
 import { initQueue } from '../Products/actions/initQueue';
 import { LoggedInAs } from './components/index';
 import { navItems, type DashNavItem } from './navItems';
@@ -21,9 +23,11 @@ export default function DashNav({
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
+  const awin = useAwin();
   const queueBus = useLeidaBus('/api/products/queue');
 
   React.useEffect(() => {
+    dispatch(initAwin());
     dispatch(initQueue());
   }, [dispatch]);
 
@@ -61,6 +65,12 @@ export default function DashNav({
     return queueBus.data.length;
   }, [queueBus?.data]);
 
+  const awinCount = React.useMemo(() => {
+    if (typeof awin?.count === 'number') return awin.count;
+    if (Array.isArray(awin?.products)) return awin.products.length;
+    return 0;
+  }, [awin?.count, awin?.products]);
+
   const renderItem = React.useCallback((item: DashNavItem, nested = false) => (
     <React.Fragment key={item.route}>
       <MiniListItem
@@ -72,13 +82,17 @@ export default function DashNav({
           icon: item.icon,
           route: item.route,
           nested,
-          badgeContent: item.route === '/products/queue' ? queueCount : undefined,
+          badgeContent: item.route === '/products/queue'
+            ? queueCount
+            : item.route === '/awin'
+              ? awinCount
+              : undefined,
         }}
       />
       {item.children?.map((child) => renderItem(child, true))}
       {!nested ? <Divider /> : null}
     </React.Fragment>
-  ), [isRouteActive, navigateToRoute, open, queueCount]);
+  ), [awinCount, isRouteActive, navigateToRoute, open, queueCount]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>

@@ -1,6 +1,7 @@
 import type { Dispatch } from 'redux';
 import type { T_AwinProcessDecision, T_AwinProduct } from '../../../types';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
+import { fetchLeida } from '../../../actions/fetchLeida';
 
 export const processAwin =
 	({
@@ -32,6 +33,10 @@ export const processAwin =
 				if (!res.ok) {
 					const message = json?.message || `Failed to process AWIN product (${res.status})`;
 					throw new Error(message);
+				}
+
+				if (decision === 'queue') {
+					await dispatch(fetchLeida('/api/products/queue'));
 				}
 
 				return {
