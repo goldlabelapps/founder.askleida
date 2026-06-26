@@ -18,6 +18,7 @@ import ListAwin from './components/Awin/components/ListAwin';
 import Query from './components/Awin/components/Query';
 import RenderAwin from './components/Awin/components/RenderAwin';
 import Products from './components/Products/Products';
+import Queue from './components/Products/components/Queue';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
@@ -38,6 +39,7 @@ import { useLeida, useLeidaBus } from './hooks/useLeida';
 import { useFounderAccess } from './hooks/useFounderAccess';
 import { useAwin } from './components/Awin/hooks/useAwin';
 import { useProducts } from './components/Products/hooks/useProducts';
+import { useQueue } from './components/Products/hooks/useQueue';
 import { useClaude } from './components/Claude/hooks/useClaude';
 
 // Actions
@@ -56,7 +58,10 @@ import { initAwin } from './components/Awin/actions/initAwin';
 import { setAwin } from './components/Awin/actions/setAwin';
 import { processAwin } from './components/Awin/actions/processAwin';
 import { initProducts } from './components/Products/actions/initProducts';
+import { initQueue } from './components/Products/actions/initQueue';
+import { fetchQueue } from './components/Products/actions/fetchQueue';
 import { setProducts } from './components/Products/actions/setProducts';
+import { setQueue } from './components/Products/actions/setQueue';
 import { initClaude } from './components/Claude/actions/initClaude';
 import { setClaude } from './components/Claude/actions/setClaude';
 import { submitClaudePrompt } from './components/Claude/actions/submitClaudePrompt';
@@ -88,6 +93,7 @@ export {
     Query,
     RenderAwin,
     Products,
+    Queue,
     ListProducts,
     RenderProduct,
     FindProduct,
@@ -114,6 +120,7 @@ export {
     useFounderAccess,
     useAwin,
     useProducts,
+    useQueue,
     useClaude,
     useDash,
     useSupabase,
@@ -123,13 +130,16 @@ export {
     initSupabase,
     initAwin,
     initProducts,
+    initQueue,
     initClaude,
     processAwin,
     fetchLeida,
+    fetchQueue,
     fetchSupabaseRows,
     setLeida,
     setAwin,
     setProducts,
+    setQueue,
     setClaude,
     saveSupabaseRecord,
     submitClaudePrompt,

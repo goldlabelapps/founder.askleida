@@ -276,10 +276,9 @@ curl "http://localhost:3000/api/awin/lookfantastic/sync"
 
 Purpose:
 
-- Creates a row in `public.product_queue` recording a product decision.
 - Supports two decisions:
-  - `queue` (add to processing queue)
-  - `delete` (record delete decision and delete the matching row from `awin_lookfantastic`)
+  - `queue` (add to processing queue by creating a row in `public.product_queue`)
+  - `delete` (delete matching row(s) from `awin_lookfantastic` only; no queue row is created)
 
 Required body fields:
 

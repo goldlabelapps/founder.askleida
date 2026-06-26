@@ -79,7 +79,7 @@ export default function AwinProcess({ awin = null, onProcessed }: AwinProcessPro
 			return;
 		}
 
-		setSuccess(decision === 'queue' ? 'Added to processing queue.' : 'Queued as delete decision.');
+		setSuccess(decision === 'queue' ? 'Added to processing queue.' : 'Deleted from AWIN source list.');
 		await onProcessed?.({ decision, awin });
 	};
 

@@ -3,6 +3,7 @@ export type DashNavItem = {
   icon: string;
   route: string;
   activeRoutes: string[];
+  children?: DashNavItem[];
 };
 
 export const navItems: DashNavItem[] = [
@@ -22,12 +23,20 @@ export const navItems: DashNavItem[] = [
     label: 'Products',
     icon: 'products',
     route: '/products',
-    activeRoutes: ['/products'],
-  },
-  {
-    label: 'Flash',
-    icon: 'flash',
-    route: '/flash',
-    activeRoutes: ['/flash'],
+    activeRoutes: ['/products', '/awin'],
+    children: [
+      {
+        label: 'Awin',
+        icon: 'awin',
+        route: '/awin',
+        activeRoutes: ['/awin'],
+      },
+      {
+        label: 'Queue',
+        icon: 'folder',
+        route: '/products/queue',
+        activeRoutes: ['/products/queue'],
+      },
+    ],
   }
 ];

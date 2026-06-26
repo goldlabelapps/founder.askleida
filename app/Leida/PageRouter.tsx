@@ -13,6 +13,7 @@ import {
   Awin,
   PractitionerNew,
   Products,
+  Queue,
   LeidaFlash,
 } from '../Leida';
 
@@ -46,6 +47,9 @@ export function PageRouter({ active }: I_PageRouter) {
       return <AwinSearch />;
     case 'claude':
       return <Claude />;
+    case 'queue':
+    case 'products/queue':
+      return <Queue />;
     case 'flash':
       return <LeidaFlash />;
     case 'products':

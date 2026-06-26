@@ -4,10 +4,16 @@ import { makeRes } from '../../../';
 
 type T_Decision = 'queue' | 'delete';
 
+type T_JsonValue = string | number | boolean | null | T_JsonObject | T_JsonValue[];
+
+type T_JsonObject = {
+  [key: string]: T_JsonValue;
+};
+
 type T_QueueBody = {
   practitioner_id?: string;
   decision?: T_Decision;
-  awinProduct?: Record<string, unknown>;
+  awinProduct?: T_JsonObject;
 };
 
 type T_PgError = {
@@ -133,62 +139,64 @@ export async function POST(req: Request) {
   const sql = createSqlClient();
 
   try {
-    const sourceProductId = normalizeIdentifier((awinProduct as Record<string, unknown>).aw_product_id)
-      || normalizeIdentifier((awinProduct as Record<string, unknown>).merchant_product_id)
-      || normalizeIdentifier((awinProduct as Record<string, unknown>).id)
-      || normalizeIdentifier((awinProduct as Record<string, unknown>).unique_key);
+    const sourceProductId = normalizeIdentifier(awinProduct.aw_product_id)
+      || normalizeIdentifier(awinProduct.merchant_product_id)
+      || normalizeIdentifier(awinProduct.id)
+      || normalizeIdentifier(awinProduct.unique_key);
 
     let existingPending = false;
     let queueRow: Record<string, unknown> | null = null;
 
-    try {
-      const queueRows = await sql<Array<Record<string, unknown>>>`
-        insert into public.${sql(safeQueueTable)}
-          (
-            practitioner_id,
-            source,
-            source_table,
-            source_product_id,
-            decision,
-            status,
-            data
-          )
-        values
-          (
-            ${practitionerId}::uuid,
-            'awin',
-            ${safeSourceTable},
-            ${sourceProductId},
-            ${decision},
-            'pending',
-            ${sql.json(awinProduct)}
-          )
-        returning *
-      `;
-      queueRow = queueRows[0] || null;
-    } catch (error) {
-      if (isPgError(error) && error.code === '23505' && sourceProductId) {
-        const existingRows = await sql<Array<Record<string, unknown>>>`
-          select *
-          from public.${sql(safeQueueTable)}
-          where practitioner_id = ${practitionerId}::uuid
-            and source = 'awin'
-            and source_table = ${safeSourceTable}
-            and source_product_id = ${sourceProductId}
-            and decision = ${decision}
-            and status = 'pending'
-          order by created desc
-          limit 1
+    if (decision === 'queue') {
+      try {
+        const queueRows = await sql<Array<Record<string, unknown>>>`
+          insert into public.${sql(safeQueueTable)}
+            (
+              practitioner_id,
+              source,
+              source_table,
+              source_product_id,
+              decision,
+              status,
+              data
+            )
+          values
+            (
+              ${practitionerId}::uuid,
+              'awin',
+              ${safeSourceTable},
+              ${sourceProductId},
+              ${decision},
+              'pending',
+              ${sql.json(awinProduct)}
+            )
+          returning *
         `;
+        queueRow = queueRows[0] || null;
+      } catch (error) {
+        if (isPgError(error) && error.code === '23505' && sourceProductId) {
+          const existingRows = await sql<Array<Record<string, unknown>>>`
+            select *
+            from public.${sql(safeQueueTable)}
+            where practitioner_id = ${practitionerId}::uuid
+              and source = 'awin'
+              and source_table = ${safeSourceTable}
+              and source_product_id = ${sourceProductId}
+              and decision = ${decision}
+              and status = 'pending'
+            order by created desc
+            limit 1
+          `;
 
-        if (existingRows[0]) {
-          queueRow = existingRows[0];
-          existingPending = true;
+          if (existingRows[0]) {
+            queueRow = existingRows[0];
+            existingPending = true;
+          } else {
+            throw error;
+          }
         } else {
           throw error;
         }
-      } else {
-        throw error;
       }
     }
 
@@ -242,7 +250,7 @@ export async function POST(req: Request) {
       message: existingPending
         ? 'Pending queue decision already exists for this product'
         : decision === 'delete'
-          ? 'Queued delete decision and removed matching source product rows'
+          ? 'Deleted matching source product rows'
           : 'Queued product for processing',
       data: {
         decision,
