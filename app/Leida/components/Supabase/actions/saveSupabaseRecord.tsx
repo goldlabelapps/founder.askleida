@@ -4,30 +4,7 @@ import { requestSupabase } from './requestSupabase';
 import { fetchSupabaseRows } from './fetchSupabaseRows';
 import { fetchSupabaseSchema } from './fetchSupabaseSchema';
 import { fetchSupabaseAuthUsers } from './fetchSupabaseAuthUsers';
-
-type T_SaveSupabaseRecordArgs =
-    | {
-        resource?: 'table-row';
-        table: string;
-        values: Record<string, any>;
-        match?: Record<string, any>;
-      }
-    | {
-        resource: 'auth-user';
-        userId?: string;
-        email: string;
-        password?: string;
-        phone?: string;
-        email_confirm?: boolean;
-        user_metadata?: Record<string, any>;
-        app_metadata?: Record<string, any>;
-            }
-        | {
-                resource: 'practitioner-onboard';
-                email: string;
-                redirectTo?: string;
-                user_metadata?: Record<string, any>;
-      };
+import type { T_SaveSupabaseRecordArgs } from '../../../types.d';
 
 export const saveSupabaseRecord = (args: T_SaveSupabaseRecordArgs): any =>
     async (dispatch: Dispatch, getState: () => any) => {

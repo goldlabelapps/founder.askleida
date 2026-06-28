@@ -2,7 +2,7 @@ import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
 import { setSupabase } from './setSupabase';
 import { requestSupabase } from './requestSupabase';
-import type { T_SupabaseSchemaData } from '../types';
+import type { T_SupabaseSchemaData } from '../../../types.d';
 
 export const fetchSupabaseSchema = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {

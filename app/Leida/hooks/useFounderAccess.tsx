@@ -3,22 +3,10 @@ import * as React from 'react';
 import { useDispatch } from '../../NX/Uberedux';
 import { usePaywall } from '../../NX/Paywall';
 import { fetchLeida } from '../actions/fetchLeida';
+import { toAccessLevel } from '../lib/toAccessLevel';
 import { useLeidaBus } from './useLeida';
 
 const ALLOWED_ACCESS_LEVELS = new Set([3, 4]);
-
-function toAccessLevel(value: unknown): number | null {
-    if (typeof value === 'number' && Number.isInteger(value)) {
-        return value;
-    }
-    if (typeof value === 'string') {
-        const trimmed = value.trim();
-        if (/^\d+$/.test(trimmed)) {
-            return Number(trimmed);
-        }
-    }
-    return null;
-}
 
 export function useFounderAccess() {
     const dispatch = useDispatch();

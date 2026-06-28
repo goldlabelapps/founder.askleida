@@ -7,12 +7,7 @@ import {
     Typography,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
-export interface I_ClaudePromptAccordion {
-    title: string;
-    content: string;
-    defaultExpanded?: boolean;
-}
+import type { I_ClaudePromptAccordion } from '../../../types.d';
 
 export default function ClaudePromptAccordion({
     title,

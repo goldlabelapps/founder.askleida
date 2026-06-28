@@ -2,12 +2,7 @@ import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
 import { setFeedback } from '../../../../NX/DesignSystem';
 import { setLeida } from '../../../../Leida';
-
-type T_UpdatePractitionerInput = {
-	practitioner_id: string;
-	key: string;
-	value: unknown;
-};
+import type { T_UpdatePractitionerInput } from '../../../types.d';
 
 export const updatePractitioner = ({ practitioner_id, key, value }: T_UpdatePractitionerInput): any =>
 	async (dispatch: Dispatch, getState: () => any) => {

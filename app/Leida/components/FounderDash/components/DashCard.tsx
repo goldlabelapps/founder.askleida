@@ -7,13 +7,7 @@ import {
 	Typography,
 } from '@mui/material';
 import { Icon } from '../../../../NX/DesignSystem'
-
-type I_DashCard = {
-	title: string;
-	description?: string;
-	icon: string;
-	cta: () => void;
-};
+import type { I_DashCard } from '../../../types.d';
 
 const DashCard = ({ 
     title, 

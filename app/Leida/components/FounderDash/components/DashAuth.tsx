@@ -9,10 +9,7 @@ import {
     useLeidaBus,
 } from '../../../../Leida';
 import { useDispatch } from '../../../../NX/Uberedux';
-
-export interface I_UserSpot {
-    onClick?: React.MouseEventHandler<HTMLButtonElement>;
-}
+import type { I_UserSpot } from '../../../types.d';
 
 export default function DashAuth({ onClick }: I_UserSpot) {
     const dispatch = useDispatch();

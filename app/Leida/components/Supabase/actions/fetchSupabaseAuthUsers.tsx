@@ -2,19 +2,7 @@ import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
 import { setSupabase } from './setSupabase';
 import { requestSupabase } from './requestSupabase';
-import type { T_SupabaseAuthUser } from '../types';
-
-type T_FetchSupabaseAuthUsersArgs = {
-    page?: number;
-    perPage?: number;
-};
-
-type T_AuthUsersResponse = {
-    page?: number;
-    perPage?: number;
-    total?: number;
-    users?: T_SupabaseAuthUser[];
-};
+import type { T_AuthUsersResponse, T_FetchSupabaseAuthUsersArgs } from '../../../types.d';
 
 export const fetchSupabaseAuthUsers = ({ page = 1, perPage = 10 }: T_FetchSupabaseAuthUsersArgs = {}): any =>
     async (dispatch: Dispatch) => {

@@ -8,22 +8,23 @@ import {
 import { useDispatch } from '../../../NX/Uberedux';
 import { MiniListItem } from '../../../NX/NXAdmin';
 import { useLeidaBus } from '../../hooks/useLeida';
-import { useAwin } from '../Awin/hooks/useAwin';
 import { initAwin } from '../Awin/actions/initAwin';
 import { initQueue } from '../Products/actions/initQueue';
 import { LoggedInAs } from './components/index';
-import { navItems, type DashNavItem } from './navItems';
+import { navItems } from './navItems';
+import type { DashNavItem } from '../../types.d';
 
 export default function DashNav({
+  open = true,
   onNavigate,
 }: {
+  open?: boolean;
   onNavigate?: () => void;
 }) {
 
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const awin = useAwin();
   const queueBus = useLeidaBus('/api/products/queue');
 
   React.useEffect(() => {
@@ -45,7 +46,6 @@ export default function DashNav({
       onNavigate?.();
   }, [onNavigate, pathname, router]);
 
-  const open = true;
   const normalizedPathname = React.useMemo(() => {
     if (!pathname) return '/';
     if (pathname.length > 1 && pathname.endsWith('/')) return pathname.slice(0, -1);
@@ -65,12 +65,6 @@ export default function DashNav({
     return queueBus.data.length;
   }, [queueBus?.data]);
 
-  const awinCount = React.useMemo(() => {
-    if (typeof awin?.count === 'number') return awin.count;
-    if (Array.isArray(awin?.products)) return awin.products.length;
-    return 0;
-  }, [awin?.count, awin?.products]);
-
   const renderItem = React.useCallback((item: DashNavItem, nested = false) => (
     <React.Fragment key={item.route}>
       <MiniListItem
@@ -82,17 +76,13 @@ export default function DashNav({
           icon: item.icon,
           route: item.route,
           nested,
-          badgeContent: item.route === '/products/queue'
-            ? queueCount
-            : item.route === '/awin'
-              ? awinCount
-              : undefined,
+          badgeContent: item.route === '/products/queue' ? queueCount : undefined,
         }}
       />
       {item.children?.map((child) => renderItem(child, true))}
       {!nested ? <Divider /> : null}
     </React.Fragment>
-  ), [awinCount, isRouteActive, navigateToRoute, open, queueCount]);
+  ), [isRouteActive, navigateToRoute, open, queueCount]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>

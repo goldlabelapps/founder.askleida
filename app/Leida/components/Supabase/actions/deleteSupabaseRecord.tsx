@@ -4,18 +4,7 @@ import { requestSupabase } from './requestSupabase';
 import { fetchSupabaseRows } from './fetchSupabaseRows';
 import { fetchSupabaseSchema } from './fetchSupabaseSchema';
 import { fetchSupabaseAuthUsers } from './fetchSupabaseAuthUsers';
-
-type T_DeleteSupabaseRecordArgs =
-    | {
-        resource?: 'table-row';
-        table: string;
-        match: Record<string, any>;
-      }
-    | {
-        resource: 'auth-user';
-        userId: string;
-        shouldSoftDelete?: boolean;
-      };
+import type { T_DeleteSupabaseRecordArgs } from '../../../types.d';
 
 export const deleteSupabaseRecord = (args: T_DeleteSupabaseRecordArgs): any =>
     async (dispatch: Dispatch, getState: () => any) => {

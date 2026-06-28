@@ -1,11 +1,7 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
 import { setLeida } from '../../../../Leida';
-
-type T_UpdateAvatarInput = {
-	practitioner_id: string;
-	file: File;
-};
+import type { T_UpdateAvatarInput } from '../../../types.d';
 
 export const updateAvatar = ({ practitioner_id, file }: T_UpdateAvatarInput): any =>
 	async (dispatch: Dispatch, getState: () => any) => {

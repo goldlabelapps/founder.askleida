@@ -1,5 +1,5 @@
 import type { Dispatch } from 'redux';
-import type { T_AwinProcessDecision, T_AwinProduct } from '../../../types';
+import type { T_AwinProcessDecision, T_AwinProduct } from '../../../types.d';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
 import { fetchLeida } from '../../../actions/fetchLeida';
 

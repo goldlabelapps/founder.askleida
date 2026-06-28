@@ -16,10 +16,7 @@ import {
   Queue,
   LeidaFlash,
 } from '../Leida';
-
-interface I_PageRouter {
-  active: string | null;
-}
+import type { I_PageRouter } from './types';
 
 export function PageRouter({ active }: I_PageRouter) {
   const pathname = usePathname();

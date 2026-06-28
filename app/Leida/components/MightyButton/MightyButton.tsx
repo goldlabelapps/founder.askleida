@@ -15,7 +15,7 @@ import type {
 	ListItemButtonProps,
 } from '@mui/material';
 import {Icon} from '../../../NX/DesignSystem';
-import type { MightyButtonProps } from '../../types';
+import type { MightyButtonProps } from '../../types.d';
 
 const renderIcon = (icon: MightyButtonProps['icon']) => {
 	if (!icon) return null;

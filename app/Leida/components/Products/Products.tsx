@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import type { T_Product } from './components/FindProduct';
+import type { T_Product } from '../../types.d';
 import {
 	Box,
 	Grid,
@@ -77,24 +77,17 @@ export default function Products() {
 			<Grid container spacing={2} sx={{ mt: 1 }}>
 				<Grid size={{
 					xs: 12,
-					md: 4
+					md: 6
 				}}>
-					<ListProducts
+					ListProducts
+					{/* <ListProducts
 						showFindProduct={showFindProduct}
 						onVisibleProductsChange={setVisibleProducts}
 						onProductSelect={setSelectedProduct}
-					/>
+					/> */}
 				</Grid>
 
-				<Grid size={{
-					xs: 12,
-					md: 8
-				}}>
-					<AffiliatePlayer
-						products={visibleProducts}
-						selectedProduct={selectedProduct}
-					/>
-				</Grid>
+				
 			</Grid>
 			
 		</Box>

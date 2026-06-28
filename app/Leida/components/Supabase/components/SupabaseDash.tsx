@@ -14,7 +14,7 @@ import { Icon, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { initSupabase } from '../actions/initSupabase';
 import { useSupabase } from '../hooks/useSupabase';
-import type { T_SupabaseTable } from '../types';
+import type { T_SupabaseTable } from '../../../types.d';
 
 export default function SupabaseDash() {
 

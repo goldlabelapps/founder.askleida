@@ -13,28 +13,10 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { usePaywall } from '../../../../NX/Paywall';
-import type { T_AwinProcessDecision, T_AwinProduct } from '../../../types';
+import { asText } from '../../../lib/asText';
+import { inferAwinPrice } from '../../../lib/inferAwinPrice';
+import type { AwinProcessProps, T_AwinProcessDecision } from '../../../types.d';
 import { processAwin } from '../actions/processAwin';
-
-type AwinProcessProps = {
-	awin?: T_AwinProduct | null;
-	onProcessed?: (payload: { decision: T_AwinProcessDecision; awin: T_AwinProduct }) => void | Promise<void>;
-};
-
-function asText(value: unknown): string {
-	return typeof value === 'string' ? value : '';
-}
-
-function inferPrice(product: T_AwinProduct): string {
-	const raw = product.search_price;
-	if (typeof raw === 'number' && Number.isFinite(raw)) {
-		return raw.toFixed(2);
-	}
-	if (typeof raw === 'string' && raw.trim()) {
-		return raw.trim();
-	}
-	return '';
-}
 
 export default function AwinProcess({ awin = null, onProcessed }: AwinProcessProps) {
 	const dispatch = useDispatch();
@@ -42,7 +24,7 @@ export default function AwinProcess({ awin = null, onProcessed }: AwinProcessPro
 	const steps = ['Confirm product'];
 	const productName = awin ? asText(awin.product_name) || 'Untitled product' : '';
 	const category = awin ? asText(awin.category_name) : '';
-	const price = awin ? inferPrice(awin) : '';
+	const price = awin ? inferAwinPrice(awin) : '';
 	const currency = awin ? asText(awin.currency) || 'GBP' : 'GBP';
 	const [loadingDecision, setLoadingDecision] = React.useState<T_AwinProcessDecision | null>(null);
 	const [error, setError] = React.useState<string>('');

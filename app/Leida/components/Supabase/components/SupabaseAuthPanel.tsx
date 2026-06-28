@@ -17,39 +17,11 @@ import {
     Typography,
 } from '@mui/material';
 import type { T_SupabaseAuthUser } from '../types';
+import { parseJsonRecord } from '../../../lib/parseJsonRecord';
+import { stringifyJson } from '../../../lib/stringifyJson';
+import type { T_SupabaseAuthFormState, T_SupabaseAuthPanelProps } from '../../../types.d';
 
-type T_Props = {
-    loading?: boolean;
-    error?: string | null;
-    users: T_SupabaseAuthUser[];
-    total?: number;
-    page?: number;
-    perPage?: number;
-    onRefresh: () => void;
-    onPageChange: (page: number) => void;
-    onSave: (args: {
-        userId?: string;
-        email: string;
-        password?: string;
-        phone?: string;
-        email_confirm?: boolean;
-        user_metadata?: Record<string, any>;
-        app_metadata?: Record<string, any>;
-    }) => Promise<void>;
-    onDelete: (userId: string) => Promise<void>;
-};
-
-type T_FormState = {
-    userId?: string;
-    email: string;
-    phone: string;
-    password: string;
-    userMetadata: string;
-    appMetadata: string;
-    emailConfirm: boolean;
-};
-
-const EMPTY_FORM: T_FormState = {
+const EMPTY_FORM: T_SupabaseAuthFormState = {
     userId: undefined,
     email: '',
     phone: '',
@@ -59,24 +31,8 @@ const EMPTY_FORM: T_FormState = {
     emailConfirm: false,
 };
 
-function stringifyJson(value: unknown): string {
-    try {
-        return JSON.stringify(value ?? {}, null, 2);
-    } catch {
-        return '{}';
-    }
-}
-
-function parseJson(text: string, label: string): Record<string, any> {
-    const parsed = JSON.parse(text || '{}');
-    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-        throw new Error(`${label} must be a JSON object`);
-    }
-    return parsed;
-}
-
-export default function SupabaseAuthPanel({ loading, error, users, total, page, perPage, onRefresh, onPageChange, onSave, onDelete }: T_Props) {
-    const [form, setForm] = React.useState<T_FormState>(EMPTY_FORM);
+export default function SupabaseAuthPanel({ loading, error, users, total, page, perPage, onRefresh, onPageChange, onSave, onDelete }: T_SupabaseAuthPanelProps) {
+    const [form, setForm] = React.useState<T_SupabaseAuthFormState>(EMPTY_FORM);
     const [localError, setLocalError] = React.useState<string | null>(null);
     const [saving, setSaving] = React.useState(false);
     const currentPage = typeof page === 'number' && page > 0 ? page : 1;
@@ -122,8 +78,8 @@ export default function SupabaseAuthPanel({ loading, error, users, total, page, 
                 password: form.password.trim() || undefined,
                 phone: form.phone.trim() || undefined,
                 email_confirm: form.emailConfirm,
-                user_metadata: parseJson(form.userMetadata, 'user_metadata'),
-                app_metadata: parseJson(form.appMetadata, 'app_metadata'),
+                user_metadata: parseJsonRecord(form.userMetadata, 'user_metadata'),
+                app_metadata: parseJsonRecord(form.appMetadata, 'app_metadata'),
             });
 
             if (!form.userId) {

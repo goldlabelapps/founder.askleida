@@ -29,7 +29,16 @@ import {
     useAwin,
     useDash,
 } from '../../../Leida';
-import type { T_AwinProcessedPayload, T_AwinProduct } from '../../types';
+import type { T_AwinProcessedPayload, T_AwinProduct } from '../../types.d';
+import { asText } from '../../lib/asText';
+import { formatUkPrice } from '../../lib/formatUkPrice';
+import { orderByFromSortField } from '../../lib/orderByFromSortField';
+import { productCategory } from '../../lib/productCategory';
+import { productDeepLink } from '../../lib/productDeepLink';
+import { productIdentity } from '../../lib/productIdentity';
+import { productName } from '../../lib/productName';
+import { productPriceValue } from '../../lib/productPriceValue';
+import { sortFieldFromQuery } from '../../lib/sortFieldFromQuery';
 
 const RESULTS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
 const SEARCH_DEBOUNCE_MS = 350;
@@ -40,114 +49,6 @@ function LinkOutIcon() {
             <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3Zm5 16V11h2v10H3V3h10v2H5v14h14Z" />
         </SvgIcon>
     );
-}
-
-function asText(value: unknown): string {
-    return typeof value === 'string' ? value : '';
-}
-
-function asId(value: unknown): string {
-    if (typeof value === 'string') {
-        return value;
-    }
-    if (typeof value === 'number' && Number.isFinite(value)) {
-        return String(value);
-    }
-    return '';
-}
-
-function productIdentity(product: T_AwinProduct | null | undefined): string {
-    if (!product) {
-        return '';
-    }
-
-    return asText(product.id)
-        || asId(product.id)
-        || asText(product.unique_key)
-        || asText(product.aw_product_id)
-        || asText(product.merchant_product_id);
-}
-
-function productName(product: T_AwinProduct | null | undefined): string {
-    if (!product) {
-        return 'Untitled product';
-    }
-
-    return asText(product.product_name)
-        || asText(product.title)
-        || asText(product.name)
-        || 'Untitled product';
-}
-
-function productCategory(product: T_AwinProduct | null | undefined): string {
-    if (!product) {
-        return '';
-    }
-
-    return asText(product.category_name) || asText(product.category);
-}
-
-function productDeepLink(product: T_AwinProduct | null | undefined): string {
-    if (!product) {
-        return '';
-    }
-
-    return asText(product.aw_deep_link) || asText(product.merchant_deep_link);
-}
-
-function productPriceValue(product: T_AwinProduct | null | undefined): number | null {
-    if (!product) {
-        return null;
-    }
-
-    const raw = product.search_price ?? product.price;
-    if (typeof raw === 'number' && Number.isFinite(raw)) {
-        return raw;
-    }
-    if (typeof raw === 'string') {
-        const normalized = raw.replace(/[^0-9.-]/g, '').trim();
-        if (!normalized) {
-            return null;
-        }
-        const parsed = Number(normalized);
-        return Number.isFinite(parsed) ? parsed : null;
-    }
-    return null;
-}
-
-function formatUkPrice(value: number | null): string {
-    if (value === null) {
-        return 'N/A';
-    }
-
-    return new Intl.NumberFormat('en-GB', {
-        style: 'currency',
-        currency: 'GBP',
-    }).format(value);
-}
-
-function orderByFromSortField(field: string): 'product_name' | 'search_price' | 'brand' {
-    if (field === 'price') {
-        return 'search_price';
-    }
-
-    if (field === 'brand') {
-        return 'brand';
-    }
-
-    return 'product_name';
-}
-
-function sortFieldFromQuery(orderBy: unknown): string {
-    if (orderBy === 'search_price') {
-        return 'price';
-    }
-
-    if (orderBy === 'brand') {
-        return 'brand';
-    }
-
-    return 'product_name';
 }
 
 export default function Awin() {

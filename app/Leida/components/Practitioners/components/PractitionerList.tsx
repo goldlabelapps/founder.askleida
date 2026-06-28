@@ -6,7 +6,8 @@ import { initSupabase } from '../../Supabase/actions/initSupabase';
 import { fetchSupabaseRows } from '../../Supabase/actions/fetchSupabaseRows';
 import { useSupabase } from '../../Supabase/hooks/useSupabase';
 import { PractitionerNew } from '../../../../Leida';
-import PractitionerCard, { T_PractitionerRecord } from './PractitionerCard';
+import type { T_PractitionerRecord } from '../../../types.d';
+import PractitionerCard from './PractitionerCard';
 
 const PRACTITIONERS_TABLE = 'practitioners';
 

@@ -19,27 +19,19 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import type { T_SupabaseColumn, T_SupabaseRowsState, T_SupabaseTable } from '../types';
+import { buildMatch } from '../../../lib/buildMatch';
+import { getSupabaseFieldValue } from '../../../lib/getSupabaseFieldValue';
+import { getTableFormPreset } from '../../../lib/getTableFormPreset';
+import { isBooleanColumn } from '../../../lib/isBooleanColumn';
+import { isJsonColumn } from '../../../lib/isJsonColumn';
+import { isNumericColumn } from '../../../lib/isNumericColumn';
+import { normalizeColumnsForPreset } from '../../../lib/normalizeColumnsForPreset';
+import { parseJsonRecord } from '../../../lib/parseJsonRecord';
+import { parseSupabaseFieldValue } from '../../../lib/parseSupabaseFieldValue';
+import { previewValue } from '../../../lib/previewValue';
+import { stringifyJson } from '../../../lib/stringifyJson';
+import type { T_SupabaseRowsPanelProps, T_TableFormPreset } from '../../../types.d';
 
-type T_Props = {
-    table: T_SupabaseTable | null;
-    rowsState: T_SupabaseRowsState | null;
-    onRefresh: (tableName: string) => void;
-    onCreate: (tableName: string, values: Record<string, any>) => Promise<void>;
-    onUpdate: (tableName: string, match: Record<string, any>, values: Record<string, any>) => Promise<void>;
-    onDelete: (tableName: string, match: Record<string, any>) => Promise<void>;
-};
-
-type T_TableFormPreset = {
-    fieldOrder?: string[];
-    hiddenFields?: string[];
-    labels?: Record<string, string>;
-    selectOptions?: Record<string, string[]>;
-};
-
-const NUMERIC_TYPES = new Set(['int2', 'int4', 'int8', 'float4', 'float8', 'numeric', 'integer', 'bigint', 'smallint', 'real', 'double precision']);
-const BOOLEAN_TYPES = new Set(['bool', 'boolean']);
-const JSON_TYPES = new Set(['json', 'jsonb']);
 const DEFAULT_HIDDEN_FIELDS = ['created', 'updated'];
 
 const TABLE_PRESETS: Record<string, T_TableFormPreset> = {
@@ -90,131 +82,9 @@ const TABLE_PRESETS: Record<string, T_TableFormPreset> = {
     },
 };
 
-function stringifyJson(value: unknown): string {
-    try {
-        return JSON.stringify(value ?? {}, null, 2);
-    } catch {
-        return '{}';
-    }
-}
-
-function parseJson(text: string): Record<string, any> {
-    const parsed = JSON.parse(text || '{}');
-    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-        throw new Error('Row payload must be a JSON object');
-    }
-    return parsed;
-}
-
-function isNumericColumn(dataType?: string, udtName?: string): boolean {
-    return NUMERIC_TYPES.has(String(udtName || '').toLowerCase()) || NUMERIC_TYPES.has(String(dataType || '').toLowerCase());
-}
-
-function isBooleanColumn(dataType?: string, udtName?: string): boolean {
-    return BOOLEAN_TYPES.has(String(udtName || '').toLowerCase()) || BOOLEAN_TYPES.has(String(dataType || '').toLowerCase());
-}
-
-function isJsonColumn(dataType?: string, udtName?: string): boolean {
-    return JSON_TYPES.has(String(udtName || '').toLowerCase()) || JSON_TYPES.has(String(dataType || '').toLowerCase());
-}
-
-function buildMatch(primaryKeys: string[], row: Record<string, any> | undefined): Record<string, any> | null {
-    if (!row || !primaryKeys.length) return null;
-    const match: Record<string, any> = {};
-
-    for (const key of primaryKeys) {
-        if (!(key in row)) {
-            return null;
-        }
-        match[key] = row[key];
-    }
-
-    return match;
-}
-
-function previewValue(value: unknown): string {
-    if (value === null || value === undefined) return 'null';
-    if (typeof value === 'object') {
-        const stringified = stringifyJson(value);
-        return stringified.length > 60 ? `${stringified.slice(0, 57)}...` : stringified;
-    }
-    return String(value);
-}
-
-function getFieldValue(draftObject: Record<string, any>, column: T_SupabaseColumn, columnName: string): string {
-    const current = draftObject[columnName];
-    if (current === undefined || current === null) {
-        return '';
-    }
-
-    if (isJsonColumn(column.data_type, column.udt_name)) {
-        return stringifyJson(current);
-    }
-
-    if (isBooleanColumn(column.data_type, column.udt_name)) {
-        if (current === true) return 'true';
-        if (current === false) return 'false';
-        return '';
-    }
-
-    return String(current);
-}
-
-function parseFieldValue(rawValue: string, column: T_SupabaseColumn): unknown {
-    if (rawValue === '') {
-        return column.nullable ? null : '';
-    }
-
-    if (isJsonColumn(column.data_type, column.udt_name)) {
-        return JSON.parse(rawValue);
-    }
-
-    if (isBooleanColumn(column.data_type, column.udt_name)) {
-        if (rawValue === 'true') return true;
-        if (rawValue === 'false') return false;
-        return column.nullable ? null : false;
-    }
-
-    if (isNumericColumn(column.data_type, column.udt_name)) {
-        const parsed = Number(rawValue);
-        if (!Number.isFinite(parsed)) {
-            throw new Error(`Invalid number for ${column.udt_name || column.data_type || 'numeric field'}`);
-        }
-        return parsed;
-    }
-
-    return rawValue;
-}
-
-function getPreset(tableName: string | null): T_TableFormPreset {
-    if (!tableName) return {};
-    return TABLE_PRESETS[tableName] || {};
-}
-
-function normalizeColumnsForPreset(columns: T_SupabaseColumn[], preset: T_TableFormPreset): T_SupabaseColumn[] {
-    const hidden = new Set(preset.hiddenFields || []);
-    const visibleColumns = columns.filter((column) => {
-        const name = column?.name || '';
-        return !hidden.has(name);
-    });
-
-    const order = preset.fieldOrder || [];
-    const rank = new Map<string, number>();
-    order.forEach((name, index) => rank.set(name, index));
-
-    return [...visibleColumns].sort((a, b) => {
-        const aName = a.name || '';
-        const bName = b.name || '';
-        const aRank = rank.has(aName) ? (rank.get(aName) as number) : Number.MAX_SAFE_INTEGER;
-        const bRank = rank.has(bName) ? (rank.get(bName) as number) : Number.MAX_SAFE_INTEGER;
-        if (aRank !== bRank) return aRank - bRank;
-        return aName.localeCompare(bName);
-    });
-}
-
-export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreate, onUpdate, onDelete }: T_Props) {
+export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreate, onUpdate, onDelete }: T_SupabaseRowsPanelProps) {
     const tableName = table?.table_name || null;
-    const preset = React.useMemo(() => getPreset(tableName), [tableName]);
+    const preset = React.useMemo(() => getTableFormPreset(tableName, TABLE_PRESETS), [tableName]);
     const crudAllowed = table?.crud_allowed !== false;
     const rows = Array.isArray(rowsState?.rows) ? rowsState?.rows : [];
     const primaryKeys = Array.isArray(rowsState?.primaryKeys) ? rowsState.primaryKeys : (Array.isArray(table?.primary_keys) ? table.primary_keys : []);
@@ -229,7 +99,7 @@ export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreat
 
     const parsedDraft = React.useMemo(() => {
         try {
-            return parseJson(draft);
+            return parseJsonRecord(draft);
         } catch {
             return null;
         }
@@ -279,7 +149,7 @@ export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreat
 
         try {
             const next = { ...(parsedDraft || {}) };
-            next[columnName] = parseFieldValue(rawValue, column);
+            next[columnName] = parseSupabaseFieldValue(rawValue, column);
             setDraft(stringifyJson(next));
             setError(null);
         } catch (e: unknown) {
@@ -293,7 +163,7 @@ export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreat
         setSaving(true);
         setError(null);
         try {
-            const values = parseJson(draft);
+            const values = parseJsonRecord(draft);
             if (selectedRow && rowMatch) {
                 const nextValues = { ...values };
                 for (const key of Object.keys(rowMatch)) {
@@ -421,7 +291,7 @@ export default function SupabaseRowsPanel({ table, rowsState, onRefresh, onCreat
                                     <Typography variant="subtitle2">Column-aware editor</Typography>
                                     {columns.map((column, index) => {
                                         const columnName = column.name || `column_${index + 1}`;
-                                        const value = getFieldValue(parsedDraft, column, columnName);
+                                        const value = getSupabaseFieldValue(parsedDraft, column, columnName);
                                         const isPrimaryKey = primaryKeys.includes(columnName);
                                         const disabled = !crudAllowed || (Boolean(selectedRow) && isPrimaryKey);
                                         const displayLabel = preset.labels?.[columnName] || columnName;

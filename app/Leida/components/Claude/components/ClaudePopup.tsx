@@ -11,17 +11,10 @@ import {
 	Typography,
 	Box,
 } from '@mui/material';
-import type { I_Icon } from '../../../../NX/types';
 import { Icon } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { setLeida } from '../../../../Leida';
-
-export interface I_ClaudePopup {
-	open: boolean;
-	bodyText: string;
-	icon?: I_Icon['icon'];
-	title?: string;
-}
+import type { I_ClaudePopup } from '../../../types.d';
 
 export default function ClaudePopup({
 	open,

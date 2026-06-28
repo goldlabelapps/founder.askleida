@@ -2,23 +2,8 @@ import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../NX/Uberedux';
 import { setLeida } from '../../Leida';
 import { normalizeLeidaRouteKey } from '../lib/normalizeLeidaRouteKey';
-
-type T_LeidaBusEntry = {
-	loading: boolean;
-	error: string | null;
-	data: any[];
-};
-
-function parseArrayData(payload: any): any[] {
-	if (Array.isArray(payload?.data?.tables)) return payload.data.tables;
-	if (Array.isArray(payload?.data?.rows)) return payload.data.rows;
-	if (Array.isArray(payload?.data?.items)) return payload.data.items;
-	if (Array.isArray(payload?.tables)) return payload.tables;
-	if (Array.isArray(payload?.data)) return payload.data;
-	if (Array.isArray(payload)) return payload;
-	if (payload?.data && typeof payload.data === 'object') return [payload.data];
-	return [];
-}
+import { parseArrayData } from '../lib/parseArrayData';
+import type { T_LeidaBusEntry } from '../types.d';
 
 export const fetchLeida = (route: string): any =>
 	async (dispatch: Dispatch, getState: () => any) => {

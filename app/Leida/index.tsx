@@ -13,8 +13,8 @@ import DashAuth from './components/FounderDash/components/DashAuth';
 import Awin from './components/Awin/Awin';
 import AwinDetail from './components/Awin/components/AwinDetail';
 import AwinProcess from './components/Awin/components/AwinProcess';
+import Queue from './components/Awin/components/Queue';
 import Products from './components/Products/Products';
-import Queue from './components/Products/components/Queue';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
@@ -70,6 +70,57 @@ import { toDayjsOrNull } from './lib/toDayjsOrNull';
 import { toHumanDateLabel } from './lib/toHumanDateLabel';
 import { textFieldSx } from './lib/textFieldSx';
 import { selectMenuItemSx } from './lib/selectMenuItemSx';
+import { toLabel } from './lib/toLabel';
+import { toDate } from './lib/toDate';
+import { parseArrayData } from './lib/parseArrayData';
+import { toAccessLevel } from './lib/toAccessLevel';
+import { asText } from './lib/asText';
+import { asId } from './lib/asId';
+import { inferAwinPrice } from './lib/inferAwinPrice';
+import { productIdentity } from './lib/productIdentity';
+import { productName } from './lib/productName';
+import { productCategory } from './lib/productCategory';
+import { productDeepLink } from './lib/productDeepLink';
+import { productPriceValue } from './lib/productPriceValue';
+import { formatUkPrice } from './lib/formatUkPrice';
+import { orderByFromSortField } from './lib/orderByFromSortField';
+import { sortFieldFromQuery } from './lib/sortFieldFromQuery';
+import { toTrimmedText } from './lib/toTrimmedText';
+import { getProductName } from './lib/getProductName';
+import { getProductCategory } from './lib/getProductCategory';
+import { getProductBrand } from './lib/getProductBrand';
+import { getProductPrice } from './lib/getProductPrice';
+import { getProductUpdatedAt } from './lib/getProductUpdatedAt';
+import { includesProductQuery } from './lib/includesProductQuery';
+import { getProductPriceLabel } from './lib/getProductPriceLabel';
+import { getProductImageUrl } from './lib/getProductImageUrl';
+import { getProductCategoryLabel } from './lib/getProductCategoryLabel';
+import { isRecord } from './lib/isRecord';
+import { parseJsonObject } from './lib/parseJsonObject';
+import { getPathValue } from './lib/getPathValue';
+import { pickFirstText } from './lib/pickFirstText';
+import { normalizeUrl } from './lib/normalizeUrl';
+import { findNestedTextByKeys } from './lib/findNestedTextByKeys';
+import { getAffiliateTitle } from './lib/getAffiliateTitle';
+import { getAffiliateDescription } from './lib/getAffiliateDescription';
+import { getAffiliateCategory } from './lib/getAffiliateCategory';
+import { getAffiliateImageUrl } from './lib/getAffiliateImageUrl';
+import { getAffiliateMerchantLink } from './lib/getAffiliateMerchantLink';
+import { getAffiliateProductIdentity } from './lib/getAffiliateProductIdentity';
+import { parsePractitionerData } from './lib/parsePractitionerData';
+import { formatEstimatedRows } from './lib/formatEstimatedRows';
+import { formatNumber } from './lib/formatNumber';
+import { stringifyJson } from './lib/stringifyJson';
+import { parseJsonRecord } from './lib/parseJsonRecord';
+import { isNumericColumn } from './lib/isNumericColumn';
+import { isBooleanColumn } from './lib/isBooleanColumn';
+import { isJsonColumn } from './lib/isJsonColumn';
+import { buildMatch } from './lib/buildMatch';
+import { previewValue } from './lib/previewValue';
+import { getSupabaseFieldValue } from './lib/getSupabaseFieldValue';
+import { parseSupabaseFieldValue } from './lib/parseSupabaseFieldValue';
+import { getTableFormPreset } from './lib/getTableFormPreset';
+import { normalizeColumnsForPreset } from './lib/normalizeColumnsForPreset';
 
 const AwinSearch = Awin;
 
@@ -152,4 +203,57 @@ export {
     toHumanDateLabel,
     textFieldSx,
     selectMenuItemSx,
+    toLabel,
+    toDate,
+    parseArrayData,
+    toAccessLevel,
+    asText,
+    asId,
+    inferAwinPrice,
+    productIdentity,
+    productName,
+    productCategory,
+    productDeepLink,
+    productPriceValue,
+    formatUkPrice,
+    orderByFromSortField,
+    sortFieldFromQuery,
+    toTrimmedText,
+    getProductName,
+    getProductCategory,
+    getProductBrand,
+    getProductPrice,
+    getProductUpdatedAt,
+    includesProductQuery,
+    getProductPriceLabel,
+    getProductImageUrl,
+    getProductCategoryLabel,
+    isRecord,
+    parseJsonObject,
+    getPathValue,
+    pickFirstText,
+    normalizeUrl,
+    findNestedTextByKeys,
+    getAffiliateTitle,
+    getAffiliateDescription,
+    getAffiliateCategory,
+    getAffiliateImageUrl,
+    getAffiliateMerchantLink,
+    getAffiliateProductIdentity,
+    parsePractitionerData,
+    formatEstimatedRows,
+    formatNumber,
+    stringifyJson,
+    parseJsonRecord,
+    isNumericColumn,
+    isBooleanColumn,
+    isJsonColumn,
+    buildMatch,
+    previewValue,
+    getSupabaseFieldValue,
+    parseSupabaseFieldValue,
+    getTableFormPreset,
+    normalizeColumnsForPreset,
 }
+
+export type * from './types';

@@ -11,39 +11,8 @@ import {
 } from '@mui/material';
 import { navigateTo, Icon } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
-
-type T_PractitionerData = {
-	avatar?: string;
-	display_name?: string;
-	[key: string]: any;
-};
-
-export type T_PractitionerRecord = {
-	practitioner_id?: string;
-	title?: string;
-	created?: string;
-	updated?: string;
-	data?: unknown;
-	[key: string]: any;
-};
-
-function parsePractitionerData(value: unknown): T_PractitionerData {
-	if (!value) return {};
-	if (typeof value === 'object') {
-		return value as T_PractitionerData;
-	}
-	if (typeof value === 'string') {
-		try {
-			const parsed = JSON.parse(value);
-			if (parsed && typeof parsed === 'object') {
-				return parsed as T_PractitionerData;
-			}
-		} catch {
-			return {};
-		}
-	}
-	return {};
-}
+import { parsePractitionerData } from '../../../lib/parsePractitionerData';
+import type { T_PractitionerRecord } from '../../../types.d';
 
 const PractitionerCard = ({
 	practitioner,

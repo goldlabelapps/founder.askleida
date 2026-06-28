@@ -8,20 +8,8 @@ import {
     Stack,
     Typography,
 } from '@mui/material';
-import type { T_SupabaseSchemaData } from '../types';
-
-type T_Props = {
-    schema: T_SupabaseSchemaData | null | undefined;
-    activeTable: string | null | undefined;
-    loading?: boolean;
-    error?: string | null;
-    onSelectTable: (tableName: string) => void;
-    onRefresh: () => void;
-};
-
-function formatNumber(value?: number): string {
-    return typeof value === 'number' ? value.toLocaleString() : '0';
-}
+import { formatNumber } from '../../../lib/formatNumber';
+import type { T_SupabaseSchemaPanelProps } from '../../../types.d';
 
 export default function SupabaseSchemaPanel({
     schema,
@@ -30,7 +18,7 @@ export default function SupabaseSchemaPanel({
     error,
     onSelectTable,
     onRefresh,
-}: T_Props) {
+}: T_SupabaseSchemaPanelProps) {
     const tables = Array.isArray(schema?.tables) ? schema?.tables : [];
 
     return (
