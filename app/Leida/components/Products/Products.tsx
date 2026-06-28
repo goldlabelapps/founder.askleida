@@ -1,95 +1,100 @@
 'use client';
+
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
-import type { T_Product } from '../../types.d';
 import {
+	Card,
+	CardContent,
 	Box,
-	Grid,
-	Paper,
 	Stack,
-	Tooltip,
 	Typography,
-	Fab,
 } from '@mui/material';
-import { Icon, navigateTo } from '../../../NX/DesignSystem';
+import { setFeedback } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
 import {
-	setLeida,
-	useDash,
-	ListProducts,
+	ConfirmAction,
+	deleteQueueSelection,
 	MightyButton,
-	AffiliatePlayer,
+	setLeida,
 } from '../../../Leida';
+
+const QUEUE_COUNT_REFRESH_EVENT = 'leida:queue-count-refresh';
+
+function notifyQueueCountRefresh() {
+	window.dispatchEvent(new Event(QUEUE_COUNT_REFRESH_EVENT));
+}
 
 export default function Products() {
 	const dispatch = useDispatch();
-	const router = useRouter();
-	const dash = useDash();
-	const [showFindProduct, setShowFindProduct] = React.useState(false);
-	const [visibleProducts, setVisibleProducts] = React.useState<T_Product[]>([]);
-	const [selectedProduct, setSelectedProduct] = React.useState<T_Product | null>(null);
+	const [confirmDeleteQueueOpen, setConfirmDeleteQueueOpen] = React.useState(false);
+	const [deletingQueue, setDeletingQueue] = React.useState(false);
 
 	React.useEffect(() => {
-		if (dash && dash.title) {
 			dispatch(setLeida('header', {
 				title: 'Products',
 				icon: 'products',
 			}));
-		}
-	}, [dispatch, dash?.title]);
+	}, [dispatch]);
 
-	React.useEffect(() => {
-		if (!selectedProduct) return;
-
-		const stillVisible = visibleProducts.some((product) => product === selectedProduct);
-		if (!stillVisible) {
-			setSelectedProduct(visibleProducts[0] ?? null);
+	const handleDeleteQueue = React.useCallback(async () => {
+		if (deletingQueue) {
+			return;
 		}
-	}, [visibleProducts, selectedProduct]);
+
+		setConfirmDeleteQueueOpen(false);
+		setDeletingQueue(true);
+
+		try {
+			const result = await dispatch(deleteQueueSelection({
+				selection: {
+					type: 'exclude',
+					ids: [],
+				},
+			}));
+
+			if (!result?.ok) {
+				throw new Error(result?.error || 'Failed to delete queue items.');
+			}
+
+			dispatch(setFeedback({
+				severity: 'success',
+				title: `Deleted ${result.deletedRows} queue item${result.deletedRows === 1 ? '' : 's'}.`,
+			}));
+			notifyQueueCountRefresh();
+		} catch (e: unknown) {
+			const message = e instanceof Error ? e.message : String(e);
+			dispatch(setFeedback({
+				severity: 'warning',
+				title: message || 'Failed to delete queue items.',
+			}));
+		} finally {
+			setDeletingQueue(false);
+		}
+	}, [deletingQueue, dispatch]);
 
 	return (
-		<Box sx={{ p: 2 }}>
-			<Paper variant="outlined" sx={{ p: 2 }}>
-				<Stack spacing={2}>
-					<Box sx={{ display: 'flex', alignItems: 'center' }}>
+		<Box sx={{  }}>
+			<Stack spacing={2} alignItems="flex-start">
+				<Typography variant="body1">
+					Queue cleanup is intentionally destructive. Use this only when you want to permanently remove every item from the queue.
+				</Typography>
+				<MightyButton
+					variant="outlined"
+					startIcon="delete"
+					disabled={deletingQueue}
+					onClick={() => setConfirmDeleteQueueOpen(true)}
+				>
+					{deletingQueue ? 'Deleting queue...' : 'Delete Queue'}
+				</MightyButton>
+			</Stack>
 
-						<Typography variant="h5">
-							Products
-						</Typography>
-						
-						<Box sx={{ flexGrow: 1 }} />
-						<MightyButton
-							kind="button"
-							startIcon="awin"
-							endIcon="add"
-							variant="outlined"
-							color="primary"
-							onClick={() => {
-								dispatch(navigateTo(router, '/awin'));
-							}}
-							
-						>
-							Awin
-						</MightyButton>
-					</Box>
-				</Stack>
-			</Paper>
-			<Grid container spacing={2} sx={{ mt: 1 }}>
-				<Grid size={{
-					xs: 12,
-					md: 6
-				}}>
-					ListProducts
-					{/* <ListProducts
-						showFindProduct={showFindProduct}
-						onVisibleProductsChange={setVisibleProducts}
-						onProductSelect={setSelectedProduct}
-					/> */}
-				</Grid>
-
-				
-			</Grid>
-			
+			<ConfirmAction
+				open={confirmDeleteQueueOpen}
+				icon="delete"
+				title="Delete everything from the queue?"
+				body="This will permanently delete every item currently in the queue."
+				handleConfirm={handleDeleteQueue}
+				handleClose={() => setConfirmDeleteQueueOpen(false)}
+			/>
 		</Box>
 	);
 }

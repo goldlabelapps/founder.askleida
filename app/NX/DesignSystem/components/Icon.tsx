@@ -1,12 +1,10 @@
 'use client';
 import { I_Icon } from '../../types';
 import * as React from 'react';
-
 import AwinIcon from './SVGIcons/_AwinIcon';
 import SupabaseIcon from './SVGIcons/_SupabaseIcon';
 import LeidaIcon from './SVGIcons/_LeidaIcon';
 import ClaudeIcon from './SVGIcons/_ClaudeIcon';
-
 import PingpongballIcon from './SVGIcons/PingpongballIcon';
 import OliverIcon from './SVGIcons/OliverIcon';
 import FallmanagerIcon from './SVGIcons/FallmanagerIcon';
@@ -124,7 +122,7 @@ import FeatureIcon from '@mui/icons-material/RocketLaunchOutlined';
 import SitemapIcon from '@mui/icons-material/AccountTree';
 import GoodfitIcon from '@mui/icons-material/InterpreterMode';
 import SpeakwriteIcon from '@mui/icons-material/KeyboardVoice';
-import ProductsIcon from '@mui/icons-material/Store';
+import ProductsIcon from '@mui/icons-material/PriceChange';
 import UbereduxIcon from '@mui/icons-material/StorageOutlined';
 import CartridgeIcon from '@mui/icons-material/AutoAwesomeMotion';
 import CoreIcon from '@mui/icons-material/BarcodeReader';
@@ -136,7 +134,7 @@ import AddIcon from '@mui/icons-material/Add';
 import PreviewIcon from '@mui/icons-material/Preview';
 import PhotoIcon from '@mui/icons-material/CameraAlt';
 import AlbumIcon from '@mui/icons-material/Collections';
-import LinkIcon from '@mui/icons-material/Link';
+import LinkIcon from '@mui/icons-material/OpenInNew';
 import AboutIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ClientsIcon from '@mui/icons-material/PeopleAltOutlined';
 import MoreIcon from '@mui/icons-material/MoreVert';
@@ -202,6 +200,9 @@ import RandomIcon from '@mui/icons-material/Shuffle';
 import PractitionerIcon from '@mui/icons-material/Face6';
 import PractitionerAddIcon from '@mui/icons-material/FaceRetouchingNatural';
 
+import StartIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+
 export default function Icon({ icon, color }: I_Icon) {
   if (!color) color = 'inherit';
   let iconFragment = <React.Fragment />;
@@ -209,7 +210,12 @@ export default function Icon({ icon, color }: I_Icon) {
     case 'stop':
       iconFragment = <StopIcon color={color} />;
       break;
-
+    case 'pause':
+      iconFragment = <PauseIcon color={color} />;
+      break;
+    case 'start':
+      iconFragment = <StartIcon color={color} />;
+      break;
     case 'claude':
       iconFragment = <ClaudeIcon color={color} />;
       break;
@@ -946,6 +952,11 @@ export default function Icon({ icon, color }: I_Icon) {
     case 'logs':
       iconFragment = <LogsIcon color={color} />;
       break;
+
+    case 'list':
+      iconFragment = <LogsIcon color={color} />;
+      break;
+      
     case 'experience':
       iconFragment = <ExperienceIcon color={color} />;
       break;

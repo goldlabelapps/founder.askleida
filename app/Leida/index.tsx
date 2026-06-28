@@ -12,6 +12,7 @@ import {
 import DashAuth from './components/FounderDash/components/DashAuth';
 import Awin from './components/Awin/Awin';
 import AwinDetail from './components/Awin/components/AwinDetail';
+import AwinList from './components/Awin/components/AwinList';
 import AwinProcess from './components/Awin/components/AwinProcess';
 import Queue from './components/Awin/components/Queue';
 import Products from './components/Products/Products';
@@ -20,6 +21,8 @@ import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
 import { AffiliatePlayer } from './components/AffiliatePlayer';
 import MightyButton from './components/MightyButton/MightyButton';
+import ConfirmAction from '../NX/DesignSystem/components/ConfirmAction';
+import Editable from '../NX/NXAdmin/components/UI/Editable';
 import { LeidaFlash } from './components/LeidaFlash';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
@@ -52,10 +55,14 @@ import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRo
 import { saveSupabaseRecord } from './components/Supabase/actions/saveSupabaseRecord';
 import { initAwin } from './components/Awin/actions/initAwin';
 import { setAwin } from './components/Awin/actions/setAwin';
+import { fetchAwin } from './components/Awin/actions/fetchAwin';
 import { processAwin } from './components/Awin/actions/processAwin';
+import { processQueueItem } from './components/Awin/actions/processQueueItem';
 import { initProducts } from './components/Products/actions/initProducts';
+import { fetchProducts } from './components/Products/actions/fetchProducts';
 import { initQueue } from './components/Products/actions/initQueue';
 import { fetchQueue } from './components/Products/actions/fetchQueue';
+import { deleteQueueSelection } from './components/Products/actions/deleteQueueSelection';
 import { setProducts } from './components/Products/actions/setProducts';
 import { setQueue } from './components/Products/actions/setQueue';
 import { initClaude } from './components/Claude/actions/initClaude';
@@ -136,6 +143,7 @@ export {
     DashSurface,
     Awin,
     AwinDetail,
+    AwinList,
     AwinProcess,
     AwinSearch,
     Products,
@@ -145,6 +153,8 @@ export {
     FindProduct,
     AffiliatePlayer,
     MightyButton,
+    ConfirmAction,
+    Editable,
     LeidaFlash,
     Claude,
     ClaudePopup,
@@ -176,11 +186,15 @@ export {
     initSupabase,
     initAwin,
     initProducts,
+    fetchProducts,
     initQueue,
     initClaude,
     processAwin,
+    processQueueItem,
+    fetchAwin,
     fetchLeida,
     fetchQueue,
+    deleteQueueSelection,
     fetchSupabaseRows,
     setLeida,
     setAwin,

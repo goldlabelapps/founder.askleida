@@ -1,54 +1,46 @@
 'use client';
 import * as React from 'react';
+
+import type { T_AwinProcessedPayload, T_AwinProduct } from '../../types.d';
 import {
-    Alert,
     Box,
-    Button,
     CircularProgress,
-    IconButton,
     Stack,
-    SvgIcon,
-    TextField,
     Typography,
 } from '@mui/material';
 import {
-    DataGrid,
-    type GridColDef,
-    type GridRenderCellParams,
     type GridRowSelectionModel,
     type GridSortModel,
 } from '@mui/x-data-grid';
 import { useDispatch } from '../../../NX/Uberedux';
 import { usePaywall } from '../../../NX/Paywall';
-import AwinDetail from './components/AwinDetail';
-import { processAwin } from './actions/processAwin';
+import { setFeedback } from '../../../NX/DesignSystem';
+import { Editable } from '../../../NX/NXAdmin';
 import {
+    asText,
     fetchLeida,
+    MightyButton,
+    orderByFromSortField,
+    productCategory,
+    productDeepLink,
+    productIdentity,
+    productName,
+    productPriceValue,
     setLeida,
-    setAwin,
+    sortFieldFromQuery,
     useAwin,
     useDash,
+    AwinDetail,
+    AwinList,
+    fetchAwin,
 } from '../../../Leida';
-import type { T_AwinProcessedPayload, T_AwinProduct } from '../../types.d';
-import { asText } from '../../lib/asText';
-import { formatUkPrice } from '../../lib/formatUkPrice';
-import { orderByFromSortField } from '../../lib/orderByFromSortField';
-import { productCategory } from '../../lib/productCategory';
-import { productDeepLink } from '../../lib/productDeepLink';
-import { productIdentity } from '../../lib/productIdentity';
-import { productName } from '../../lib/productName';
-import { productPriceValue } from '../../lib/productPriceValue';
-import { sortFieldFromQuery } from '../../lib/sortFieldFromQuery';
 
-const RESULTS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
+const RESULTS_PER_PAGE_OPTIONS = [5, 10, 25, 50, 100];
 const SEARCH_DEBOUNCE_MS = 350;
+const QUEUE_COUNT_REFRESH_EVENT = 'leida:queue-count-refresh';
 
-function LinkOutIcon() {
-    return (
-        <SvgIcon fontSize="small" viewBox="0 0 24 24">
-            <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3Zm5 16V11h2v10H3V3h10v2H5v14h14Z" />
-        </SvgIcon>
-    );
+function notifyQueueCountRefresh() {
+    window.dispatchEvent(new Event(QUEUE_COUNT_REFRESH_EVENT));
 }
 
 export default function Awin() {
@@ -63,11 +55,18 @@ export default function Awin() {
     const [page, setPage] = React.useState(typeof awin?.query?.page === 'number' ? awin.query.page : 1);
     const [searchTerm, setSearchTerm] = React.useState(typeof awin?.query?.q === 'string' ? awin.query.q : '');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState(typeof awin?.query?.q === 'string' ? awin.query.q : '');
-    const [resultsPerPage, setResultsPerPage] = React.useState(typeof awin?.query?.limit === 'number' ? awin.query.limit : 25);
+    const clampPageSize = React.useCallback((value: number) => {
+        if (!Number.isFinite(value)) return 100;
+        return Math.min(100, Math.max(5, Math.floor(value)));
+    }, []);
+
+    const [resultsPerPage, setResultsPerPage] = React.useState(
+        clampPageSize(typeof awin?.query?.limit === 'number' ? awin.query.limit : 100),
+    );
     const [sortModel, setSortModel] = React.useState<GridSortModel>([
         {
             field: sortFieldFromQuery(awin?.query?.orderBy),
-            sort: awin?.query?.orderDir === 'asc' ? 'asc' : 'desc',
+            sort: awin?.query?.orderDir === 'desc' ? 'desc' : 'asc',
         },
     ]);
     const [selectionModel, setSelectionModel] = React.useState<GridRowSelectionModel>({
@@ -76,13 +75,11 @@ export default function Awin() {
     });
     const [loading, setLoading] = React.useState(false);
     const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false);
-    const [error, setError] = React.useState<string | null>(null);
-    const [bulkError, setBulkError] = React.useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
     const [bulkDecision, setBulkDecision] = React.useState<'queue' | 'delete' | null>(null);
     const [refreshNonce, setRefreshNonce] = React.useState(0);
+    const [isInitialLoad, setIsInitialLoad] = React.useState(true);
 
-    const activeSort = sortModel[0] || { field: 'product_name', sort: 'desc' as const };
+    const activeSort = sortModel[0] || { field: 'product_name', sort: 'asc' as const };
     const orderBy = orderByFromSortField(activeSort.field);
     const orderDir = activeSort.sort === 'asc' ? 'asc' : 'desc';
 
@@ -97,13 +94,21 @@ export default function Awin() {
         }));
     }, [products]);
 
-    const selectedCount = React.useMemo(() => {
-        if (selectionModel.type === 'exclude') {
-            return Math.max(total - selectionModel.ids.size, 0);
-        }
+    const displayedRows = isInitialLoad ? [] : rows;
+    const displayedTotal = isInitialLoad ? 0 : total;
 
-        return selectionModel.ids.size;
-    }, [selectionModel, total]);
+    const visibleRowIds = React.useMemo(() => {
+        return new Set(rows.map((row) => String(row.id)));
+    }, [rows]);
+
+    const visibleSelectedIds = React.useMemo(() => {
+        // Bulk actions should only operate on checked rows visible in the current grid page.
+        return Array.from(selectionModel.ids)
+            .map((value) => String(value))
+            .filter((id) => visibleRowIds.has(id));
+    }, [selectionModel.ids, visibleRowIds]);
+
+    const selectedCount = visibleSelectedIds.length;
 
     const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
     const activeQuery = debouncedSearchTerm.trim();
@@ -126,30 +131,37 @@ export default function Awin() {
     }, [activeQuery, hasLoadedOnce, loading, page, total, totalPages]);
 
     const handleProcessed = React.useCallback(async ({ decision, awin: processedAwin }: T_AwinProcessedPayload) => {
-        setSuccessMessage(decision === 'queue'
-            ? `Queued ${productName(processedAwin)} and removed it from the AWIN source table.`
-            : `Deleted ${productName(processedAwin)}.`);
-        setBulkError(null);
+        dispatch(setFeedback({
+            severity: 'success',
+            title: decision === 'queue'
+                ? `Queued ${productName(processedAwin)} and removed it from the AWIN source table.`
+                : `Deleted ${productName(processedAwin)}.`,
+        }));
         setSelectionModel({
             type: 'include',
             ids: new Set<string>(),
         });
         setRefreshNonce((value) => value + 1);
-    }, []);
+
+        if (decision === 'queue') {
+            notifyQueueCountRefresh();
+        }
+    }, [dispatch]);
 
     const handleBulkProcess = React.useCallback(async (decision: 'queue' | 'delete') => {
-        if (!selectedCount) {
+        if (!visibleSelectedIds.length) {
             return;
         }
 
         if (!practitionerId) {
-            setBulkError('Practitioner ID is required before processing products.');
+            dispatch(setFeedback({
+                severity: 'warning',
+                title: 'Practitioner ID is required before processing products.',
+            }));
             return;
         }
 
         setBulkDecision(decision);
-        setBulkError(null);
-        setSuccessMessage(null);
 
         try {
             const res = await fetch('/api/awin/lookfantastic/queue', {
@@ -167,8 +179,8 @@ export default function Awin() {
                         orderDir,
                     },
                     selection: {
-                        type: selectionModel.type,
-                        ids: Array.from(selectionModel.ids).map((value) => String(value)),
+                        type: 'include',
+                        ids: visibleSelectedIds,
                     },
                 }),
             });
@@ -186,12 +198,16 @@ export default function Awin() {
 
             if (decision === 'queue') {
                 await dispatch(fetchLeida('/api/products/queue'));
+                notifyQueueCountRefresh();
             }
 
             const actionLabel = decision === 'queue'
-                ? 'queued and removed from the AWIN source table'
-                : 'deleted';
-            setSuccessMessage(`${processedCount} product${processedCount === 1 ? '' : 's'} ${actionLabel}.`);
+                ? 'Queued and removed.'
+                : 'Deleted.';
+            dispatch(setFeedback({
+                severity: 'success',
+                title: `${processedCount} product${processedCount === 1 ? '' : 's'} ${actionLabel}.`,
+            }));
             setSelectionModel({
                 type: 'include',
                 ids: new Set<string>(),
@@ -199,11 +215,14 @@ export default function Awin() {
             setRefreshNonce((value) => value + 1);
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : String(e);
-            setBulkError(message || `Failed to ${decision} selected products.`);
+            dispatch(setFeedback({
+                severity: 'warning',
+                title: message || `Failed to ${decision} selected products.`,
+            }));
         } finally {
             setBulkDecision(null);
         }
-    }, [debouncedSearchTerm, dispatch, orderBy, orderDir, practitionerId, selectedCount, selectionModel]);
+    }, [debouncedSearchTerm, dispatch, orderBy, orderDir, practitionerId, selectedCount, visibleSelectedIds]);
 
     React.useEffect(() => {
         const timeoutId = window.setTimeout(() => {
@@ -225,69 +244,39 @@ export default function Awin() {
         let cancelled = false;
 
         const run = async () => {
-            const offset = Math.max(0, (page - 1) * resultsPerPage);
-            const params = new URLSearchParams({
-                limit: String(resultsPerPage),
-                offset: String(offset),
-                orderBy,
-                orderDir,
-            });
-
-            if (debouncedSearchTerm.trim()) {
-                params.set('q', debouncedSearchTerm.trim());
-            }
-
-            const route = `/api/awin?${params.toString()}`;
-
             setLoading(true);
-            setError(null);
 
             try {
-                const res = await fetch(route, {
-                    method: 'GET',
-                    headers: {
-                        Accept: 'application/json',
-                    },
-                });
-
-                const json = await res.json().catch(() => null);
-
-                if (!res.ok) {
-                    const message = json?.message || `Failed to fetch AWIN results (${res.status})`;
-                    throw new Error(message);
-                }
-
-                const data = json?.data || {};
-                const nextRows = Array.isArray(data?.rows) ? data.rows : [];
-                const count = typeof data?.count === 'number' ? data.count : nextRows.length;
+                const result = await dispatch(fetchAwin({
+                    page,
+                    limit: resultsPerPage,
+                    orderBy,
+                    orderDir,
+                    q: debouncedSearchTerm,
+                }));
 
                 if (cancelled) {
                     return;
                 }
 
-                await dispatch(setAwin('rows', nextRows));
-                await dispatch(setAwin('products', nextRows));
-                await dispatch(setAwin('count', count));
-                await dispatch(setAwin('scanned', nextRows.length));
-                await dispatch(setAwin('sourceRoute', route));
-                await dispatch(setAwin('query', {
-                    page,
-                    limit: resultsPerPage,
-                    offset,
-                    orderBy,
-                    orderDir,
-                    q: debouncedSearchTerm.trim(),
-                }));
+                if (!result?.ok) {
+                    throw new Error(result?.error || 'AWIN query failed');
+                }
+
                 setHasLoadedOnce(true);
             } catch (e: unknown) {
                 if (cancelled) {
                     return;
                 }
                 const message = e instanceof Error ? e.message : String(e);
-                setError(message || 'AWIN query failed');
+                dispatch(setFeedback({
+                    severity: 'warning',
+                    title: message || 'AWIN query failed',
+                }));
             } finally {
                 if (!cancelled) {
                     setLoading(false);
+                    setIsInitialLoad(false);
                 }
             }
         };
@@ -308,170 +297,110 @@ export default function Awin() {
         }
     }, [dispatch, dash?.title]);
 
-    const columns = React.useMemo<GridColDef[]>(() => {
-        return [
-            {
-                field: 'product_name',
-                headerName: 'Product',
-                flex: 1.6,
-                minWidth: 260,
-                sortable: true,
-                renderCell: (params: GridRenderCellParams) => (
-                    <Button
-                        variant="text"
-                        sx={{ justifyContent: 'flex-start', textTransform: 'none', px: 0 }}
-                        onClick={() => {
-                            console.log('AWIN product clicked', params.row.product as T_AwinProduct);
-                        }}
-                    >
-                        {params.value}
-                    </Button>
-                ),
-            },
-            {
-                field: 'aw_deep_link',
-                headerName: 'Link',
-                width: 88,
-                sortable: false,
-                filterable: false,
-                align: 'center',
-                headerAlign: 'center',
-                renderCell: (params: GridRenderCellParams) => {
-                    const href = typeof params.value === 'string' ? params.value : '';
-                    if (!href) {
-                        return <Typography variant="caption" color="text.secondary">N/A</Typography>;
-                    }
-
-                    return (
-                        <IconButton
-                            component="a"
-                            href={href}
-                            target="_blank"
-                            rel="noreferrer"
-                            size="small"
-                            aria-label={`Open ${params.row.product_name}`}
-                            onClick={(event) => event.stopPropagation()}
-                        >
-                            <LinkOutIcon />
-                        </IconButton>
-                    );
-                },
-            },
-            {
-                field: 'category_name',
-                headerName: 'Category',
-                flex: 1,
-                minWidth: 180,
-                sortable: false,
-            },
-            {
-                field: 'price',
-                headerName: 'Price',
-                width: 140,
-                sortable: true,
-                align: 'right',
-                headerAlign: 'right',
-                renderCell: (params: GridRenderCellParams) => formatUkPrice(typeof params.value === 'number' ? params.value : null),
-            },
-        ];
-    }, []);
-
     return (
         <Box sx={{ p: 2 }}>
             <Stack spacing={2}>
-                <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
-                    <TextField
-                        size="small"
-                        label="Search products"
-                        placeholder="Search by product name"
-                        value={searchTerm}
-                        sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%' }}
-                        onChange={(event) => {
-                            setPage(1);
-                            setSearchTerm(event.target.value);
-                        }}
-                    />
-                    <Button
-                        variant="text"
-                        color="inherit"
-                        disabled={!searchTerm.trim() || Boolean(bulkDecision)}
-                        onClick={() => {
-                            setPage(1);
-                            setSearchTerm('');
-                            setDebouncedSearchTerm('');
-                        }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        variant="contained"
-                        disabled={!selectedCount || Boolean(bulkDecision)}
-                        onClick={() => handleBulkProcess('queue')}
-                    >
-                        {bulkDecision === 'queue' ? <CircularProgress size={18} color="inherit" /> : `Add to queue${selectedCount ? ` (${selectedCount})` : ''}`}
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        disabled={!selectedCount || Boolean(bulkDecision)}
-                        onClick={() => handleBulkProcess('delete')}
-                    >
-                        {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
-                    </Button>
+                <Stack
+                    direction={{ xs: 'column', md: 'row' }}
+                    spacing={1.5}
+                    alignItems={{ xs: 'stretch', md: 'center' }}
+                    justifyContent="space-between"
+                >
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                       
+                        <MightyButton
+                            startIcon="queue"
+                            variant="outlined"
+                            disabled={!selectedCount || Boolean(bulkDecision)}
+                            onClick={() => handleBulkProcess('queue')}
+                        >
+                            {bulkDecision === 'queue' ? <CircularProgress size={18} color="inherit" /> : `Add${selectedCount ? ` (${selectedCount})` : ''}`}
+                        </MightyButton>
+
+                        <MightyButton
+                            variant="text"
+                            startIcon="delete"
+                            disabled={!selectedCount || Boolean(bulkDecision)}
+                            onClick={() => handleBulkProcess('delete')}
+                        >
+                            {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
+                        </MightyButton>
+
+                    </Stack>
+
+                    <Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%', ml: { md: 'auto' } }}>
+                        <Editable
+                            variant="standard"
+                            placeholder="Search Awin"
+                            value={searchTerm}
+                            onChange={(value: string) => {
+                                setPage(1);
+                                setSearchTerm(value);
+                            }}
+                            disabled={Boolean(bulkDecision)}
+                            startAdornment={'search'}
+                            endAdornment={(
+                                <MightyButton
+                                    kind="icon"
+                                    icon="cancel"
+                                    disabled={!searchTerm.trim() || Boolean(bulkDecision)}
+                                    onClick={() => {
+                                        setPage(1);
+                                        setSearchTerm('');
+                                        setDebouncedSearchTerm('');
+                                    }}
+                                />
+                            )}
+                        />
+                    </Box>
                 </Stack>
 
-                <Typography variant="body2" color="text.secondary">
-                    {statusMessage}
-                </Typography>
+                {activeQuery ? (
+                    <Typography variant="body2" color="text.secondary">
+                        {statusMessage}
+                    </Typography>
+                ) : null}
 
-                {error ? <Alert severity="error">{error}</Alert> : null}
-                {bulkError ? <Alert severity="error">{bulkError}</Alert> : null}
-                {successMessage ? <Alert severity="success">{successMessage}</Alert> : null}
-
-                <Box sx={{ width: '100%', minHeight: 560 }}>
-                    <DataGrid
-                        rows={rows}
-                        columns={columns}
-                        loading={loading}
-                        checkboxSelection
-                        disableRowSelectionOnClick
-                        pagination
-                        paginationMode="server"
-                        sortingMode="server"
-                        rowCount={total}
-                        pageSizeOptions={RESULTS_PER_PAGE_OPTIONS}
-                        paginationModel={{ page: page - 1, pageSize: resultsPerPage }}
-                        onPaginationModelChange={(model) => {
-                            setPage((typeof model?.page === 'number' ? model.page : 0) + 1);
-                            if (typeof model?.pageSize === 'number' && model.pageSize !== resultsPerPage) {
-                                setPage(1);
-                                setResultsPerPage(model.pageSize);
-                            }
-                        }}
-                        sortModel={sortModel}
-                        onSortModelChange={(nextModel) => {
-                            const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
-                                ? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'asc' ? 'asc' : 'desc' }]
-                                : [{ field: 'product_name', sort: 'desc' as const }];
+                <AwinList
+                    rows={displayedRows}
+                    loading={loading}
+                    total={displayedTotal}
+                    page={page}
+                    resultsPerPage={resultsPerPage}
+                    pageSizeOptions={RESULTS_PER_PAGE_OPTIONS}
+                    sortModel={sortModel}
+                    selectionModel={selectionModel}
+                    onPaginationModelChange={(model) => {
+                        setPage((typeof model?.page === 'number' ? model.page : 0) + 1);
+                        if (typeof model?.pageSize === 'number' && model.pageSize !== resultsPerPage) {
                             setPage(1);
-                            setSortModel(normalized);
-                        }}
-                        rowSelectionModel={selectionModel}
-                        onRowSelectionModelChange={(nextSelection) => {
-                            const nextIds = new Set(Array.from(nextSelection.ids).map((value) => String(value)));
-                            setSelectionModel({
-                                type: nextSelection.type,
-                                ids: nextIds,
-                            });
-                        }}
-                        sx={{
-                            border: 0,
-                            '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
-                                outline: 'none',
-                            },
-                        }}
-                    />
-                </Box>
+                            setResultsPerPage(clampPageSize(model.pageSize));
+                        }
+                    }}
+                    onSortModelChange={(nextModel) => {
+                        const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
+                            ? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'asc' ? 'asc' : 'desc' }]
+                            : [{ field: 'product_name', sort: 'asc' as const }];
+                        setPage(1);
+                        setSortModel(normalized);
+                    }}
+                    onRowSelectionModelChange={(nextSelection) => {
+                        const nextIds = nextSelection.type === 'exclude'
+                            ? new Set(Array.from(visibleRowIds))
+                            : new Set(
+                                Array.from(nextSelection.ids)
+                                    .map((value) => String(value))
+                                    .filter((id) => visibleRowIds.has(id)),
+                            );
+                        setSelectionModel({
+                            type: 'include',
+                            ids: nextIds,
+                        });
+                    }}
+                    onOpenProduct={(product, rowId) => {
+                        setSelectedAwin(product);
+                    }}
+                />
             </Stack>
 
             <AwinDetail

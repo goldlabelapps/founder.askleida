@@ -2,7 +2,6 @@
 import * as React from 'react';
 import {
 	Box,
-	Button,
 	CardMedia,
 	Dialog,
 	DialogActions,
@@ -11,66 +10,117 @@ import {
 	IconButton,
 	Stack,
 	Typography,
-	useMediaQuery,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import {Icon} from '../../../../NX/DesignSystem';
-import { AwinProcess } from '../../../index';
+import { ConfirmAction, Icon } from '../../../../NX/DesignSystem';
+import { useDispatch } from '../../../../NX/Uberedux';
+import { usePaywall } from '../../../../NX/Paywall';
+import { MightyButton } from '../../../index';
 import { asText } from '../../../lib/asText';
-import type { I_AwinDetail, T_ImageMeta } from '../../../types.d';
-
-const INITIAL_IMAGE_META: T_ImageMeta = {
-	status: 'idle',
-	width: 0,
-	height: 0,
-};
+import { processAwin } from '../actions/processAwin';
+import type { I_AwinDetail } from '../../../types.d';
 
 export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinDetail) {
-	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-	const [imageMeta, setImageMeta] = React.useState<T_ImageMeta>(INITIAL_IMAGE_META);
-	const [isProcessing, setIsProcessing] = React.useState(true);
+	const dispatch = useDispatch();
+	const paywall = usePaywall();
+	const [showRawData, setShowRawData] = React.useState(false);
+	const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
+	const [deleting, setDeleting] = React.useState(false);
+	const [queueing, setQueueing] = React.useState(false);
+	const [queueError, setQueueError] = React.useState<string | null>(null);
 
-	const preferredData = awin?.data && typeof awin.data === 'object'
+	const practitionerId = asText(paywall?.uid) || asText(paywall?.user?.uid);
+
+	const data = awin?.data && typeof awin.data === 'object'
 		? (awin.data as Record<string, unknown>)
 		: {};
 
-	// Prefer AWIN feed payload under data for duplicated fields.
-	const preferredAwin = awin
-		? {
-			...awin,
-			...preferredData,
-			data: awin.data,
+	const pickText = (...values: unknown[]): string => {
+		for (const value of values) {
+			if (typeof value === 'string' && value.trim()) {
+				return value.trim();
+			}
 		}
-		: null;
-	const preferredRecord = preferredAwin as Record<string, unknown> | null;
+		return '';
+	};
 
-	const title = typeof preferredAwin?.product_name === 'string' && preferredAwin.product_name.trim()
-		? preferredAwin.product_name
-		: 'Awin Detail';
-
-	const description = typeof preferredAwin?.description === 'string' && preferredAwin.description.trim()
-		? preferredAwin.description
-		: 'No description available.';
-
-	const imageUrl = [
-		asText(preferredRecord?.large_image),
-		asText(preferredRecord?.image_url),
-		asText(preferredRecord?.merchant_image_url),
-		asText(preferredRecord?.aw_image_url),
-		asText(preferredRecord?.merchant_thumb_url),
-	].find(Boolean) || '';
-	const deepLink = asText(preferredRecord?.merchant_deep_link) || asText(preferredRecord?.aw_deep_link);
-
-	React.useEffect(() => {
-		setImageMeta(INITIAL_IMAGE_META);
-	}, [imageUrl, open]);
+	const title = pickText(awin?.product_name, data.product_name) || 'AWIN Product';
+	const description = pickText(awin?.description, data.description) || 'No description available.';
+	const merchant = pickText(data.merchant_name);
+	const category = pickText(awin?.category_name, data.category_name, data.merchant_category);
+	const thumbnailUrl = pickText(
+		data.thumbnail,
+		data.thumb_url,
+		data.merchant_thumb_url,
+		data.aw_image_url,
+		data.image_url,
+		data.merchant_image_url,
+	);
+	const merchantLink = pickText(data.merchant_deep_link);
+	const awinLink = pickText(awin?.aw_deep_link, data.aw_deep_link);
+	const displayPrice = pickText(data.display_price);
+	const searchPrice = pickText(awin?.search_price, data.search_price);
+	const currency = pickText(awin?.currency, data.currency);
+	const price = displayPrice || (searchPrice ? `${currency || ''}${searchPrice}` : 'N/A');
 
 	React.useEffect(() => {
 		if (open) {
-			setIsProcessing(true);
+			setShowRawData(false);
+			setConfirmDeleteOpen(false);
+			setDeleting(false);
+			setQueueing(false);
+			setQueueError(null);
 		}
 	}, [open]);
+
+	const handleQueueConfirm = async () => {
+		if (!awin || !practitionerId || queueing) {
+			return;
+		}
+
+		setQueueing(true);
+		setQueueError(null);
+
+		const result = await dispatch(
+			processAwin({
+				awin,
+				decision: 'queue',
+				practitionerId,
+			}) as any,
+		);
+
+		setQueueing(false);
+
+		if (!result?.ok) {
+			setQueueError(typeof result?.error === 'string' ? result.error : 'Failed to add product to queue.');
+			return;
+		}
+
+		await onProcessed?.({ decision: 'queue', awin });
+		onClose();
+	};
+
+	const handleDeleteConfirm = async () => {
+		if (!awin || !practitionerId || deleting) {
+			setConfirmDeleteOpen(false);
+			return;
+		}
+
+		setDeleting(true);
+		const result = await dispatch(
+			processAwin({
+				awin,
+				decision: 'delete',
+				practitionerId,
+			}) as any,
+		);
+		setDeleting(false);
+		setConfirmDeleteOpen(false);
+
+		if (result?.ok) {
+			await onProcessed?.({ decision: 'delete', awin });
+			onClose();
+		}
+	};
 
 	return (
 		<Dialog
@@ -78,107 +128,139 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 			onClose={onClose}
 			maxWidth="md"
 			fullWidth
-			fullScreen={true}
+			fullScreen={false}
 			sx={{ zIndex: (muiTheme) => muiTheme.zIndex.modal + 100 }}
 		>
-			<DialogTitle sx={{  }}>
-				<IconButton
-					aria-label="close dialog"
+			<DialogTitle sx={{ display: 'flex' }}>
+				<Box sx={{ flexGrow: 1 }} />
+				<MightyButton
+					kind="icon"
+					icon="awin"
+					onClick={() => {
+						window.open(awinLink, '_blank', 'noopener,noreferrer');
+					}}
+				/>
+				<MightyButton
+					kind="icon"
+					icon="api"
+					onClick={() => setShowRawData((prev) => !prev)}
+				/>
+				<MightyButton
+					kind="icon"
+					icon="link"
+					onClick={() => {
+						window.open(merchantLink, '_blank', 'noopener,noreferrer');
+					}}
+				/>
+				<MightyButton
+					kind="icon"
 					onClick={onClose}
+					icon="close"
+				/>
+			</DialogTitle>
+
+			<DialogContent>
+				{showRawData ? (
+					<Box
+						component="pre"
+						sx={{
+							m: 0,
+							p: 2,
+							borderRadius: 1,
+							bgcolor: 'grey.100',
+							overflowX: 'auto',
+							whiteSpace: 'pre-wrap',
+							wordBreak: 'break-word',
+							fontSize: 13,
+						}}
+					>
+						{JSON.stringify(awin ?? {}, null, 2)}
+					</Box>
+				) : null}
+
+				<Box
 					sx={{
-						position: 'absolute',
-						right: 12,
-						top: 12,
+						display: 'grid',
+						gridTemplateColumns: { xs: '1fr', md: '260px 1fr' },
+						gap: 2,
+						alignItems: 'start',
 					}}
 				>
-					<Icon icon="cancel" />
-				</IconButton>
-			</DialogTitle>
-			<DialogContent dividers>
-				{isProcessing ? (
-					<AwinProcess
-						awin={awin}
-						onProcessed={async (payload) => {
-							await onProcessed?.(payload);
-							onClose();
-						}}
-					/>
-				) : (
 					<Box
 						sx={{
+							bgcolor: 'grey.100',
+							borderRadius: 2,
+							minHeight: 220,
 							display: 'grid',
-							gridTemplateColumns: { xs: '1fr', md: '1.15fr 0.85fr' },
-							gap: { xs: 2, md: 3 },
-							alignItems: 'start',
+							placeItems: 'center',
+							overflow: 'hidden',
 						}}
 					>
-						<Stack spacing={1.25}>
-							<Typography
-								variant="body1"
+						{thumbnailUrl ? (
+							<CardMedia
+								component="img"
+								image={thumbnailUrl}
+								alt={title}
 								sx={{
-									fontSize: { xs: '1rem', md: '1.05rem' },
-									lineHeight: 1.75,
-									color: 'text.primary',
+									width: '100%',
+									height: 260,
+									objectFit: 'contain',
+									p: 1,
 								}}
-							>
-								{description}
-							</Typography>
-							
-						</Stack>
-
-						<Box>
-							{imageUrl ? (
-								<>
-									<CardMedia
-										component="img"
-										image={imageUrl}
-										alt={title}
-										sx={{
-											width: '100%',
-											maxHeight: { xs: 260, md: 360 },
-											objectFit: 'contain',
-											borderRadius: 2,
-											bgcolor: 'grey.100',
-											p: 1,
-										}}
-										onLoad={(event) => {
-											const img = event.currentTarget;
-											setImageMeta({ status: 'loaded', width: img.naturalWidth, height: img.naturalHeight });
-										}}
-										onError={() => setImageMeta({ status: 'error', width: 0, height: 0 })}
-									/>
-								</>
-							) : (
-								<Box
-									sx={{
-										height: { xs: 220, md: 320 },
-										display: 'grid',
-										placeItems: 'center',
-										bgcolor: 'grey.100',
-										borderRadius: 2,
-									}}
-								>
-									<Typography variant="body2" color="text.secondary">
-										No image available
-									</Typography>
-								</Box>
-							)}
-						</Box>
+							/>
+						) : (
+							<Typography variant="body2" color="text.secondary">No thumbnail</Typography>
+						)}
 					</Box>
-				)}
+
+					<Stack spacing={1.5}>
+						<Typography variant="h6">
+							{title}
+						</Typography>
+
+						<Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+							{description}
+						</Typography>
+					</Stack>
+				</Box>
+
+				{queueError ? <Typography variant="body2" color="error">{queueError}</Typography> : null}
 			</DialogContent>
 			<DialogActions sx={{ px: 3, pb: 2.5, pt: 2 }}>
-				{!isProcessing && <>
-					<Button
+				<Stack
+					direction={{ xs: 'column', md: 'row' }}
+					spacing={1}
+					sx={{ width: '100%' }}
+				>
+					<MightyButton
+						startIcon={'delete'}
+						variant="outlined"
+						color="error"
 						fullWidth
-						variant={isProcessing ? 'outlined' : 'contained'}
-						startIcon={<Icon icon={isProcessing ? 'left' : 'claude'} />}
-						onClick={() => setIsProcessing((prev) => !prev)}
-					>
-						{isProcessing ? 'Back to product details' : 'Process product'}
-					</Button></>}
-				
+						disabled={!awin || !practitionerId || deleting || queueing}
+						onClick={() => setConfirmDeleteOpen(true)}>
+						{deleting ? 'Deleting...' : 'Delete from Awin'}
+					</MightyButton>
+					<MightyButton
+						startIcon={'queue'}
+						variant="contained"
+						fullWidth
+						disabled={!awin || !practitionerId || queueing || deleting}
+						onClick={() => { void handleQueueConfirm(); }}>
+						{queueing ? 'Adding...' : 'Add to Queue'}
+					</MightyButton>
+				</Stack>
 			</DialogActions>
+
+			<ConfirmAction
+				open={confirmDeleteOpen}
+				icon="delete"
+				title="Delete this AWIN product?"
+				body="This will remove it from the AWIN source list."
+				handleConfirm={handleDeleteConfirm}
+				handleClose={() => setConfirmDeleteOpen(false)}
+				zIndex={1500}
+			/>
 		</Dialog>
 	);
 }

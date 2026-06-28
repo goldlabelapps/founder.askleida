@@ -63,18 +63,18 @@ export default function MiniListItem({
                   primary={
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
                           <Typography
-                                variant="body2"
-                              color={selected ? 'text.primary' : 'text.secondary'}
-                              sx={{ ml: nested ? 3 : 0 }}
+                            variant="body2"
+                            color={selected ? 'text.primary' : 'text.secondary'}
+                            sx={{ ml: nested ? 3 : 0 }}
                           >
                               {label}
                           </Typography>
                           {typeof badgeContent === 'number' ? (
                               <Badge
-                                  badgeContent={badgeContent}
-                                  color="primary"
-                                  max={999}
-                                  sx={{ mr: 1.5 }}
+                                color="secondary"
+                                badgeContent={badgeContent} 
+                                max={50000}
+                                sx={{ mr: 1.5 }}
                               />
                           ) : null}
                       </Box>

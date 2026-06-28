@@ -5,6 +5,11 @@ import type {
     IconButtonProps,
     ListItemButtonProps,
 } from '@mui/material';
+import type {
+    GridPaginationModel,
+    GridRowSelectionModel,
+    GridSortModel,
+} from '@mui/x-data-grid';
 import type { I_Icon } from '../NX/types';
 
 export type T_SupabaseColumn = {
@@ -155,6 +160,30 @@ export interface I_AwinDetail {
     onProcessed?: (payload: T_AwinProcessedPayload) => void | Promise<void>;
 }
 
+export type T_AwinListRow = {
+    id: string;
+    product_name: string;
+    category_name: string;
+    price: number | null;
+    aw_deep_link: string;
+    product: T_AwinProduct;
+};
+
+export type T_AwinListProps = {
+    rows: T_AwinListRow[];
+    loading: boolean;
+    total: number;
+    page: number;
+    resultsPerPage: number;
+    pageSizeOptions: number[];
+    sortModel: GridSortModel;
+    selectionModel: GridRowSelectionModel;
+    onPaginationModelChange: (model: GridPaginationModel) => void;
+    onSortModelChange: (nextModel: GridSortModel) => void;
+    onRowSelectionModelChange: (nextSelection: GridRowSelectionModel) => void;
+    onOpenProduct: (product: T_AwinProduct, rowId: string) => void;
+};
+
 export type Product = {
     name?: string;
     cadence?: string;
@@ -182,6 +211,7 @@ export type RenderProductsProps = {
 
 export type T_Product = {
     id?: string;
+    product_id?: string | number;
     name?: string;
     title?: string;
     product_name?: string;
@@ -292,7 +322,6 @@ export type T_RenderProductProps = {
 };
 
 export type T_ListProductsProps = {
-    showFindProduct?: boolean;
     onVisibleProductsChange?: (products: T_Product[]) => void;
     onProductSelect?: (product: T_Product) => void;
 };

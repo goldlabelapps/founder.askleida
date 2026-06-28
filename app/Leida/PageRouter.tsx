@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import type { I_PageRouter } from './types';
 import { usePathname } from 'next/navigation';
 import {
   Supabase,
@@ -13,10 +14,10 @@ import {
   Awin,
   PractitionerNew,
   Products,
+  ListProducts,
   Queue,
   LeidaFlash,
 } from '../Leida';
-import type { I_PageRouter } from './types';
 
 export function PageRouter({ active }: I_PageRouter) {
   const pathname = usePathname();
@@ -38,6 +39,10 @@ export function PageRouter({ active }: I_PageRouter) {
       return <SupabasePostgres />;
     case 'supabase/users':
       return <SupabaseUsers />;
+    case 'products/awin':
+      return <Awin />;
+    case 'products/awin/search':
+      return <AwinSearch />;
     case 'awin':
       return <Awin />;
     case 'awin/search':
@@ -51,6 +56,8 @@ export function PageRouter({ active }: I_PageRouter) {
       return <LeidaFlash />;
     case 'products':
       return <Products />;
+    case 'products/list':
+      return <ListProducts />;
     default:
       return <FounderDash />;
   }

@@ -33,7 +33,7 @@ const DashSurface = () => {
 					title="Awin"
 					description="Affiliate marketing data"
 					icon={'awin'}
-					cta={() => handleCardClick('/awin')}
+					cta={() => handleCardClick('/products/awin')}
 				/>
 			</Grid>
 

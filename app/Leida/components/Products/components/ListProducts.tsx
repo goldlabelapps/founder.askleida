@@ -1,116 +1,374 @@
 'use client';
 import * as React from 'react';
+import {useRouter} from 'next/navigation';
 import {
-	Alert,
 	Box,
-	Collapse,
-	Grid,
+	Button,
 	LinearProgress,
 	Stack,
+	Typography,
 } from '@mui/material';
+import {
+	DataGrid,
+	type GridColDef,
+	type GridRenderCellParams,
+	type GridSortModel,
+} from '@mui/x-data-grid';
+import { setFeedback, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
-	FindProduct,
+	formatUkPrice,
+	getProductCategoryLabel,
+	getProductName,
+	getProductPrice,
+	getProductUpdatedAt,
+	Editable,
+	fetchProducts,
 	initProducts,
-	useLeidaBus,
-	useProducts,
+	MightyButton,
+	setLeida
 } from '../../../../Leida';
-import RenderProduct from './RenderProduct';
 import type { T_ListProductsProps, T_Product } from '../../../types.d';
 
+
+const RESULTS_PER_PAGE_OPTIONS = [5, 10, 25, 50, 100];
+const SEARCH_DEBOUNCE_MS = 350;
+const PRODUCTS_COUNT_REFRESH_EVENT = 'leida:products-count-refresh';
+
+type T_ProductListRow = {
+	id: string;
+	title: string;
+	category: string | null;
+	price: number | null;
+	updated: string | number | null;
+	product: T_Product;
+};
+
+function notifyProductsCountRefresh() {
+	window.dispatchEvent(new Event(PRODUCTS_COUNT_REFRESH_EVENT));
+}
+
 const ListProducts = ({
-	showFindProduct = true,
 	onVisibleProductsChange,
 	onProductSelect,
 }: T_ListProductsProps) => {
-
+	const router = useRouter();
 	const dispatch = useDispatch();
-	const productsSlice = useProducts();
-	const bus = useLeidaBus('/api/products');
-	const [visibleProducts, setVisibleProducts] = React.useState<T_Product[]>([]);
-	const [viewMode, setViewMode] = React.useState<'card' | 'list'>('list');
+	const [products, setProducts] = React.useState<T_Product[]>([]);
+	const [total, setTotal] = React.useState(0);
+	const [page, setPage] = React.useState(1);
+	const [searchTerm, setSearchTerm] = React.useState('');
+	const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState('');
+	const [resultsPerPage, setResultsPerPage] = React.useState(100);
+	const [sortModel, setSortModel] = React.useState<GridSortModel>([
+		{ field: 'title', sort: 'asc' },
+	]);
+	const [loading, setLoading] = React.useState(false);
+	const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false);
+	const [error, setError] = React.useState<string | null>(null);
+	const [refreshNonce, setRefreshNonce] = React.useState(0);
+	const lastSearchFeedbackKeyRef = React.useRef('');
 
 	React.useEffect(() => {
 		dispatch(initProducts());
 	}, [dispatch]);
 
-	const sourceProducts = React.useMemo(() => {
-		const fromSlice = Array.isArray(productsSlice?.products)
-			? (productsSlice.products as T_Product[])
-			: [];
-		const fromBus = Array.isArray(bus?.data)
-			? (bus.data as T_Product[])
-			: [];
+	const activeSort = sortModel[0] || { field: 'title', sort: 'asc' as const };
+	const sortBy = (() => {
+		switch (activeSort.field) {
+			case 'created':
+				return 'created';
+			case 'updated':
+				return 'updated';
+			default:
+				return 'title';
+		}
+	})();
+	const sortOrder = activeSort.sort === 'desc' ? 'desc' : 'asc';
 
-		if (fromSlice.length > 0) return fromSlice;
-		return fromBus;
-
-	}, [productsSlice?.products, bus?.data]);
+	const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
+	const activeQuery = debouncedSearchTerm.trim();
+	const isResolvingInitialProducts = !hasLoadedOnce && !error;
+	const showEmptyLibraryState = !loading && !error && hasLoadedOnce && !activeQuery && total === 0;
 
 	React.useEffect(() => {
-		setVisibleProducts(sourceProducts);
-	}, [sourceProducts]);
+		dispatch(setLeida('header', {
+			title: 'List',
+			icon: 'list',
+		}));
+	}, [dispatch]);
 
 	React.useEffect(() => {
-		onVisibleProductsChange?.(visibleProducts);
-	}, [visibleProducts, onVisibleProductsChange]);
+		const timeoutId = window.setTimeout(() => {
+			setDebouncedSearchTerm(searchTerm);
+		}, SEARCH_DEBOUNCE_MS);
 
-	const loading = Boolean(productsSlice?.loading) || Boolean(bus?.loading);
-	const error = typeof productsSlice?.error === 'string' && productsSlice.error
-		? productsSlice.error
-		: (typeof bus?.error === 'string' ? bus.error : null);
+		return () => {
+			window.clearTimeout(timeoutId);
+		};
+	}, [searchTerm]);
+
+	React.useEffect(() => {
+		if (page > totalPages) {
+			setPage(totalPages);
+		}
+	}, [page, totalPages]);
+
+	React.useEffect(() => {
+		if (!activeQuery) {
+			lastSearchFeedbackKeyRef.current = '';
+			return;
+		}
+
+		if (error || !hasLoadedOnce) {
+			return;
+		}
+
+		const feedbackKey = loading
+			? `loading:${activeQuery}`
+			: total === 0
+				? `empty:${activeQuery}`
+				: `results:${activeQuery}:${total}`;
+
+		if (lastSearchFeedbackKeyRef.current === feedbackKey) {
+			return;
+		}
+
+		lastSearchFeedbackKeyRef.current = feedbackKey;
+		dispatch(setFeedback({
+			severity: 'info',
+			title: loading
+				? `Searching for "${activeQuery}"...`
+				: total === 0
+					? `Nothing found for "${activeQuery}"`
+					: `${total} results for "${activeQuery}".`,
+		}));
+	}, [activeQuery, dispatch, error, hasLoadedOnce, loading, total]);
+
+	React.useEffect(() => {
+		let cancelled = false;
+
+		const run = async () => {
+			setLoading(true);
+			setError(null);
+
+			try {
+				const result = await dispatch(fetchProducts({
+					page,
+					pageSize: resultsPerPage,
+					sortBy,
+					sortOrder,
+					q: debouncedSearchTerm,
+				}));
+
+				if (cancelled) {
+					return;
+				}
+
+				if (!result?.ok) {
+					throw new Error(result?.error || 'Products query failed');
+				}
+
+				setProducts(Array.isArray(result.rows) ? result.rows as T_Product[] : []);
+				setTotal(typeof result.total === 'number' ? result.total : 0);
+				setHasLoadedOnce(true);
+			} catch (e: unknown) {
+				if (cancelled) {
+					return;
+				}
+				const message = e instanceof Error ? e.message : String(e);
+				setError(message || 'Products query failed');
+				dispatch(setFeedback({
+					severity: 'warning',
+					title: message || 'Products query failed',
+				}));
+			} finally {
+				if (!cancelled) {
+					setLoading(false);
+				}
+			}
+		};
+
+		run();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [debouncedSearchTerm, dispatch, page, refreshNonce, resultsPerPage, sortBy, sortOrder]);
+
+	const rows = React.useMemo<T_ProductListRow[]>(() => {
+		return products.map((product, index) => {
+			const productId = typeof product?.product_id === 'string' && product.product_id
+				? product.product_id
+				: (typeof product?.product_id === 'number' && Number.isFinite(product.product_id)
+					? String(Math.floor(product.product_id))
+					: '');
+			const fallbackId = typeof product?.id === 'string' && product.id
+				? product.id
+				: (typeof product?.id === 'number' && Number.isFinite(product.id)
+					? String(Math.floor(product.id))
+					: `product-row-${index}`);
+			const id = productId || fallbackId;
+			const numericPrice = Number(getProductPrice(product));
+
+			return {
+				id,
+				title: getProductName(product),
+				category: getProductCategoryLabel(product),
+				price: Number.isFinite(numericPrice) ? numericPrice : null,
+				updated: getProductUpdatedAt(product),
+				product,
+			};
+		});
+	}, [products]);
+
+	React.useEffect(() => {
+		onVisibleProductsChange?.(products);
+	}, [products, onVisibleProductsChange]);
+
+	const columns = React.useMemo<GridColDef[]>(() => {
+		return [
+			{
+				field: 'title',
+				headerName: '',
+				flex: 1.6,
+				minWidth: 280,
+				sortable: true,
+				renderCell: (params: GridRenderCellParams) => (
+					<Button
+						variant="text"
+						sx={{ justifyContent: 'flex-start', textTransform: 'none', px: 0 }}
+						onClick={() => {
+							onProductSelect?.(params.row.product as T_Product);
+						}}
+					>
+						{params.value}
+					</Button>
+				),
+			},
+			{
+				field: 'category',
+				headerName: 'Category',
+				flex: 1,
+				minWidth: 180,
+				sortable: false,
+			},
+			{
+				field: 'price',
+				headerName: 'Price',
+				width: 140,
+				sortable: false,
+				align: 'right',
+				headerAlign: 'right',
+				renderCell: (params: GridRenderCellParams) => formatUkPrice(typeof params.value === 'number' ? params.value : null),
+			},
+			{
+				field: 'updated',
+				headerName: 'Updated',
+				width: 180,
+				sortable: true,
+			},
+		];
+	}, [onProductSelect]);
 
 	return (
 		<Stack spacing={2}>
-			
-
-			<Box sx={{ height: 6 }}>
-				{loading ? <LinearProgress /> : null}
-			</Box>
-
-			{error ? <Alert severity="error">{error}</Alert> : null}
-
-			{!loading && !error && visibleProducts.length === 0 ? (
-				<Alert severity="info">No products found.</Alert>
-			) : null}
-
-			{viewMode === 'card' ? (
-				<Grid container spacing={1.25}>
-					{visibleProducts.map((product, index) => {
-						const key = typeof product?.id === 'string' && product.id
-							? product.id
-							: `product-${index}`;
-
-						return (
-							<Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
-								<RenderProduct
-									product={product}
-									viewMode="card"
-									onAddToCart={onProductSelect}
-								/>
-							</Grid>
-						);
-					})}
-				</Grid>
+			{isResolvingInitialProducts ? (
+				<LinearProgress />
+			) : showEmptyLibraryState ? (
+				<Box sx={{ py: 4 }}>
+					<Typography variant="body1" color="text.secondary">
+						No products yet. Add products from Awin into the Queue, then process them to build your products library.
+					</Typography>
+					<MightyButton
+						variant="contained"
+						startIcon="awin"
+						sx={{ mt: 3 }}
+						onClick={() => {
+							dispatch(navigateTo(router, '/products/awin'));
+						}}
+					>
+						Go to Awin
+					</MightyButton>
+				</Box>
 			) : (
-				<Stack spacing={1.25}>
-					{visibleProducts.map((product, index) => {
-						const key = typeof product?.id === 'string' && product.id
-							? product.id
-							: `product-${index}`;
-
-						return (
-							<Box key={key}>
-								<RenderProduct
-									product={product}
-									viewMode="list"
-									onAddToCart={onProductSelect}
+				<Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
+					<Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%', ml: { md: 'auto' } }}>
+						<Editable
+							variant="standard"
+							placeholder="Search products"
+							value={searchTerm}
+							onChange={(value: string) => {
+								setPage(1);
+								setSearchTerm(value);
+							}}
+							startAdornment={'search'}
+							endAdornment={(
+								<MightyButton
+									kind="icon"
+									icon="cancel"
+									disabled={!searchTerm.trim()}
+									onClick={() => {
+										setPage(1);
+										setSearchTerm('');
+										setDebouncedSearchTerm('');
+									}}
 								/>
-							</Box>
-						);
-					})}
+							)}
+						/>
+					</Box>
 				</Stack>
 			)}
+
+			{loading || rows.length > 0 ? (
+				<Box sx={{ width: '100%', minHeight: 560 }}>
+					<DataGrid
+						rows={rows}
+						columns={columns}
+						initialState={{
+							columns: {
+								columnVisibilityModel: {
+									category: false,
+									price: false,
+									updated: false,
+								},
+							},
+						}}
+						loading={loading}
+						disableRowSelectionOnClick
+						pagination
+						paginationMode="server"
+						sortingMode="server"
+						rowCount={total}
+						pageSizeOptions={RESULTS_PER_PAGE_OPTIONS}
+						paginationModel={{ page: page - 1, pageSize: resultsPerPage }}
+						onPaginationModelChange={(model) => {
+							setPage((typeof model?.page === 'number' ? model.page : 0) + 1);
+							if (typeof model?.pageSize === 'number' && model.pageSize !== resultsPerPage) {
+								setPage(1);
+								setResultsPerPage(model.pageSize);
+							}
+						}}
+						sortModel={sortModel}
+						onSortModelChange={(nextModel) => {
+							const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
+								? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'desc' ? 'desc' : 'asc' }]
+								: [{ field: 'title', sort: 'asc' as const }];
+							setPage(1);
+							setSortModel(normalized);
+						}}
+						onCellClick={(params) => {
+							onProductSelect?.(params.row.product as T_Product);
+						}}
+						sx={{
+							border: 0,
+							'& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
+								outline: 'none',
+							},
+						}}
+					/>
+				</Box>
+			) : null}
 		</Stack>
 	);
 };
