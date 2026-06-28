@@ -1,5 +1,4 @@
 import React from 'react';
-import type { T_Product } from '../Products/components/FindProduct';
 import {
     Box,
     Button,
@@ -16,6 +15,14 @@ import {
 } from '@mui/material';
 import { Icon } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
+import { findNestedTextByKeys } from '../../lib/findNestedTextByKeys';
+import { getAffiliateCategory } from '../../lib/getAffiliateCategory';
+import { getAffiliateDescription } from '../../lib/getAffiliateDescription';
+import { getAffiliateImageUrl } from '../../lib/getAffiliateImageUrl';
+import { getAffiliateMerchantLink } from '../../lib/getAffiliateMerchantLink';
+import { getAffiliateProductIdentity } from '../../lib/getAffiliateProductIdentity';
+import { getAffiliateTitle } from '../../lib/getAffiliateTitle';
+import type { AffiliatePlayerProps, T_Product } from '../../types.d';
 import { 
     useLeidaBus,
     useProducts,
@@ -25,260 +32,6 @@ import {
 
 const CARD_HEIGHT = 375;
 const SWIPE_THRESHOLD_PX = 50;
-
-type AffiliatePlayerProps = {
-    products?: T_Product[];
-    selectedProduct?: T_Product | null;
-};
-
-type T_Record = Record<string, unknown>;
-
-const isRecord = (value: unknown): value is T_Record => {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
-};
-
-const parseJsonObject = (value: unknown): unknown => {
-    if (isRecord(value) || Array.isArray(value)) return value;
-    if (typeof value !== 'string') return value;
-
-    const trimmed = value.trim();
-    if (!trimmed || (trimmed[0] !== '{' && trimmed[0] !== '[')) return value;
-
-    try {
-        return JSON.parse(trimmed);
-    } catch {
-        return value;
-    }
-};
-
-const toText = (value: unknown): string => {
-    if (typeof value !== 'string') return '';
-    const trimmed = value.trim();
-    if (!trimmed) return '';
-
-    const lowered = trimmed.toLowerCase();
-    if (lowered === 'null' || lowered === 'undefined') return '';
-
-    return trimmed;
-};
-
-const getPathValue = (source: unknown, path: string): unknown => {
-    const parts = path.split('.');
-    let cursor: unknown = parseJsonObject(source);
-
-    for (const part of parts) {
-        cursor = parseJsonObject(cursor);
-
-        if (Array.isArray(cursor)) {
-            const index = Number(part);
-            if (!Number.isInteger(index) || index < 0 || index >= cursor.length) return undefined;
-            cursor = cursor[index];
-            continue;
-        }
-
-        if (!isRecord(cursor)) return undefined;
-        cursor = cursor[part];
-    }
-
-    return cursor;
-};
-
-const pickFirstText = (source: unknown, paths: string[]): string => {
-    for (const path of paths) {
-        const value = toText(getPathValue(source, path));
-        if (value) return value;
-    }
-    return '';
-};
-
-const normalizeUrl = (value: string): string => {
-    const raw = toText(value);
-    if (!raw) return '';
-
-    if (raw.startsWith('//')) return `https:${raw}`;
-    if (/^https?:\/\//i.test(raw)) return raw;
-    if (/^www\./i.test(raw)) return `https://${raw}`;
-    if (/^[^\s]+\.[^\s]+/.test(raw)) return `https://${raw}`;
-
-    return raw;
-};
-
-const findNestedTextByKeys = (source: unknown, keys: string[]): string => {
-    const queue: unknown[] = [parseJsonObject(source)];
-    const targetKeys = new Set(keys.map((key) => key.toLowerCase()));
-    const seen = new Set<unknown>();
-
-    while (queue.length) {
-        const current = queue.shift();
-        if (!current || seen.has(current)) continue;
-        seen.add(current);
-
-        const parsedCurrent = parseJsonObject(current);
-
-        if (Array.isArray(parsedCurrent)) {
-            for (const item of parsedCurrent) queue.push(item);
-            continue;
-        }
-
-        if (!isRecord(parsedCurrent)) continue;
-
-        for (const [key, value] of Object.entries(parsedCurrent)) {
-            const keyLower = key.toLowerCase();
-            const textValue = toText(value);
-            if (targetKeys.has(keyLower) && textValue) {
-                return textValue;
-            }
-
-            if (isRecord(value) || Array.isArray(value) || typeof value === 'string') {
-                queue.push(value);
-            }
-        }
-    }
-
-    return '';
-};
-
-const getTitle = (product: T_Product | undefined): string => {
-    if (!product) return 'Untitled product';
-    return pickFirstText(product, [
-        'name',
-        'title',
-        'product_name',
-        'data.name',
-        'data.title',
-        'data.product_name',
-        'data.awin.product_name',
-        'data.awin.product_basic.title',
-        'data.awin.product_basic.name',
-    ])
-        || 'Untitled product';
-};
-
-const getDescription = (product: T_Product | undefined): string => {
-    if (!product) return '';
-    return pickFirstText(product, [
-        'description',
-        'data.description',
-        'data.awin.description',
-        'data.awin.product_basic.description',
-    ]);
-};
-
-const getCategory = (product: T_Product | undefined): string => {
-    if (!product) return 'Uncategorized';
-    return pickFirstText(product, [
-        'category',
-        'category_name',
-        'merchant_category',
-        'data.category',
-        'data.category_name',
-        'data.merchant_category',
-        'data.awin.category_name',
-        'data.awin.product_basic.category',
-    ])
-        || 'Uncategorized';
-};
-
-const getImageUrl = (product: T_Product | undefined): string => {
-    if (!product) return 'https://via.placeholder.com/1200x630?text=No+Image';
-
-    const image = pickFirstText(product, [
-        'image',
-        'image_url',
-        'merchant_image_url',
-        'aw_image_url',
-        'merchant_thumb_url',
-        'large_image',
-        'data.image',
-        'data.image_url',
-        'data.images.0',
-        'data.aw_image_url',
-        'data.merchant_image_url',
-        'data.awinProduct.data.merchant_image_url',
-        'data.awinProduct.data.aw_image_url',
-        'data.awinProduct.product_basic.merchant_image_url',
-        'data.awinProduct.product_basic.aw_image_url',
-        'data.awinRow.data.merchant_image_url',
-        'data.awinRow.data.aw_image_url',
-        'data.awin.data.merchant_image_url',
-        'data.awin.data.aw_image_url',
-        'data.awin.product_basic.merchant_image_url',
-        'data.awin.product_basic.aw_image_url',
-    ]);
-
-    const deepImage = image || findNestedTextByKeys(product, [
-        'merchant_image_url',
-        'aw_image_url',
-        'image_url',
-        'image',
-        'thumbnail',
-        'thumb_url',
-    ]);
-
-    const normalizedImage = normalizeUrl(deepImage);
-    if (normalizedImage) return normalizedImage;
-
-    return 'https://via.placeholder.com/1200x630?text=No+Image';
-};
-
-const getMerchantLink = (product: T_Product | undefined): string => {
-    if (!product) return '';
-
-    const link = pickFirstText(product, [
-        'aw_deep_link',
-        'merchant_deep_link',
-        'deeplink',
-        'deep_link',
-        'url',
-        'product_url',
-        'data.awinDeepLink',
-        'data.merchant_deep_link',
-        'data.aw_deep_link',
-        'data.deeplink',
-        'data.deep_link',
-        'data.url',
-        'data.product_url',
-        'data.awinProduct.merchant_deep_link',
-        'data.awinProduct.aw_deep_link',
-        'data.awinProduct.data.merchant_deep_link',
-        'data.awinProduct.data.aw_deep_link',
-        'data.awinRow.data.merchant_deep_link',
-        'data.awinRow.data.aw_deep_link',
-        'data.awin.merchant_deep_link',
-        'data.awin.aw_deep_link',
-        'data.awin.product_basic.aw_deep_link',
-    ]);
-
-    const deepLink = link || findNestedTextByKeys(product, [
-        'merchant_deep_link',
-        'aw_deep_link',
-        'deeplink',
-        'deep_link',
-        'product_url',
-        'url',
-    ]);
-
-    return normalizeUrl(deepLink);
-};
-
-const getProductIdentity = (product: T_Product | undefined): string => {
-    if (!product) return '';
-
-    return pickFirstText(product, [
-        'id',
-        'unique_key',
-        'aw_product_id',
-        'merchant_product_id',
-        'ean',
-        'name',
-        'title',
-        'product_name',
-        'data.id',
-        'data.unique_key',
-        'data.aw_product_id',
-        'data.merchant_product_id',
-    ]);
-};
 
 const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products, selectedProduct = null }) => {
     const dispatch = useDispatch();
@@ -329,11 +82,11 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products, selectedPro
     React.useEffect(() => {
         if (!selectedProduct || productsData.length === 0) return;
 
-        const selectedIdentity = getProductIdentity(selectedProduct);
+        const selectedIdentity = getAffiliateProductIdentity(selectedProduct);
         const selectedIndex = productsData.findIndex((product) => {
             if (product === selectedProduct) return true;
             if (!selectedIdentity) return false;
-            return getProductIdentity(product) === selectedIdentity;
+            return getAffiliateProductIdentity(product) === selectedIdentity;
         });
 
         if (selectedIndex >= 0 && selectedIndex !== activeStep) {
@@ -395,11 +148,11 @@ const AffiliatePlayer: React.FC<AffiliatePlayerProps> = ({ products, selectedPro
         );
     }
 
-    const title = getTitle(currentProduct);
-    const description = getDescription(currentProduct);
-    const category = getCategory(currentProduct);
-    const imageUrl = getImageUrl(currentProduct);
-    const merchantLink = getMerchantLink(currentProduct);
+    const title = getAffiliateTitle(currentProduct);
+    const description = getAffiliateDescription(currentProduct);
+    const category = getAffiliateCategory(currentProduct);
+    const imageUrl = getAffiliateImageUrl(currentProduct);
+    const merchantLink = getAffiliateMerchantLink(currentProduct);
     const isMenuOpen = Boolean(menuAnchorEl);
 
     return (

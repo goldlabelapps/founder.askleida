@@ -17,31 +17,9 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { initQueue, setLeida, useDash, useLeidaBus, useQueue } from '../../../../Leida';
-
-type T_QueueRow = {
-  id?: string | number | null;
-  source?: string | null;
-  source_table?: string | null;
-  source_product_id?: string | null;
-  decision?: string | null;
-  status?: string | null;
-  practitioner_id?: string | null;
-  created?: string | null;
-  updated?: string | null;
-  [key: string]: unknown;
-};
-
-function toLabel(value: unknown) {
-  if (typeof value !== 'string' || !value.trim()) return 'Unknown';
-  return value.replace(/_/g, ' ');
-}
-
-function toDate(value: unknown) {
-  if (typeof value !== 'string' || !value.trim()) return '—';
-  const parsed = Date.parse(value);
-  if (Number.isNaN(parsed)) return value;
-  return new Date(parsed).toLocaleString();
-}
+import type { T_QueueRow } from '../../../types.d';
+import { toDate } from '../../../lib/toDate';
+import { toLabel } from '../../../lib/toLabel';
 
 export default function Queue() {
   const dispatch = useDispatch();

@@ -2,22 +2,7 @@ import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
 import { setSupabase } from './setSupabase';
 import { requestSupabase } from './requestSupabase';
-
-type T_FetchSupabaseRowsArgs = {
-    table: string;
-    limit?: number;
-    offset?: number;
-};
-
-type T_RowsResponse = {
-    table?: string;
-    rows?: Record<string, any>[];
-    count?: number;
-    limit?: number;
-    offset?: number;
-    columns?: any[];
-    primary_keys?: string[];
-};
+import type { T_FetchSupabaseRowsArgs, T_RowsResponse } from '../../../types.d';
 
 export const fetchSupabaseRows = ({ table, limit = 25, offset = 0 }: T_FetchSupabaseRowsArgs): any =>
     async (dispatch: Dispatch, getState: () => any) => {

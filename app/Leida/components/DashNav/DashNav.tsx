@@ -8,13 +8,17 @@ import {
 import { useDispatch } from '../../../NX/Uberedux';
 import { MiniListItem } from '../../../NX/NXAdmin';
 import { useLeidaBus } from '../../hooks/useLeida';
+import { initAwin } from '../Awin/actions/initAwin';
 import { initQueue } from '../Products/actions/initQueue';
 import { LoggedInAs } from './components/index';
-import { navItems, type DashNavItem } from './navItems';
+import { navItems } from './navItems';
+import type { DashNavItem } from '../../types.d';
 
 export default function DashNav({
+  open = true,
   onNavigate,
 }: {
+  open?: boolean;
   onNavigate?: () => void;
 }) {
 
@@ -24,6 +28,7 @@ export default function DashNav({
   const queueBus = useLeidaBus('/api/products/queue');
 
   React.useEffect(() => {
+    dispatch(initAwin());
     dispatch(initQueue());
   }, [dispatch]);
 
@@ -41,7 +46,6 @@ export default function DashNav({
       onNavigate?.();
   }, [onNavigate, pathname, router]);
 
-  const open = true;
   const normalizedPathname = React.useMemo(() => {
     if (!pathname) return '/';
     if (pathname.length > 1 && pathname.endsWith('/')) return pathname.slice(0, -1);

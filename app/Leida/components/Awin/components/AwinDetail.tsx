@@ -16,23 +16,14 @@ import {
 import { useTheme } from '@mui/material/styles';
 import {Icon} from '../../../../NX/DesignSystem';
 import { AwinProcess } from '../../../index';
-import type { I_AwinDetail } from '../../../types';
-
-type T_ImageMeta = {
-	status: 'idle' | 'loaded' | 'error';
-	width: number;
-	height: number;
-};
+import { asText } from '../../../lib/asText';
+import type { I_AwinDetail, T_ImageMeta } from '../../../types.d';
 
 const INITIAL_IMAGE_META: T_ImageMeta = {
 	status: 'idle',
 	width: 0,
 	height: 0,
 };
-
-function getString(value: unknown): string {
-	return typeof value === 'string' ? value : '';
-}
 
 export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinDetail) {
 	const theme = useTheme();
@@ -63,13 +54,13 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 		: 'No description available.';
 
 	const imageUrl = [
-		getString(preferredRecord?.large_image),
-		getString(preferredRecord?.image_url),
-		getString(preferredRecord?.merchant_image_url),
-		getString(preferredRecord?.aw_image_url),
-		getString(preferredRecord?.merchant_thumb_url),
+		asText(preferredRecord?.large_image),
+		asText(preferredRecord?.image_url),
+		asText(preferredRecord?.merchant_image_url),
+		asText(preferredRecord?.aw_image_url),
+		asText(preferredRecord?.merchant_thumb_url),
 	].find(Boolean) || '';
-	const deepLink = getString(preferredRecord?.merchant_deep_link) || getString(preferredRecord?.aw_deep_link);
+	const deepLink = asText(preferredRecord?.merchant_deep_link) || asText(preferredRecord?.aw_deep_link);
 
 	React.useEffect(() => {
 		setImageMeta(INITIAL_IMAGE_META);

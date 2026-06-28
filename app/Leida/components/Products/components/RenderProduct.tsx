@@ -14,60 +14,11 @@ import {
 	Stack,
 	Typography,
 } from '@mui/material';
-import { T_Product } from './FindProduct';
-
-type T_RenderProductProps = {
-	product: T_Product;
-	onAddToCart?: (product: T_Product) => void | Promise<void>;
-	addingToCart?: boolean;
-	viewMode?: 'card' | 'list';
-};
-
-function getName(product: T_Product): string {
-	if (typeof product?.name === 'string' && product.name.trim()) return product.name.trim();
-	if (typeof product?.title === 'string' && product.title.trim()) return product.title.trim();
-	if (typeof product?.product_name === 'string' && product.product_name.trim()) return product.product_name.trim();
-	return 'Untitled product';
-}
-
-function getPriceLabel(product: T_Product): string | null {
-	const raw = product?.price ?? product?.search_price ?? product?.store_price;
-	if (typeof raw === 'number' && Number.isFinite(raw)) {
-		return `GBP ${raw.toFixed(2)}`;
-	}
-	if (typeof raw === 'string' && raw.trim()) {
-		const normalized = raw.trim();
-		if (/^\d+(\.\d+)?$/.test(normalized)) {
-			return `GBP ${normalized}`;
-		}
-		return normalized;
-	}
-	return null;
-}
-
-function getImageUrl(product: T_Product): string | null {
-	const candidates = [
-		product?.image,
-		product?.image_url,
-		product?.merchant_image_url,
-		product?.aw_image_url,
-		product?.merchant_thumb_url,
-		product?.large_image,
-	];
-
-	for (const candidate of candidates) {
-		if (typeof candidate === 'string' && candidate.trim()) {
-			return candidate.trim();
-		}
-	}
-
-	return null;
-}
-
-function getCategoryLabel(product: T_Product): string | null {
-	const value = product?.category ?? product?.category_name ?? product?.merchant_category;
-	return typeof value === 'string' && value.trim() ? value.trim() : null;
-}
+import { getProductCategoryLabel } from '../../../lib/getProductCategoryLabel';
+import { getProductImageUrl } from '../../../lib/getProductImageUrl';
+import { getProductName } from '../../../lib/getProductName';
+import { getProductPriceLabel } from '../../../lib/getProductPriceLabel';
+import type { T_RenderProductProps } from '../../../types.d';
 
 const RenderProduct = ({
 	product,
@@ -77,10 +28,10 @@ const RenderProduct = ({
 }: T_RenderProductProps) => {
 	const [added, setAdded] = React.useState(false);
 
-	const name = getName(product);
-	const priceLabel = getPriceLabel(product);
-	const imageUrl = getImageUrl(product);
-	const categoryLabel = getCategoryLabel(product);
+	const name = getProductName(product);
+	const priceLabel = getProductPriceLabel(product);
+	const imageUrl = getProductImageUrl(product);
+	const categoryLabel = getProductCategoryLabel(product);
 	const description = typeof product?.description === 'string' && product.description.trim()
 		? product.description.trim()
 		: '';

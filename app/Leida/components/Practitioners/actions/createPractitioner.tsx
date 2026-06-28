@@ -4,21 +4,11 @@ import { fetchSupabaseRows } from '../../Supabase/actions/fetchSupabaseRows';
 import { saveSupabaseRecord } from '../../Supabase/actions/saveSupabaseRecord';
 import { updatePractitioner } from './updatePractitioner';
 import { setFeedback } from '../../../../NX/DesignSystem'
+import type { T_CreatePractitionerArgs, T_CreatePractitionerResult } from '../../../types.d';
 
 const PRACTITIONERS_TABLE = 'practitioners';
 const ACCESS_LEVEL = 3;
 const DEFAULT_AVATAR_URL = 'https://app.askleida.com/askleida/png/default-logo.png';
-
-type T_CreatePractitionerArgs = {
-	email: string;
-};
-
-type T_CreatePractitionerResult = {
-	email: string;
-	practitionerId: string | null;
-	practitioner?: Record<string, any>;
-	user?: Record<string, any>;
-};
 
 export const createPractitioner = ({ email }: T_CreatePractitionerArgs): any =>
 	async (dispatch: Dispatch) => {

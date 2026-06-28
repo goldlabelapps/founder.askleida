@@ -44,7 +44,7 @@ export default function MiniListItem({
           <ListItemButton
               onClick={() => onClick(route)}
               sx={[
-                  { minHeight: nested ? 40 : 48, px: 2.5, pl: nested ? 6 : 2.5 },
+                  { minHeight: nested ? 40 : 48, px: 2.5, pl: open ? (nested ? 6 : 2.5) : 2.5 },
                   open ? { justifyContent: 'initial' } : { justifyContent: 'center' },
                   selected ? { bgcolor: 'action.selected' } : null,
               ]}

@@ -1,10 +1,4 @@
-export type DashNavItem = {
-  label: string;
-  icon: string;
-  route: string;
-  activeRoutes: string[];
-  children?: DashNavItem[];
-};
+import type { DashNavItem } from '../../types.d';
 
 export const navItems: DashNavItem[] = [
   {

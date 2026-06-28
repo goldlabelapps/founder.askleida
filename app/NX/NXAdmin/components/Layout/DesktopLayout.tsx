@@ -188,7 +188,7 @@ export default function DesktopLayout({ config }: { config: any }) {
                     </>}
                     
                 </DrawerHeader>  
-                <DashNav />
+                <DashNav open={open} />
 
             </Drawer>
             <Box component="main" sx={{ flexGrow: 1, p: 3}}>

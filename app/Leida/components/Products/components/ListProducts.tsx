@@ -16,13 +16,7 @@ import {
 	useProducts,
 } from '../../../../Leida';
 import RenderProduct from './RenderProduct';
-import type { T_Product } from './FindProduct';
-
-type T_ListProductsProps = {
-	showFindProduct?: boolean;
-	onVisibleProductsChange?: (products: T_Product[]) => void;
-	onProductSelect?: (product: T_Product) => void;
-};
+import type { T_ListProductsProps, T_Product } from '../../../types.d';
 
 const ListProducts = ({
 	showFindProduct = true,

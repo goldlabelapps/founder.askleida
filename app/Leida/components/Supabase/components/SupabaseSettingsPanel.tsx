@@ -6,13 +6,9 @@ import {
     Stack,
     Typography,
 } from '@mui/material';
-import type { T_SupabaseSchemaData } from '../types';
+import type { T_SupabaseSettingsPanelProps } from '../../../types.d';
 
-type T_Props = {
-    schema: T_SupabaseSchemaData | null | undefined;
-};
-
-export default function SupabaseSettingsPanel({ schema }: T_Props) {
+export default function SupabaseSettingsPanel({ schema }: T_SupabaseSettingsPanelProps) {
     const allowlist = Array.isArray(schema?.crud_allowed_tables) ? schema.crud_allowed_tables : [];
     const source = schema?.crud_allowlist_source || 'default';
 

@@ -23,12 +23,22 @@ import { usePaywall } from '../../../NX/Paywall';
 import AwinDetail from './components/AwinDetail';
 import { processAwin } from './actions/processAwin';
 import {
+    fetchLeida,
     setLeida,
     setAwin,
     useAwin,
     useDash,
 } from '../../../Leida';
-import type { T_AwinProcessedPayload, T_AwinProduct } from '../../types';
+import type { T_AwinProcessedPayload, T_AwinProduct } from '../../types.d';
+import { asText } from '../../lib/asText';
+import { formatUkPrice } from '../../lib/formatUkPrice';
+import { orderByFromSortField } from '../../lib/orderByFromSortField';
+import { productCategory } from '../../lib/productCategory';
+import { productDeepLink } from '../../lib/productDeepLink';
+import { productIdentity } from '../../lib/productIdentity';
+import { productName } from '../../lib/productName';
+import { productPriceValue } from '../../lib/productPriceValue';
+import { sortFieldFromQuery } from '../../lib/sortFieldFromQuery';
 
 const RESULTS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
 const SEARCH_DEBOUNCE_MS = 350;
@@ -39,114 +49,6 @@ function LinkOutIcon() {
             <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3Zm5 16V11h2v10H3V3h10v2H5v14h14Z" />
         </SvgIcon>
     );
-}
-
-function asText(value: unknown): string {
-    return typeof value === 'string' ? value : '';
-}
-
-function asId(value: unknown): string {
-    if (typeof value === 'string') {
-        return value;
-    }
-    if (typeof value === 'number' && Number.isFinite(value)) {
-        return String(value);
-    }
-    return '';
-}
-
-function productIdentity(product: T_AwinProduct | null | undefined): string {
-    if (!product) {
-        return '';
-    }
-
-    return asText(product.id)
-        || asId(product.id)
-        || asText(product.unique_key)
-        || asText(product.aw_product_id)
-        || asText(product.merchant_product_id);
-}
-
-function productName(product: T_AwinProduct | null | undefined): string {
-    if (!product) {
-        return 'Untitled product';
-    }
-
-    return asText(product.product_name)
-        || asText(product.title)
-        || asText(product.name)
-        || 'Untitled product';
-}
-
-function productCategory(product: T_AwinProduct | null | undefined): string {
-    if (!product) {
-        return '';
-    }
-
-    return asText(product.category_name) || asText(product.category);
-}
-
-function productDeepLink(product: T_AwinProduct | null | undefined): string {
-    if (!product) {
-        return '';
-    }
-
-    return asText(product.aw_deep_link) || asText(product.merchant_deep_link);
-}
-
-function productPriceValue(product: T_AwinProduct | null | undefined): number | null {
-    if (!product) {
-        return null;
-    }
-
-    const raw = product.search_price ?? product.price;
-    if (typeof raw === 'number' && Number.isFinite(raw)) {
-        return raw;
-    }
-    if (typeof raw === 'string') {
-        const normalized = raw.replace(/[^0-9.-]/g, '').trim();
-        if (!normalized) {
-            return null;
-        }
-        const parsed = Number(normalized);
-        return Number.isFinite(parsed) ? parsed : null;
-    }
-    return null;
-}
-
-function formatUkPrice(value: number | null): string {
-    if (value === null) {
-        return 'N/A';
-    }
-
-    return new Intl.NumberFormat('en-GB', {
-        style: 'currency',
-        currency: 'GBP',
-    }).format(value);
-}
-
-function orderByFromSortField(field: string): 'product_name' | 'search_price' | 'brand' {
-    if (field === 'price') {
-        return 'search_price';
-    }
-
-    if (field === 'brand') {
-        return 'brand';
-    }
-
-    return 'product_name';
-}
-
-function sortFieldFromQuery(orderBy: unknown): string {
-    if (orderBy === 'search_price') {
-        return 'price';
-    }
-
-    if (orderBy === 'brand') {
-        return 'brand';
-    }
-
-    return 'product_name';
 }
 
 export default function Awin() {
@@ -195,16 +97,13 @@ export default function Awin() {
         }));
     }, [products]);
 
-    const selectedProducts = React.useMemo(() => {
-        if (!selectionModel.ids.size) {
-            return [];
+    const selectedCount = React.useMemo(() => {
+        if (selectionModel.type === 'exclude') {
+            return Math.max(total - selectionModel.ids.size, 0);
         }
 
-        const selectedSet = selectionModel.ids;
-        return rows
-            .filter((row: { id: string; product: T_AwinProduct }) => selectedSet.has(row.id))
-            .map((row: { id: string; product: T_AwinProduct }) => row.product as T_AwinProduct);
-    }, [rows, selectionModel]);
+        return selectionModel.ids.size;
+    }, [selectionModel, total]);
 
     const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
     const activeQuery = debouncedSearchTerm.trim();
@@ -227,7 +126,9 @@ export default function Awin() {
     }, [activeQuery, hasLoadedOnce, loading, page, total, totalPages]);
 
     const handleProcessed = React.useCallback(async ({ decision, awin: processedAwin }: T_AwinProcessedPayload) => {
-        setSuccessMessage(decision === 'queue' ? `Added ${productName(processedAwin)} to queue.` : `Deleted ${productName(processedAwin)}.`);
+        setSuccessMessage(decision === 'queue'
+            ? `Queued ${productName(processedAwin)} and removed it from the AWIN source table.`
+            : `Deleted ${productName(processedAwin)}.`);
         setBulkError(null);
         setSelectionModel({
             type: 'include',
@@ -237,7 +138,7 @@ export default function Awin() {
     }, []);
 
     const handleBulkProcess = React.useCallback(async (decision: 'queue' | 'delete') => {
-        if (!selectedProducts.length) {
+        if (!selectedCount) {
             return;
         }
 
@@ -250,39 +151,59 @@ export default function Awin() {
         setBulkError(null);
         setSuccessMessage(null);
 
-        const results = await Promise.all(
-            selectedProducts.map(async (product: T_AwinProduct) => ({
-                product,
-                result: await dispatch(
-                    processAwin({
-                        awin: product,
-                        decision,
-                        practitionerId,
-                    }) as any,
-                ),
-            })),
-        );
+        try {
+            const res = await fetch('/api/awin/lookfantastic/queue', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    practitioner_id: practitionerId,
+                    decision,
+                    awinQuery: {
+                        q: debouncedSearchTerm.trim(),
+                        orderBy,
+                        orderDir,
+                    },
+                    selection: {
+                        type: selectionModel.type,
+                        ids: Array.from(selectionModel.ids).map((value) => String(value)),
+                    },
+                }),
+            });
 
-        const succeeded = results.filter(({ result }) => result?.ok);
-        const failed = results.filter(({ result }) => !result?.ok);
+            const json = await res.json().catch(() => null);
 
-        if (failed.length) {
-            const firstError = failed[0]?.result?.error;
-            setBulkError(typeof firstError === 'string' ? firstError : `Failed to ${decision} ${failed.length} products.`);
-        }
+            if (!res.ok) {
+                const message = json?.message || `Failed to ${decision} selected products (${res.status})`;
+                throw new Error(message);
+            }
 
-        if (succeeded.length) {
-            const actionLabel = decision === 'queue' ? 'queued' : 'deleted';
-            setSuccessMessage(`${succeeded.length} product${succeeded.length === 1 ? '' : 's'} ${actionLabel}.`);
+            const processedCount = typeof json?.data?.processedCount === 'number'
+                ? json.data.processedCount
+                : selectedCount;
+
+            if (decision === 'queue') {
+                await dispatch(fetchLeida('/api/products/queue'));
+            }
+
+            const actionLabel = decision === 'queue'
+                ? 'queued and removed from the AWIN source table'
+                : 'deleted';
+            setSuccessMessage(`${processedCount} product${processedCount === 1 ? '' : 's'} ${actionLabel}.`);
             setSelectionModel({
                 type: 'include',
                 ids: new Set<string>(),
             });
             setRefreshNonce((value) => value + 1);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            setBulkError(message || `Failed to ${decision} selected products.`);
+        } finally {
+            setBulkDecision(null);
         }
-
-        setBulkDecision(null);
-    }, [dispatch, practitionerId, selectedProducts]);
+    }, [debouncedSearchTerm, dispatch, orderBy, orderDir, practitionerId, selectedCount, selectionModel]);
 
     React.useEffect(() => {
         const timeoutId = window.setTimeout(() => {
@@ -399,7 +320,9 @@ export default function Awin() {
                     <Button
                         variant="text"
                         sx={{ justifyContent: 'flex-start', textTransform: 'none', px: 0 }}
-                        onClick={() => setSelectedAwin(params.row.product as T_AwinProduct)}
+                        onClick={() => {
+                            console.log('AWIN product clicked', params.row.product as T_AwinProduct);
+                        }}
                     >
                         {params.value}
                     </Button>
@@ -458,30 +381,42 @@ export default function Awin() {
             <Stack spacing={2}>
                 <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
                     <TextField
-                        fullWidth
                         size="small"
                         label="Search products"
                         placeholder="Search by product name"
                         value={searchTerm}
+                        sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%' }}
                         onChange={(event) => {
                             setPage(1);
                             setSearchTerm(event.target.value);
                         }}
                     />
                     <Button
+                        variant="text"
+                        color="inherit"
+                        disabled={!searchTerm.trim() || Boolean(bulkDecision)}
+                        onClick={() => {
+                            setPage(1);
+                            setSearchTerm('');
+                            setDebouncedSearchTerm('');
+                        }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
                         variant="contained"
-                        disabled={!selectionModel.ids.size || Boolean(bulkDecision)}
+                        disabled={!selectedCount || Boolean(bulkDecision)}
                         onClick={() => handleBulkProcess('queue')}
                     >
-                        {bulkDecision === 'queue' ? <CircularProgress size={18} color="inherit" /> : `Add to queue${selectionModel.ids.size ? ` (${selectionModel.ids.size})` : ''}`}
+                        {bulkDecision === 'queue' ? <CircularProgress size={18} color="inherit" /> : `Add to queue${selectedCount ? ` (${selectedCount})` : ''}`}
                     </Button>
                     <Button
                         variant="outlined"
                         color="error"
-                        disabled={!selectionModel.ids.size || Boolean(bulkDecision)}
+                        disabled={!selectedCount || Boolean(bulkDecision)}
                         onClick={() => handleBulkProcess('delete')}
                     >
-                        {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectionModel.ids.size ? ` (${selectionModel.ids.size})` : ''}`}
+                        {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
                     </Button>
                 </Stack>
 

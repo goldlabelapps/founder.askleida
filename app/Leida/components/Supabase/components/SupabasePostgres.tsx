@@ -21,17 +21,12 @@ import { saveSupabaseRecord } from '../actions/saveSupabaseRecord';
 import { deleteSupabaseRecord } from '../actions/deleteSupabaseRecord';
 import { setSupabase } from '../actions/setSupabase';
 import { useSupabase } from '../hooks/useSupabase';
-import type { T_SupabaseTable } from '../types';
+import { formatEstimatedRows } from '../../../lib/formatEstimatedRows';
+import type { T_SupabaseTable } from '../../../types.d';
 import SupabaseSchemaPanel from './SupabaseSchemaPanel';
 import SupabaseRowsPanel from './SupabaseRowsPanel';
 import SupabaseAuthPanel from './SupabaseAuthPanel';
 import SupabaseSettingsPanel from './SupabaseSettingsPanel';
-
-function formatEstimatedRows(value?: number): string {
-    if (typeof value !== 'number') return 'N/A';
-    if (value < 0) return 'Unknown';
-    return value.toLocaleString();
-}
 
 
 export default function SupabasePostgres() {

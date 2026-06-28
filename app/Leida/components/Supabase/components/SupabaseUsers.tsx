@@ -24,16 +24,8 @@ import { initSupabase } from '../actions/initSupabase';
 import { fetchSupabaseAuthUsers } from '../actions/fetchSupabaseAuthUsers';
 import { saveSupabaseRecord } from '../actions/saveSupabaseRecord';
 import { useSupabase } from '../hooks/useSupabase';
-import type { T_SupabaseAuthUser } from '../types';
-
-type T_PractitionerRecord = {
-    practitioner_id?: string;
-    name?: string;
-    title?: string;
-    updated?: string;
-    created?: string;
-    [key: string]: any;
-};
+import type { T_SupabaseAuthUser } from '../../../types.d';
+import type { T_SupabaseUsersPractitionerRecord } from '../../../types.d';
 
 export default function SupabaseUsers() {
     const dispatch = useDispatch();
@@ -49,7 +41,7 @@ export default function SupabaseUsers() {
     const canGoNext = currentPage < totalPages;
     const authUsers = (Array.isArray(supabase?.authUsers) ? supabase.authUsers : []) as T_SupabaseAuthUser[];
 
-    const [practitioners, setPractitioners] = React.useState<T_PractitionerRecord[]>([]);
+    const [practitioners, setPractitioners] = React.useState<T_SupabaseUsersPractitionerRecord[]>([]);
     const [practitionersLoading, setPractitionersLoading] = React.useState(false);
     const [practitionersError, setPractitionersError] = React.useState<string | null>(null);
     const [inviteEmail, setInviteEmail] = React.useState('');
@@ -89,7 +81,7 @@ export default function SupabaseUsers() {
                 throw new Error(message);
             }
             const data = Array.isArray(json?.data) ? json.data : [];
-            setPractitioners(data as T_PractitionerRecord[]);
+            setPractitioners(data as T_SupabaseUsersPractitionerRecord[]);
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);
             setPractitionersError(msg || 'Failed to fetch practitioners');

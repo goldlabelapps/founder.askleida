@@ -14,35 +14,13 @@ import {
 	ToggleButtonGroup,
 } from '@mui/material';
 import {Icon} from '../../../../NX/DesignSystem';
-
-export type T_Product = {
-	id?: string;
-	name?: string;
-	title?: string;
-	product_name?: string;
-	description?: string;
-	brand?: string;
-	brand_name?: string;
-	category?: string;
-	category_name?: string;
-	merchant_category?: string;
-	price?: number | string;
-	search_price?: number | string;
-	store_price?: number | string;
-	in_stock?: boolean | string | number;
-	updated?: string;
-	created?: string;
-	[key: string]: unknown;
-};
-
-type T_SortBy = 'relevance' | 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'updated-desc';
-
-type T_FindProductProps = {
-	products: T_Product[];
-	onProductsChange?: (nextProducts: T_Product[]) => void;
-	viewMode?: 'card' | 'list';
-	onViewModeChange?: (nextMode: 'card' | 'list') => void;
-};
+import { getProductBrand } from '../../../lib/getProductBrand';
+import { getProductCategory } from '../../../lib/getProductCategory';
+import { getProductName } from '../../../lib/getProductName';
+import { getProductPrice } from '../../../lib/getProductPrice';
+import { getProductUpdatedAt } from '../../../lib/getProductUpdatedAt';
+import { includesProductQuery } from '../../../lib/includesProductQuery';
+import type { T_FindProductProps, T_Product, T_SortBy } from '../../../types.d';
 
 const SORT_OPTIONS: Array<{ value: T_SortBy; label: string }> = [
 	{ value: 'relevance', label: 'Relevance' },
@@ -52,65 +30,6 @@ const SORT_OPTIONS: Array<{ value: T_SortBy; label: string }> = [
 	{ value: 'price-desc', label: 'Price (High to low)' },
 	{ value: 'updated-desc', label: 'Most recent' },
 ];
-
-function toText(value: unknown): string {
-	return typeof value === 'string' ? value.trim() : '';
-}
-
-function getProductName(product: T_Product): string {
-	return toText(product?.name)
-		|| toText(product?.title)
-		|| toText(product?.product_name)
-		|| 'Untitled product';
-}
-
-function getProductCategory(product: T_Product): string {
-	return toText(product?.category)
-		|| toText(product?.category_name)
-		|| toText(product?.merchant_category);
-}
-
-function getProductBrand(product: T_Product): string {
-	return toText(product?.brand)
-		|| toText(product?.brand_name);
-}
-
-function getProductPrice(product: T_Product): number | null {
-	const value = product?.price ?? product?.search_price ?? product?.store_price;
-
-	if (typeof value === 'number' && Number.isFinite(value)) {
-		return value;
-	}
-
-	if (typeof value === 'string' && value.trim()) {
-		const parsed = Number(value.replace(/[^0-9.-]/g, ''));
-		return Number.isFinite(parsed) ? parsed : null;
-	}
-
-	return null;
-}
-
-function getProductUpdatedAt(product: T_Product): number {
-	const raw = toText(product?.updated) || toText(product?.created);
-	if (!raw) return 0;
-	const parsed = Date.parse(raw);
-	return Number.isNaN(parsed) ? 0 : parsed;
-}
-
-function includesQuery(product: T_Product, normalizedQuery: string): boolean {
-	if (!normalizedQuery) return true;
-
-	const haystack = [
-		getProductName(product),
-		toText(product?.description),
-		getProductBrand(product),
-		getProductCategory(product),
-	]
-		.join(' ')
-		.toLowerCase();
-
-	return haystack.includes(normalizedQuery);
-}
 
 export default function FindProduct({
 	products,
@@ -145,7 +64,7 @@ export default function FindProduct({
 		const normalizedQuery = query.trim().toLowerCase();
 
 		const next = products.filter((product) => {
-			if (!includesQuery(product, normalizedQuery)) return false;
+			if (!includesProductQuery(product, normalizedQuery)) return false;
 
 			if (selectedCategory !== 'all' && getProductCategory(product) !== selectedCategory) {
 				return false;
