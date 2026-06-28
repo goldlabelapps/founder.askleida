@@ -3,14 +3,12 @@ import * as React from 'react';
 import {
 	Alert,
 	Box,
-	Collapse,
 	Grid,
 	LinearProgress,
 	Stack,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
-	FindProduct,
 	initProducts,
 	useLeidaBus,
 	useProducts,

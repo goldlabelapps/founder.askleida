@@ -1,24 +1,15 @@
 'use client';
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import type { T_Product } from '../../types.d';
+import { useRouter } from 'next/navigation';
 import {
 	Box,
-	Grid,
-	Paper,
-	Stack,
-	Tooltip,
-	Typography,
-	Fab,
 } from '@mui/material';
-import { Icon, navigateTo } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
 import {
 	setLeida,
 	useDash,
 	ListProducts,
-	MightyButton,
-	AffiliatePlayer,
 } from '../../../Leida';
 
 export default function Products() {
@@ -30,13 +21,11 @@ export default function Products() {
 	const [selectedProduct, setSelectedProduct] = React.useState<T_Product | null>(null);
 
 	React.useEffect(() => {
-		if (dash && dash.title) {
 			dispatch(setLeida('header', {
 				title: 'Products',
 				icon: 'products',
 			}));
-		}
-	}, [dispatch, dash?.title]);
+	}, [dispatch]);
 
 	React.useEffect(() => {
 		if (!selectedProduct) return;
@@ -48,48 +37,12 @@ export default function Products() {
 	}, [visibleProducts, selectedProduct]);
 
 	return (
-		<Box sx={{ p: 2 }}>
-			<Paper variant="outlined" sx={{ p: 2 }}>
-				<Stack spacing={2}>
-					<Box sx={{ display: 'flex', alignItems: 'center' }}>
-
-						<Typography variant="h5">
-							Products
-						</Typography>
-						
-						<Box sx={{ flexGrow: 1 }} />
-						<MightyButton
-							kind="button"
-							startIcon="awin"
-							endIcon="add"
-							variant="outlined"
-							color="primary"
-							onClick={() => {
-								dispatch(navigateTo(router, '/awin'));
-							}}
-							
-						>
-							Awin
-						</MightyButton>
-					</Box>
-				</Stack>
-			</Paper>
-			<Grid container spacing={2} sx={{ mt: 1 }}>
-				<Grid size={{
-					xs: 12,
-					md: 6
-				}}>
-					ListProducts
-					{/* <ListProducts
-						showFindProduct={showFindProduct}
-						onVisibleProductsChange={setVisibleProducts}
-						onProductSelect={setSelectedProduct}
-					/> */}
-				</Grid>
-
-				
-			</Grid>
-			
+		<Box sx={{}}>
+			<ListProducts
+				showFindProduct={showFindProduct}
+				onVisibleProductsChange={setVisibleProducts}
+				onProductSelect={setSelectedProduct}
+			/>
 		</Box>
 	);
 }

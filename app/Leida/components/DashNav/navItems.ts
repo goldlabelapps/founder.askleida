@@ -27,7 +27,7 @@ export const navItems: DashNavItem[] = [
       },
       {
         label: 'Queue',
-        icon: 'folder',
+        icon: 'queue',
         route: '/products/queue',
         activeRoutes: ['/products/queue'],
       },

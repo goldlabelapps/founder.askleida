@@ -6,7 +6,6 @@ import AwinIcon from './SVGIcons/_AwinIcon';
 import SupabaseIcon from './SVGIcons/_SupabaseIcon';
 import LeidaIcon from './SVGIcons/_LeidaIcon';
 import ClaudeIcon from './SVGIcons/_ClaudeIcon';
-
 import PingpongballIcon from './SVGIcons/PingpongballIcon';
 import OliverIcon from './SVGIcons/OliverIcon';
 import FallmanagerIcon from './SVGIcons/FallmanagerIcon';
@@ -124,7 +123,7 @@ import FeatureIcon from '@mui/icons-material/RocketLaunchOutlined';
 import SitemapIcon from '@mui/icons-material/AccountTree';
 import GoodfitIcon from '@mui/icons-material/InterpreterMode';
 import SpeakwriteIcon from '@mui/icons-material/KeyboardVoice';
-import ProductsIcon from '@mui/icons-material/Store';
+import ProductsIcon from '@mui/icons-material/PriceChange';
 import UbereduxIcon from '@mui/icons-material/StorageOutlined';
 import CartridgeIcon from '@mui/icons-material/AutoAwesomeMotion';
 import CoreIcon from '@mui/icons-material/BarcodeReader';
