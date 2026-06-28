@@ -54,7 +54,7 @@ export default function Editable({
 	const renderAdornmentContent = React.useCallback((adornment?: IconName | React.ReactNode) => {
 		if (!adornment) return null;
 		if (typeof adornment === 'string') {
-			return <Icon icon={adornment} />;
+			return <Icon icon={adornment as IconName} />;
 		}
 		return adornment;
 	}, []);
