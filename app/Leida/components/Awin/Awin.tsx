@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 
 import type { T_AwinProcessedPayload, T_AwinProduct } from '../../types.d';
 import {
@@ -14,7 +15,7 @@ import {
 } from '@mui/x-data-grid';
 import { useDispatch } from '../../../NX/Uberedux';
 import { usePaywall } from '../../../NX/Paywall';
-import { setFeedback } from '../../../NX/DesignSystem';
+import { navigateTo, setFeedback } from '../../../NX/DesignSystem';
 import { Editable } from '../../../NX/NXAdmin';
 import {
     asText,
@@ -45,6 +46,7 @@ function notifyQueueCountRefresh() {
 
 export default function Awin() {
     const dispatch = useDispatch();
+    const router = useRouter();
     const dash = useDash();
     const awin = useAwin();
     const paywall = usePaywall();
@@ -145,8 +147,9 @@ export default function Awin() {
 
         if (decision === 'queue') {
             notifyQueueCountRefresh();
+            dispatch(navigateTo(router, '/products/queue'));
         }
-    }, [dispatch]);
+    }, [dispatch, router]);
 
     const handleBulkProcess = React.useCallback(async (decision: 'queue' | 'delete') => {
         if (!visibleSelectedIds.length) {
@@ -199,6 +202,7 @@ export default function Awin() {
             if (decision === 'queue') {
                 await dispatch(fetchLeida('/api/products/queue'));
                 notifyQueueCountRefresh();
+                dispatch(navigateTo(router, '/products/queue'));
             }
 
             const actionLabel = decision === 'queue'
@@ -222,7 +226,7 @@ export default function Awin() {
         } finally {
             setBulkDecision(null);
         }
-    }, [debouncedSearchTerm, dispatch, orderBy, orderDir, practitionerId, selectedCount, visibleSelectedIds]);
+    }, [debouncedSearchTerm, dispatch, orderBy, orderDir, practitionerId, router, selectedCount, visibleSelectedIds]);
 
     React.useEffect(() => {
         const timeoutId = window.setTimeout(() => {
@@ -298,6 +302,35 @@ export default function Awin() {
     return (
         <Box sx={{ p: 2 }}>
             <Stack spacing={2}>
+                <Box sx={{
+                    width: { xs: '100%', md: 300 },
+                    maxWidth: '100%',
+                    ml: { md: 'auto' },
+                }}>
+                    <Editable
+                        variant="standard"
+                        value={searchTerm}
+                        onChange={(value: string) => {
+                            setPage(1);
+                            setSearchTerm(value);
+                        }}
+                        disabled={Boolean(bulkDecision)}
+                        startAdornment={'search'}
+                        endAdornment={(
+                            <MightyButton
+                                kind="icon"
+                                icon="cancel"
+                                disabled={!searchTerm.trim() || Boolean(bulkDecision)}
+                                onClick={() => {
+                                    setPage(1);
+                                    setSearchTerm('');
+                                    setDebouncedSearchTerm('');
+                                }}
+                            />
+                        )}
+                    />
+                </Box>
+
                 <Stack
                     direction={{ xs: 'column', md: 'row' }}
                     spacing={1.5}
@@ -305,14 +338,14 @@ export default function Awin() {
                     justifyContent="space-between"
                 >
                     <Stack direction="row" spacing={1.5} alignItems="center">
-                       
+
                         <MightyButton
                             startIcon="queue"
-                            variant="outlined"
+                            variant="contained"
                             disabled={!selectedCount || Boolean(bulkDecision)}
                             onClick={() => handleBulkProcess('queue')}
                         >
-                            {bulkDecision === 'queue' ? <CircularProgress size={18} color="inherit" /> : `Add${selectedCount ? ` (${selectedCount})` : ''}`}
+                            {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add to Queue${selectedCount ? ` (${selectedCount})` : ''}`}
                         </MightyButton>
 
                         <MightyButton
@@ -325,32 +358,6 @@ export default function Awin() {
                         </MightyButton>
 
                     </Stack>
-
-                    <Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%', ml: { md: 'auto' } }}>
-                        <Editable
-                            variant="standard"
-                            placeholder="Search Awin"
-                            value={searchTerm}
-                            onChange={(value: string) => {
-                                setPage(1);
-                                setSearchTerm(value);
-                            }}
-                            disabled={Boolean(bulkDecision)}
-                            startAdornment={'search'}
-                            endAdornment={(
-                                <MightyButton
-                                    kind="icon"
-                                    icon="cancel"
-                                    disabled={!searchTerm.trim() || Boolean(bulkDecision)}
-                                    onClick={() => {
-                                        setPage(1);
-                                        setSearchTerm('');
-                                        setDebouncedSearchTerm('');
-                                    }}
-                                />
-                            )}
-                        />
-                    </Box>
                 </Stack>
 
                 {activeQuery ? (

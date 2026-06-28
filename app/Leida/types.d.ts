@@ -239,6 +239,7 @@ type MightyButtonBaseProps = {
     size?: 'small' | 'medium' | 'large';
     onClick?: React.MouseEventHandler<HTMLElement>;
     children?: React.ReactNode;
+    alignLeft?: boolean;
 };
 
 type MightyButtonButtonProps = MightyButtonBaseProps & ButtonProps & {

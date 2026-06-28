@@ -194,17 +194,20 @@ export default function Products() {
 				<Stack spacing={1.5} sx={{ width: '100%' }}>
 					<MightyButton
 						fullWidth
+						alignLeft
 						variant="outlined"
-						startIcon="info"
+						startIcon="awin"
 						disabled={checkingAwinFeedSnapshot}
 						onClick={handleCheckAwinFeedSnapshot}
 					>
-						{checkingAwinFeedSnapshot ? 'Checking feed snapshot...' : 'Check Awin feed snapshot'}
+						{checkingAwinFeedSnapshot ? 'Checking Awin Feed...' : 'Check Awin Feed'}
 					</MightyButton>
+
 					<MightyButton
 						fullWidth
+						alignLeft
 						variant="outlined"
-						startIcon="play_arrow"
+						startIcon="start"
 						disabled={loadingAwinProducts}
 						onClick={handleLoadAwinProducts}
 					>
@@ -212,21 +215,23 @@ export default function Products() {
 					</MightyButton>
 					<MightyButton
 						fullWidth
+						alignLeft
 						variant="outlined"
-						startIcon="delete"
+						startIcon="cancel"
 						disabled={deletingQueue}
 						onClick={() => setConfirmDeleteQueueOpen(true)}
 					>
-						{deletingQueue ? 'Deleting queue...' : 'Delete Queue'}
+						{deletingQueue ? 'Clearing queue...' : 'Clear Queue'}
 					</MightyButton>
 					<MightyButton
 						fullWidth
+						alignLeft
 						variant="outlined"
-						startIcon="delete"
+						startIcon="cancel"
 						disabled={deletingProductQueue}
 						onClick={() => setConfirmDeleteProductQueueOpen(true)}
 					>
-						{deletingProductQueue ? 'Deleting Awin records...' : 'Delete all Awin records'}
+						{deletingProductQueue ? 'Clearing Awin products...' : 'Clear all Awin products'}
 					</MightyButton>
 				</Stack>
 			</Stack>
@@ -234,8 +239,8 @@ export default function Products() {
 			<ConfirmAction
 				open={confirmDeleteQueueOpen}
 				icon="delete"
-				title="Delete everything from the queue?"
-				body="This will permanently delete every item currently in the queue."
+				title="Clear everything from the queue?"
+				body="This will permanently clear every item currently in the queue."
 				handleConfirm={handleDeleteQueue}
 				handleClose={() => setConfirmDeleteQueueOpen(false)}
 			/>
@@ -243,8 +248,8 @@ export default function Products() {
 			<ConfirmAction
 				open={confirmDeleteProductQueueOpen}
 				icon="delete"
-				title="Delete all Awin records?"
-				body="This will permanently delete every record from the Awin table."
+				title="Clear all Awin products?"
+				body="This will permanently clear every record from the Awin table."
 				handleConfirm={handleDeleteProductQueue}
 				handleClose={() => setConfirmDeleteProductQueueOpen(false)}
 			/>
