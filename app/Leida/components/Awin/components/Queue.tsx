@@ -17,12 +17,11 @@ import {
   DataGrid,
   type GridColDef,
   type GridRenderCellParams,
-  type GridRowSelectionModel,
   type GridSortModel,
 } from '@mui/x-data-grid';
-import { ConfirmAction, setFeedback } from '../../../../NX/DesignSystem';
+import { setFeedback } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { deleteQueueSelection, initQueue, MightyButton, processQueueItem, setLeida } from '../../../../Leida';
+import { initQueue, MightyButton, processQueueItem, setLeida } from '../../../../Leida';
 import type { T_QueueRow } from '../../../types.d';
 import { toDate } from '../../../lib/toDate';
 import { toLabel } from '../../../lib/toLabel';
@@ -33,6 +32,7 @@ const PRODUCTS_COUNT_REFRESH_EVENT = 'leida:products-count-refresh';
 
 type T_QueueListRow = {
   id: string;
+  position: number;
   queueId: string;
   title: string;
   source: string | null;
@@ -102,17 +102,12 @@ export default function Queue() {
   ]);
   const [loading, setLoading] = React.useState(false);
   const [hasQueryError, setHasQueryError] = React.useState(false);
-  const [selectionModel, setSelectionModel] = React.useState<GridRowSelectionModel>({
-    type: 'include',
-    ids: new Set<string>(),
-  });
   const [selectedQueueId, setSelectedQueueId] = React.useState<string | null>(null);
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
-  const [deleting, setDeleting] = React.useState(false);
   const [refreshNonce, setRefreshNonce] = React.useState(0);
   const [processOpen, setProcessOpen] = React.useState(false);
   const [processing, setProcessing] = React.useState(false);
   const [editedPayload, setEditedPayload] = React.useState('');
+  const hasAutoSelectedInitialRowRef = React.useRef(false);
 
   React.useEffect(() => {
     dispatch(initQueue());
@@ -214,6 +209,7 @@ export default function Queue() {
       const queueId = asText(row.queue_id) || asText(row.id) || `queue-${index}`;
       return {
         id: queueId,
+        position: ((page - 1) * resultsPerPage) + index + 1,
         queueId,
         title: getQueueRowTitle(row),
         source: asText(row.source) || null,
@@ -230,7 +226,7 @@ export default function Queue() {
     });
 
     return mapped;
-  }, [rows]);
+  }, [page, resultsPerPage, rows]);
 
   React.useEffect(() => {
     if (!gridRows.length) {
@@ -247,6 +243,15 @@ export default function Queue() {
     }
   }, [gridRows, selectedQueueId]);
 
+  React.useEffect(() => {
+    if (hasAutoSelectedInitialRowRef.current || selectedQueueId || !gridRows.length) {
+      return;
+    }
+
+    hasAutoSelectedInitialRowRef.current = true;
+    setSelectedQueueId(gridRows[0].id);
+  }, [gridRows, selectedQueueId]);
+
   const selectedRow = React.useMemo(
     () => (selectedQueueId ? gridRows.find((row) => row.id === selectedQueueId) || null : null),
     [gridRows, selectedQueueId],
@@ -256,16 +261,6 @@ export default function Queue() {
     return new Set(gridRows.map((row) => String(row.id)));
   }, [gridRows]);
 
-  const selectedVisibleIds = React.useMemo(() => {
-    return Array.from(selectionModel.ids)
-      .map((value) => String(value))
-      .filter((id) => visibleRowIds.has(id));
-  }, [selectionModel.ids, visibleRowIds]);
-
-  const selectedCount = React.useMemo(() => {
-    return selectedVisibleIds.length;
-  }, [selectedVisibleIds]);
-
   const openProcessDialog = React.useCallback(() => {
     if (!selectedRow) {
       return;
@@ -274,50 +269,6 @@ export default function Queue() {
     setEditedPayload(JSON.stringify(selectedRow.data || {}, null, 2));
     setProcessOpen(true);
   }, [selectedRow]);
-
-  const handleDeleteSelection = React.useCallback(async () => {
-    if (!selectedCount || deleting) {
-      setConfirmDeleteOpen(false);
-      return;
-    }
-
-    setConfirmDeleteOpen(false);
-    setDeleting(true);
-
-    try {
-      const result = await dispatch(deleteQueueSelection({
-        status: statusFilter || undefined,
-        selection: {
-          type: 'include',
-          ids: selectedVisibleIds,
-        },
-      }));
-
-      if (!result?.ok) {
-        throw new Error(result?.error || 'Failed to delete queue items.');
-      }
-
-      const deletedCount = typeof result?.deletedRows === 'number' && result.deletedRows > 0
-        ? result.deletedRows
-        : selectedCount;
-
-      dispatch(setFeedback({
-        severity: 'success',
-        title: `Deleted ${deletedCount} queue item${deletedCount === 1 ? '' : 's'}.`,
-      }));
-      setSelectionModel({ type: 'include', ids: new Set<string>() });
-      setRefreshNonce((value) => value + 1);
-      notifyQueueCountRefresh();
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e);
-      dispatch(setFeedback({
-        severity: 'warning',
-        title: message || 'Failed to delete queue items.',
-      }));
-    } finally {
-      setDeleting(false);
-    }
-  }, [deleting, dispatch, selectedCount, selectedVisibleIds, statusFilter]);
 
   const handleProcessConfirm = React.useCallback(async () => {
     if (!selectedRow || processing) {
@@ -359,7 +310,6 @@ export default function Queue() {
         severity: 'success',
         title: 'Processed selected queue item and removed it from the queue.',
       }));
-      setSelectionModel({ type: 'include', ids: new Set<string>() });
       setRefreshNonce((value) => value + 1);
       notifyQueueCountRefresh();
       notifyProductsCountRefresh();
@@ -377,8 +327,16 @@ export default function Queue() {
   const columns = React.useMemo<GridColDef[]>(() => {
     return [
       {
+        field: 'position',
+        headerName: '#',
+        width: 72,
+        sortable: false,
+        align: 'center',
+        headerAlign: 'center',
+      },
+      {
         field: 'title',
-        headerName: 'Title',
+        headerName: '',
         flex: 1.5,
         minWidth: 280,
         sortable: false,
@@ -440,15 +398,6 @@ export default function Queue() {
 
 
           <Box sx={{ flexGrow: 1 }} />
-
-          <MightyButton
-            variant="outlined"
-            startIcon="delete"
-            disabled={!selectedCount || deleting}
-            onClick={() => setConfirmDeleteOpen(true)}
-          >
-            {deleting ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ' from queue'}`}
-          </MightyButton>
         </Stack>
 
         {!loading && !hasQueryError && gridRows.length === 0 ? (
@@ -487,6 +436,7 @@ export default function Queue() {
           <DataGrid
             rows={gridRows}
             columns={columns}
+            columnHeaderHeight={0}
             initialState={{
               columns: {
                 columnVisibilityModel: {
@@ -498,7 +448,6 @@ export default function Queue() {
               },
             }}
             loading={loading}
-            checkboxSelection
             disableRowSelectionOnClick
             pagination
             paginationMode="server"
@@ -521,34 +470,14 @@ export default function Queue() {
               setPage(1);
               setSortModel(normalized);
             }}
-            rowSelectionModel={selectionModel}
-            onRowSelectionModelChange={(nextSelection) => {
-              const nextIds = nextSelection.type === 'exclude'
-                ? new Set(Array.from(visibleRowIds))
-                : new Set(
-                  Array.from(nextSelection.ids)
-                    .map((value) => String(value))
-                    .filter((id) => visibleRowIds.has(id)),
-                );
-
-              setSelectionModel({
-                type: 'include',
-                ids: nextIds,
-              });
-
-              if (nextSelection.type === 'include' && nextIds.size > 0) {
-                const firstId = Array.from(nextIds)[0];
-                setSelectedQueueId(firstId);
-              }
-            }}
             onCellClick={(params) => {
-              if (params.field === '__check__') {
-                return;
-              }
               setSelectedQueueId(String(params.row.id));
             }}
             sx={{
               border: 0,
+              '& .MuiDataGrid-columnHeaders': {
+                display: 'none',
+              },
               '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
                 outline: 'none',
               },
@@ -595,15 +524,6 @@ export default function Queue() {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <ConfirmAction
-        open={confirmDeleteOpen}
-        icon="delete"
-        title="Delete selected queue items?"
-        body={`This will permanently delete ${selectedCount} queue item${selectedCount === 1 ? '' : 's'}.`}
-        handleConfirm={handleDeleteSelection}
-        handleClose={() => setConfirmDeleteOpen(false)}
-      />
     </Box>
   );
 }
