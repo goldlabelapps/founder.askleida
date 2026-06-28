@@ -22,7 +22,7 @@ type T_FetchAwinFeedSnapshotResult = {
 export const fetchAwinFeedSnapshot = (): any =>
   async (dispatch: Dispatch): Promise<T_FetchAwinFeedSnapshotResult> => {
     try {
-      const res = await fetch('/api/awin/lookfantastic/feed?source=feed', {
+      const res = await fetch('/api/awin/lookfantastic/sync', {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -41,10 +41,10 @@ export const fetchAwinFeedSnapshot = (): any =>
         ok: true,
         message: typeof json?.message === 'string'
           ? json.message
-          : 'Awin feed snapshot checked.',
+          : 'Awin feed sync checked.',
         changed: typeof json?.data?.changed === 'boolean' ? json.data.changed : null,
         reason: typeof json?.data?.reason === 'string' ? json.data.reason : null,
-        latest: json?.data?.latest ?? null,
+        latest: (json?.data?.latest ?? json?.data?.saved ?? null) as T_AwinFeedSnapshotLatest,
       };
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);

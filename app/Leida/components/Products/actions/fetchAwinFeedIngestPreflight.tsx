@@ -16,7 +16,7 @@ type T_FetchAwinFeedIngestPreflightResult = {
 export const fetchAwinFeedIngestPreflight = (): any =>
 	async (dispatch: Dispatch): Promise<T_FetchAwinFeedIngestPreflightResult> => {
 		try {
-			const res = await fetch('/api/awin/lookfantastic/ingest?limit=25', {
+			const res = await fetch('/api/awin/lookfantastic/ingest?limit=300&category=Skincare', {
 				method: 'GET',
 				headers: {
 					Accept: 'application/json',
@@ -36,7 +36,7 @@ export const fetchAwinFeedIngestPreflight = (): any =>
 				message: typeof json?.message === 'string'
 					? json.message
 					: 'Awin products loaded successfully.',
-				rowLimit: typeof json?.data?.rowLimit === 'number' ? json.data.rowLimit : 25,
+				rowLimit: typeof json?.data?.rowLimit === 'number' ? json.data.rowLimit : 300,
 				csvRows: typeof json?.data?.csvRows === 'number' ? json.data.csvRows : null,
 				upserted: typeof json?.data?.upserted === 'number' ? json.data.upserted : null,
 				skipped: typeof json?.data?.skipped === 'number' ? json.data.skipped : null,

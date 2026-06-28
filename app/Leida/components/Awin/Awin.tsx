@@ -98,6 +98,7 @@ export default function Awin() {
 
     const displayedRows = isInitialLoad ? [] : rows;
     const displayedTotal = isInitialLoad ? 0 : total;
+    const showEmptyAwinState = !loading && displayedRows.length === 0;
 
     const visibleRowIds = React.useMemo(() => {
         return new Set(rows.map((row) => String(row.id)));
@@ -302,68 +303,72 @@ export default function Awin() {
     return (
         <Box sx={{ p: 2 }}>
             <Stack spacing={2}>
-                <Box sx={{
-                    width: { xs: '100%', md: 300 },
-                    maxWidth: '100%',
-                    ml: { md: 'auto' },
-                }}>
-                    <Editable
-                        variant="standard"
-                        value={searchTerm}
-                        onChange={(value: string) => {
-                            setPage(1);
-                            setSearchTerm(value);
-                        }}
-                        disabled={Boolean(bulkDecision)}
-                        startAdornment={'search'}
-                        endAdornment={(
-                            <MightyButton
-                                kind="icon"
-                                icon="cancel"
-                                disabled={!searchTerm.trim() || Boolean(bulkDecision)}
-                                onClick={() => {
+                {!showEmptyAwinState ? (
+                    <>
+                        <Box sx={{
+                            width: { xs: '100%', md: 300 },
+                            maxWidth: '100%',
+                            ml: { md: 'auto' },
+                        }}>
+                            <Editable
+                                variant="standard"
+                                value={searchTerm}
+                                onChange={(value: string) => {
                                     setPage(1);
-                                    setSearchTerm('');
-                                    setDebouncedSearchTerm('');
+                                    setSearchTerm(value);
                                 }}
+                                disabled={Boolean(bulkDecision)}
+                                startAdornment={'search'}
+                                endAdornment={(
+                                    <MightyButton
+                                        kind="icon"
+                                        icon="cancel"
+                                        disabled={!searchTerm.trim() || Boolean(bulkDecision)}
+                                        onClick={() => {
+                                            setPage(1);
+                                            setSearchTerm('');
+                                            setDebouncedSearchTerm('');
+                                        }}
+                                    />
+                                )}
                             />
-                        )}
-                    />
-                </Box>
+                        </Box>
 
-                <Stack
-                    direction={{ xs: 'column', md: 'row' }}
-                    spacing={1.5}
-                    alignItems={{ xs: 'stretch', md: 'center' }}
-                    justifyContent="space-between"
-                >
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-
-                        <MightyButton
-                            startIcon="queue"
-                            variant="contained"
-                            disabled={!selectedCount || Boolean(bulkDecision)}
-                            onClick={() => handleBulkProcess('queue')}
+                        <Stack
+                            direction={{ xs: 'column', md: 'row' }}
+                            spacing={1.5}
+                            alignItems={{ xs: 'stretch', md: 'center' }}
+                            justifyContent="space-between"
                         >
-                            {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add to Queue${selectedCount ? ` (${selectedCount})` : ''}`}
-                        </MightyButton>
+                            <Stack direction="row" spacing={1.5} alignItems="center">
 
-                        <MightyButton
-                            variant="text"
-                            startIcon="delete"
-                            disabled={!selectedCount || Boolean(bulkDecision)}
-                            onClick={() => handleBulkProcess('delete')}
-                        >
-                            {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
-                        </MightyButton>
+                                <MightyButton
+                                    startIcon="queue"
+                                    variant="outlined"
+                                    disabled={!selectedCount || Boolean(bulkDecision)}
+                                    onClick={() => handleBulkProcess('queue')}
+                                >
+                                    {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add to Queue${selectedCount ? ` (${selectedCount})` : ''}`}
+                                </MightyButton>
 
-                    </Stack>
-                </Stack>
+                                <MightyButton
+                                    variant="text"
+                                    startIcon="delete"
+                                    disabled={!selectedCount || Boolean(bulkDecision)}
+                                    onClick={() => handleBulkProcess('delete')}
+                                >
+                                    {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
+                                </MightyButton>
 
-                {activeQuery ? (
-                    <Typography variant="body2" color="text.secondary">
-                        {statusMessage}
-                    </Typography>
+                            </Stack>
+                        </Stack>
+
+                        {activeQuery ? (
+                            <Typography variant="body2" color="text.secondary">
+                                {statusMessage}
+                            </Typography>
+                        ) : null}
+                    </>
                 ) : null}
 
                 <AwinList

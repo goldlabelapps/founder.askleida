@@ -301,6 +301,18 @@ function parseOptionalLimit(value: string | null, fallback: number | null) {
   return Math.floor(parsed);
 }
 
+function matchesCategoryFilter(row: T_RawRow, categoryFilter: string | null) {
+  if (!categoryFilter) {
+    return true;
+  }
+
+  const categoryName = normalizeText(row.category_name)?.toLowerCase() || '';
+  const merchantCategory = normalizeText(row.merchant_category)?.toLowerCase() || '';
+  const filter = categoryFilter.toLowerCase();
+
+  return categoryName.includes(filter) || merchantCategory.includes(filter);
+}
+
 async function runIngest(req: Request) {
   const url = new URL(req.url);
   const supabaseUrl = requireEnv('NEXT_PUBLIC_SUPABASE_URL');
@@ -309,6 +321,7 @@ async function runIngest(req: Request) {
   const targetTable = assertSafeTableName(DEFAULT_TARGET_TABLE, 'AWIN_LOOKFANTASTIC_TABLE');
   const envLimit = process.env.AWIN_SYNC_LIMIT?.trim() || null;
   const rowLimit = parseOptionalLimit(url.searchParams.get('limit'), parseOptionalLimit(envLimit, null));
+  const categoryFilter = normalizeText(url.searchParams.get('category'));
 
   const sql = createSqlClient();
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -346,7 +359,10 @@ async function runIngest(req: Request) {
       trim: true,
     }) as T_RawRow[];
 
-    const parsedRows = rowLimit ? parsed.slice(0, rowLimit) : parsed;
+    const categoryFilteredRows = categoryFilter
+      ? parsed.filter((row) => matchesCategoryFilter(row, categoryFilter))
+      : parsed;
+    const parsedRows = rowLimit ? categoryFilteredRows.slice(0, rowLimit) : categoryFilteredRows;
     const products: T_ProductRow[] = [];
     let skipped = 0;
 
@@ -373,6 +389,7 @@ async function runIngest(req: Request) {
         },
         table: targetTable,
         csvRows: parsedRows.length,
+        categoryFilter,
         upserted: totalUpserted,
         skipped,
         rowLimit,

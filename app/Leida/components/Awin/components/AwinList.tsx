@@ -2,13 +2,13 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import type { T_AwinListProps, T_AwinProduct } from '../../../types.d';
-import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
+import { Box, IconButton, Stack, Typography } from '@mui/material';
 import {
     DataGrid,
     type GridColDef,
     type GridRenderCellParams,
 } from '@mui/x-data-grid';
-import { formatUkPrice, setLeida, } from '../../../../Leida';
+import { formatUkPrice, MightyButton, setLeida, } from '../../../../Leida';
 import { Icon, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 
@@ -48,7 +48,7 @@ export default function AwinList({
                 minWidth: 260,
                 sortable: true,
                 renderCell: (params: GridRenderCellParams) => (
-                    <Button
+                    <MightyButton
                         variant="text"
                         sx={{ justifyContent: 'flex-start', textTransform: 'none', px: 0 }}
                         onClick={() => {
@@ -56,7 +56,7 @@ export default function AwinList({
                         }}
                     >
                         {params.value}
-                    </Button>
+                    </MightyButton>
                 ),
             },
             {
@@ -117,12 +117,13 @@ export default function AwinList({
                     <Typography variant="body1" color="text.secondary">
                         Pull in Awin products first, then come back here to review and manage them.
                     </Typography>
-                    <Button
+                    <MightyButton
+                        startIcon="products"
                         variant="contained"
                         onClick={() => dispatch(navigateTo(router, '/products'))}
                     >
                         Go to Products
-                    </Button>
+                    </MightyButton>
                 </Stack>
             </Box>
         );

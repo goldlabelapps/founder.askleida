@@ -66,6 +66,7 @@ const ListProducts = ({
 	const [loading, setLoading] = React.useState(false);
 	const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false);
 	const [error, setError] = React.useState<string | null>(null);
+	const [queueTotal, setQueueTotal] = React.useState(0);
 	const [refreshNonce, setRefreshNonce] = React.useState(0);
 	const lastSearchFeedbackKeyRef = React.useRef('');
 
@@ -226,6 +227,54 @@ const ListProducts = ({
 		onVisibleProductsChange?.(products);
 	}, [products, onVisibleProductsChange]);
 
+	React.useEffect(() => {
+		if (!showEmptyLibraryState) {
+			return;
+		}
+
+		let cancelled = false;
+
+		const run = async () => {
+			try {
+				const params = new URLSearchParams({
+					page: '1',
+					pageSize: '1',
+					sortBy: 'created',
+					sortOrder: 'asc',
+					status: 'pending',
+				});
+
+				const res = await fetch(`/api/products/queue?${params.toString()}`, {
+					method: 'GET',
+					headers: { Accept: 'application/json' },
+				});
+
+				const json = await res.json().catch(() => null);
+				if (!res.ok || cancelled) {
+					return;
+				}
+
+				const totalFromApi = typeof json?.data?.total === 'number'
+					? json.data.total
+					: Array.isArray(json?.data?.rows)
+						? json.data.rows.length
+						: 0;
+
+				setQueueTotal(totalFromApi);
+			} catch {
+				if (!cancelled) {
+					setQueueTotal(0);
+				}
+			}
+		};
+
+		run();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [showEmptyLibraryState]);
+
 	const columns = React.useMemo<GridColDef[]>(() => {
 		return [
 			{
@@ -280,16 +329,30 @@ const ListProducts = ({
 					<Typography variant="body1" color="text.secondary">
 						No products yet. Add products from Awin into the Queue, then process them to build your products library.
 					</Typography>
-					<MightyButton
-						variant="contained"
-						startIcon="awin"
-						sx={{ mt: 3 }}
-						onClick={() => {
-							dispatch(navigateTo(router, '/products/awin'));
-						}}
-					>
-						Go to Awin
-					</MightyButton>
+
+					<Stack direction="row" spacing={1.5} sx={{ mt: 3 }}>
+						{queueTotal > 0 ? (
+							<MightyButton
+								variant="outlined"
+								startIcon="queue"
+								onClick={() => {
+									dispatch(navigateTo(router, '/products/queue'));
+								}}
+							>
+								Queue
+							</MightyButton>
+						) : null}
+
+						<MightyButton
+							variant="outlined"
+							startIcon="awin"
+							onClick={() => {
+								dispatch(navigateTo(router, '/products/awin'));
+							}}
+						>
+							Awin
+						</MightyButton>
+					</Stack>
 				</Box>
 			) : (
 				<Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
