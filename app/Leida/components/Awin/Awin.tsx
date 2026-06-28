@@ -56,12 +56,12 @@ export default function Awin() {
     const [searchTerm, setSearchTerm] = React.useState(typeof awin?.query?.q === 'string' ? awin.query.q : '');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState(typeof awin?.query?.q === 'string' ? awin.query.q : '');
     const clampPageSize = React.useCallback((value: number) => {
-        if (!Number.isFinite(value)) return 10;
+        if (!Number.isFinite(value)) return 100;
         return Math.min(100, Math.max(5, Math.floor(value)));
     }, []);
 
     const [resultsPerPage, setResultsPerPage] = React.useState(
-        clampPageSize(typeof awin?.query?.limit === 'number' ? awin.query.limit : 10),
+        clampPageSize(typeof awin?.query?.limit === 'number' ? awin.query.limit : 100),
     );
     const [sortModel, setSortModel] = React.useState<GridSortModel>([
         {
@@ -307,8 +307,18 @@ export default function Awin() {
                     justifyContent="space-between"
                 >
                     <Stack direction="row" spacing={1.5} alignItems="center">
+                       
                         <MightyButton
+                            startIcon="queue"
                             variant="outlined"
+                            disabled={!selectedCount || Boolean(bulkDecision)}
+                            onClick={() => handleBulkProcess('queue')}
+                        >
+                            {bulkDecision === 'queue' ? <CircularProgress size={18} color="inherit" /> : `Add${selectedCount ? ` (${selectedCount})` : ''}`}
+                        </MightyButton>
+
+                        <MightyButton
+                            variant="text"
                             startIcon="delete"
                             disabled={!selectedCount || Boolean(bulkDecision)}
                             onClick={() => handleBulkProcess('delete')}
@@ -316,19 +326,11 @@ export default function Awin() {
                             {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
                         </MightyButton>
 
-                        <MightyButton
-                            startIcon="queue"
-                            variant="contained"
-                            disabled={!selectedCount || Boolean(bulkDecision)}
-                            onClick={() => handleBulkProcess('queue')}
-                        >
-                            {bulkDecision === 'queue' ? <CircularProgress size={18} color="inherit" /> : `Add${selectedCount ? ` (${selectedCount})` : ''}`}
-                        </MightyButton>
                     </Stack>
 
                     <Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%', ml: { md: 'auto' } }}>
                         <Editable
-                            variant="filled"
+                            variant="standard"
                             placeholder="Search Awin"
                             value={searchTerm}
                             onChange={(value: string) => {

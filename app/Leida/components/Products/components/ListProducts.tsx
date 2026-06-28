@@ -1,7 +1,6 @@
 'use client';
 import * as React from 'react';
 import {
-	Alert,
 	Box,
 	Button,
 	CircularProgress,
@@ -15,6 +14,7 @@ import {
 	type GridRowSelectionModel,
 	type GridSortModel,
 } from '@mui/x-data-grid';
+import { setFeedback } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	formatUkPrice,
@@ -59,7 +59,7 @@ const ListProducts = ({
 	const [page, setPage] = React.useState(1);
 	const [searchTerm, setSearchTerm] = React.useState('');
 	const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState('');
-	const [resultsPerPage, setResultsPerPage] = React.useState(10);
+	const [resultsPerPage, setResultsPerPage] = React.useState(100);
 	const [sortModel, setSortModel] = React.useState<GridSortModel>([
 		{ field: 'title', sort: 'asc' },
 	]);
@@ -70,11 +70,10 @@ const ListProducts = ({
 	const [loading, setLoading] = React.useState(false);
 	const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false);
 	const [error, setError] = React.useState<string | null>(null);
-	const [bulkError, setBulkError] = React.useState<string | null>(null);
-	const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
 	const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
 	const [deleting, setDeleting] = React.useState(false);
 	const [refreshNonce, setRefreshNonce] = React.useState(0);
+	const lastSearchFeedbackKeyRef = React.useRef('');
 
 	React.useEffect(() => {
 		dispatch(initProducts());
@@ -104,26 +103,6 @@ const ListProducts = ({
 	const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
 	const activeQuery = debouncedSearchTerm.trim();
 
-
-
-
-	const statusMessage = React.useMemo(() => {
-		if (loading) {
-			return `Searching ${activeQuery ? `for "${activeQuery}"` : 'all products'}...`;
-		}
-
-		if (!hasLoadedOnce) {
-			return 'Ready to search';
-		}
-
-		if (total === 0 && activeQuery) {
-			return `Nothing found for "${activeQuery}"`;
-		}
-
-		const suffix = activeQuery ? ` for "${activeQuery}"` : '';
-		return `${total} results${suffix}, page ${page} of ${totalPages}.`;
-	}, [activeQuery, hasLoadedOnce, loading, page, total, totalPages]);
-
 	const handleDeleteConfirm = React.useCallback(async () => {
 		if (!selectedCount || deleting) {
 			setConfirmDeleteOpen(false);
@@ -132,8 +111,6 @@ const ListProducts = ({
 
 		setConfirmDeleteOpen(false);
 		setDeleting(true);
-		setBulkError(null);
-		setSuccessMessage(null);
 
 		try {
 			const res = await fetch('/api/products', {
@@ -162,7 +139,10 @@ const ListProducts = ({
 				? json.data.deletedRows
 				: selectedCount;
 
-			setSuccessMessage(`Deleted ${deletedCount} product${deletedCount === 1 ? '' : 's'} from the products table.`);
+			dispatch(setFeedback({
+				severity: 'success',
+				title: `Deleted ${deletedCount} product${deletedCount === 1 ? '' : 's'} from the products table.`,
+			}));
 			setSelectionModel({
 				type: 'include',
 				ids: new Set<string>(),
@@ -171,11 +151,14 @@ const ListProducts = ({
 			notifyProductsCountRefresh();
 		} catch (e: unknown) {
 			const message = e instanceof Error ? e.message : String(e);
-			setBulkError(message || 'Failed to delete selected products.');
+			dispatch(setFeedback({
+				severity: 'warning',
+				title: message || 'Failed to delete selected products.',
+			}));
 		} finally {
 			setDeleting(false);
 		}
-	}, [debouncedSearchTerm, deleting, selectedCount, selectionModel]);
+	}, [debouncedSearchTerm, deleting, dispatch, selectedCount, selectionModel]);
 
 	React.useEffect(() => {
 		dispatch(setLeida('header', {
@@ -199,6 +182,37 @@ const ListProducts = ({
 			setPage(totalPages);
 		}
 	}, [page, totalPages]);
+
+	React.useEffect(() => {
+		if (!activeQuery) {
+			lastSearchFeedbackKeyRef.current = '';
+			return;
+		}
+
+		if (error || !hasLoadedOnce) {
+			return;
+		}
+
+		const feedbackKey = loading
+			? `loading:${activeQuery}`
+			: total === 0
+				? `empty:${activeQuery}`
+				: `results:${activeQuery}:${total}`;
+
+		if (lastSearchFeedbackKeyRef.current === feedbackKey) {
+			return;
+		}
+
+		lastSearchFeedbackKeyRef.current = feedbackKey;
+		dispatch(setFeedback({
+			severity: 'info',
+			title: loading
+				? `Searching for "${activeQuery}"...`
+				: total === 0
+					? `Nothing found for "${activeQuery}"`
+					: `${total} results for "${activeQuery}".`,
+		}));
+	}, [activeQuery, dispatch, error, hasLoadedOnce, loading, total]);
 
 	React.useEffect(() => {
 		let cancelled = false;
@@ -233,6 +247,10 @@ const ListProducts = ({
 				}
 				const message = e instanceof Error ? e.message : String(e);
 				setError(message || 'Products query failed');
+				dispatch(setFeedback({
+					severity: 'warning',
+					title: message || 'Products query failed',
+				}));
 			} finally {
 				if (!cancelled) {
 					setLoading(false);
@@ -245,7 +263,7 @@ const ListProducts = ({
 		return () => {
 			cancelled = true;
 		};
-	}, [debouncedSearchTerm, page, refreshNonce, resultsPerPage, sortBy, sortOrder]);
+	}, [debouncedSearchTerm, dispatch, page, refreshNonce, resultsPerPage, sortBy, sortOrder]);
 
 	const rows = React.useMemo<T_ProductListRow[]>(() => {
 		return products.map((product, index) => {
@@ -357,19 +375,6 @@ const ListProducts = ({
 					{deleting ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
 				</Button>
 			</Stack>
-
-			<Typography variant="body2" color="text.secondary">
-				{statusMessage}
-			</Typography>
-
-			{error ? <Alert severity="warning">{error}</Alert> : null}
-			{deleting ? <Alert severity="warning">Deleting selected products...</Alert> : null}
-			{bulkError ? <Alert severity="warning">{bulkError}</Alert> : null}
-			{successMessage ? <Alert severity="success">{successMessage}</Alert> : null}
-
-			{!loading && !error && rows.length === 0 ? (
-				<Alert severity="info">No products found.</Alert>
-			) : null}
 
 			<Box sx={{ width: '100%', minHeight: 560 }}>
 				<DataGrid

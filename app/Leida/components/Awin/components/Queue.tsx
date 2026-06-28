@@ -9,8 +9,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
-  Switch,
   Stack,
   TextField,
   Typography,
@@ -24,13 +22,12 @@ import {
 } from '@mui/x-data-grid';
 import { ConfirmAction, setFeedback } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { deleteQueueSelection, initQueue, MightyButton, processQueueItem, setLeida, useDash, useLeidaBus } from '../../../../Leida';
+import { deleteQueueSelection, initQueue, MightyButton, processQueueItem, setLeida } from '../../../../Leida';
 import type { T_QueueRow } from '../../../types.d';
 import { toDate } from '../../../lib/toDate';
 import { toLabel } from '../../../lib/toLabel';
 
 const RESULTS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
-const SEARCH_DEBOUNCE_MS = 350;
 const QUEUE_COUNT_REFRESH_EVENT = 'leida:queue-count-refresh';
 const PRODUCTS_COUNT_REFRESH_EVENT = 'leida:products-count-refresh';
 
@@ -95,19 +92,14 @@ function notifyProductsCountRefresh() {
 
 export default function Queue() {
   const dispatch = useDispatch();
-  const dash = useDash();
-  const bus = useLeidaBus('/api/products/queue');
 
   const [rows, setRows] = React.useState<T_QueueRow[]>([]);
   const [total, setTotal] = React.useState(0);
   const [page, setPage] = React.useState(1);
-  const [resultsPerPage, setResultsPerPage] = React.useState(10);
+  const [resultsPerPage, setResultsPerPage] = React.useState(100);
   const [sortModel, setSortModel] = React.useState<GridSortModel>([
     { field: 'created', sort: 'asc' },
   ]);
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState('');
-  const [showAllStatuses, setShowAllStatuses] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [hasQueryError, setHasQueryError] = React.useState(false);
   const [selectionModel, setSelectionModel] = React.useState<GridRowSelectionModel>({
@@ -131,23 +123,7 @@ export default function Queue() {
         title: 'Queue',
         icon: 'queue',
       }));
-
-      dispatch(setFeedback({
-        severity: 'info',
-        title: 'This is the queue of products that need to be processed and sent to AWIN.',
-      }));
-
   }, [dispatch]);
-
-  React.useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, SEARCH_DEBOUNCE_MS);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [searchTerm]);
 
   const activeSort = sortModel[0] || { field: 'created', sort: 'asc' as const };
   const sortBy = (() => {
@@ -165,7 +141,7 @@ export default function Queue() {
     }
   })();
   const sortOrder = activeSort.sort === 'desc' ? 'desc' : 'asc';
-  const statusFilter = showAllStatuses ? '' : 'pending';
+  const statusFilter = 'pending';
 
   React.useEffect(() => {
     let cancelled = false;
@@ -178,7 +154,6 @@ export default function Queue() {
         const params = new URLSearchParams({
           page: String(page),
           pageSize: String(resultsPerPage),
-          q: debouncedSearchTerm,
           sortBy,
           sortOrder,
         });
@@ -232,7 +207,7 @@ export default function Queue() {
     return () => {
       cancelled = true;
     };
-  }, [debouncedSearchTerm, dispatch, page, refreshNonce, resultsPerPage, sortBy, sortOrder, statusFilter]);
+  }, [dispatch, page, refreshNonce, resultsPerPage, sortBy, sortOrder, statusFilter]);
 
   const gridRows = React.useMemo<T_QueueListRow[]>(() => {
     const mapped = rows.map((row, index) => {
@@ -311,7 +286,6 @@ export default function Queue() {
 
     try {
       const result = await dispatch(deleteQueueSelection({
-        q: debouncedSearchTerm,
         status: statusFilter || undefined,
         selection: {
           type: 'include',
@@ -343,7 +317,7 @@ export default function Queue() {
     } finally {
       setDeleting(false);
     }
-  }, [debouncedSearchTerm, deleting, dispatch, selectedCount, selectedVisibleIds, statusFilter]);
+  }, [deleting, dispatch, selectedCount, selectedVisibleIds, statusFilter]);
 
   const handleProcessConfirm = React.useCallback(async () => {
     if (!selectedRow || processing) {
@@ -468,18 +442,14 @@ export default function Queue() {
           <Box sx={{ flexGrow: 1 }} />
 
           <MightyButton
-            variant="contained"
-            color="error"
+            variant="outlined"
+            startIcon="delete"
             disabled={!selectedCount || deleting}
             onClick={() => setConfirmDeleteOpen(true)}
           >
             {deleting ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ' from queue'}`}
           </MightyButton>
         </Stack>
-
-        <Typography variant="body2" color="text.secondary">
-          {showAllStatuses ? 'Showing all queue statuses.' : 'Showing pending queue items only.'} {total} total result{total === 1 ? '' : 's'}.
-        </Typography>
 
         {!loading && !hasQueryError && gridRows.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
