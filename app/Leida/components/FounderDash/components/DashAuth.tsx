@@ -6,6 +6,7 @@ import {
 } from '../../../../NX/Paywall';
 import {
     fetchLeida,
+    useLeida,
     useLeidaBus,
 } from '../../../../Leida';
 import { useDispatch } from '../../../../NX/Uberedux';
@@ -14,14 +15,16 @@ import type { I_UserSpot } from '../../../types.d';
 export default function DashAuth({ onClick }: I_UserSpot) {
     const dispatch = useDispatch();
     const paywall = usePaywall();
+    const leida = useLeida();
     const uid = paywall ? paywall.uid : null;
     const user = paywall?.user || null;
     const { data } = useLeidaBus('practitioners');
+    const practitionersRouteEntry = leida?.bus?.['/api/practitioners'];
 
     React.useEffect(() => {
-        if (!uid) return;
+        if (!uid || practitionersRouteEntry) return;
         dispatch(fetchLeida('practitioners'));
-    }, [dispatch, uid]);
+    }, [dispatch, practitionersRouteEntry, uid]);
 
     const practitionerRecord = React.useMemo(() => {
         if (!uid || !Array.isArray(data)) return null;

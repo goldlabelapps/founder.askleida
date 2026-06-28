@@ -8,6 +8,8 @@ export const initAwin = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {
         try {
             const leida = getState()?.redux?.leida || {};
+            const initialBus = leida?.bus || {};
+            const currentRouteEntry = initialBus?.[AWIN_ROUTE];
             if (!leida.awin) {
                 await dispatch(setLeida('awin', {
                     initted: true,
@@ -17,7 +19,9 @@ export const initAwin = (): any =>
                 }));
             }
 
-            await dispatch(fetchLeida(AWIN_ROUTE));
+            if (!currentRouteEntry) {
+                await dispatch(fetchLeida(AWIN_ROUTE));
+            }
 
             const latestLeida = getState()?.redux?.leida || {};
             const bus = latestLeida?.bus || {};
