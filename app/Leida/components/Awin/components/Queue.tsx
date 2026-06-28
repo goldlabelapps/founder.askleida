@@ -257,6 +257,14 @@ export default function Queue() {
     [gridRows, selectedQueueId],
   );
 
+  const listRows = React.useMemo(() => {
+    if (!selectedQueueId) {
+      return gridRows;
+    }
+
+    return gridRows.filter((row) => row.id !== selectedQueueId);
+  }, [gridRows, selectedQueueId]);
+
   const visibleRowIds = React.useMemo(() => {
     return new Set(gridRows.map((row) => String(row.id)));
   }, [gridRows]);
@@ -400,7 +408,7 @@ export default function Queue() {
           <Box sx={{ flexGrow: 1 }} />
         </Stack>
 
-        {!loading && !hasQueryError && gridRows.length === 0 ? (
+        {!loading && !hasQueryError && listRows.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             No queue items found.
           </Typography>
@@ -432,58 +440,61 @@ export default function Queue() {
           </Box>
         ) : null}
 
-        <Box sx={{ width: '100%', minHeight: 480 }}>
-          <DataGrid
-            rows={gridRows}
-            columns={columns}
-            columnHeaderHeight={0}
-            initialState={{
-              columns: {
-                columnVisibilityModel: {
-                  decision: false,
-                  source_table: false,
-                  source_product_id: false,
-                  created: false,
+        {loading || listRows.length > 0 ? (
+          <Box sx={{ width: '100%' }}>
+            <DataGrid
+              rows={listRows}
+              columns={columns}
+              autoHeight
+              columnHeaderHeight={0}
+              initialState={{
+                columns: {
+                  columnVisibilityModel: {
+                    decision: false,
+                    source_table: false,
+                    source_product_id: false,
+                    created: false,
+                  },
                 },
-              },
-            }}
-            loading={loading}
-            disableRowSelectionOnClick
-            pagination
-            paginationMode="server"
-            sortingMode="server"
-            rowCount={total}
-            pageSizeOptions={RESULTS_PER_PAGE_OPTIONS}
-            paginationModel={{ page: page - 1, pageSize: resultsPerPage }}
-            onPaginationModelChange={(model) => {
-              setPage((typeof model?.page === 'number' ? model.page : 0) + 1);
-              if (typeof model?.pageSize === 'number' && model.pageSize !== resultsPerPage) {
+              }}
+              loading={loading}
+              disableRowSelectionOnClick
+              pagination
+              paginationMode="server"
+              sortingMode="server"
+              rowCount={total}
+              pageSizeOptions={RESULTS_PER_PAGE_OPTIONS}
+              paginationModel={{ page: page - 1, pageSize: resultsPerPage }}
+              onPaginationModelChange={(model) => {
+                setPage((typeof model?.page === 'number' ? model.page : 0) + 1);
+                if (typeof model?.pageSize === 'number' && model.pageSize !== resultsPerPage) {
+                  setPage(1);
+                  setResultsPerPage(model.pageSize);
+                }
+              }}
+              sortModel={sortModel}
+              onSortModelChange={(nextModel) => {
+                const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
+                  ? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'desc' ? 'desc' : 'asc' }]
+                  : [{ field: 'created', sort: 'asc' as const }];
                 setPage(1);
-                setResultsPerPage(model.pageSize);
-              }
-            }}
-            sortModel={sortModel}
-            onSortModelChange={(nextModel) => {
-              const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
-                ? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'desc' ? 'desc' : 'asc' }]
-                : [{ field: 'created', sort: 'asc' as const }];
-              setPage(1);
-              setSortModel(normalized);
-            }}
-            onCellClick={(params) => {
-              setSelectedQueueId(String(params.row.id));
-            }}
-            sx={{
-              border: 0,
-              '& .MuiDataGrid-columnHeaders': {
-                display: 'none',
-              },
-              '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
-                outline: 'none',
-              },
-            }}
-          />
-        </Box>
+                setSortModel(normalized);
+              }}
+              onCellClick={(params) => {
+                setSelectedQueueId(String(params.row.id));
+              }}
+              sx={{
+                border: 0,
+                '& .MuiDataGrid-columnHeaders': {
+                  display: 'none',
+                },
+                '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
+                  outline: 'none',
+                },
+              }}
+            />
+          </Box>
+        ) : null}
       </Stack>
 
       <Dialog

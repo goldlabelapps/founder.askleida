@@ -3,15 +3,12 @@ import * as React from 'react';
 import {
 	Box,
 	Button,
-	CircularProgress,
 	Stack,
-	Typography,
 } from '@mui/material';
 import {
 	DataGrid,
 	type GridColDef,
 	type GridRenderCellParams,
-	type GridRowSelectionModel,
 	type GridSortModel,
 } from '@mui/x-data-grid';
 import { setFeedback } from '../../../../NX/DesignSystem';
@@ -23,7 +20,6 @@ import {
 	getProductPrice,
 	getProductUpdatedAt,
 	Editable,
-	ConfirmAction,
 	fetchProducts,
 	initProducts,
 	MightyButton,
@@ -63,15 +59,9 @@ const ListProducts = ({
 	const [sortModel, setSortModel] = React.useState<GridSortModel>([
 		{ field: 'title', sort: 'asc' },
 	]);
-	const [selectionModel, setSelectionModel] = React.useState<GridRowSelectionModel>({
-		type: 'include',
-		ids: new Set<string>(),
-	});
 	const [loading, setLoading] = React.useState(false);
 	const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false);
 	const [error, setError] = React.useState<string | null>(null);
-	const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
-	const [deleting, setDeleting] = React.useState(false);
 	const [refreshNonce, setRefreshNonce] = React.useState(0);
 	const lastSearchFeedbackKeyRef = React.useRef('');
 
@@ -92,77 +82,12 @@ const ListProducts = ({
 	})();
 	const sortOrder = activeSort.sort === 'desc' ? 'desc' : 'asc';
 
-	const selectedCount = React.useMemo(() => {
-		if (selectionModel.type === 'exclude') {
-			return Math.max(total - selectionModel.ids.size, 0);
-		}
-
-		return selectionModel.ids.size;
-	}, [selectionModel, total]);
-
 	const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
 	const activeQuery = debouncedSearchTerm.trim();
 
-	const handleDeleteConfirm = React.useCallback(async () => {
-		if (!selectedCount || deleting) {
-			setConfirmDeleteOpen(false);
-			return;
-		}
-
-		setConfirmDeleteOpen(false);
-		setDeleting(true);
-
-		try {
-			const res = await fetch('/api/products', {
-				method: 'DELETE',
-				headers: {
-					'Content-Type': 'application/json',
-					Accept: 'application/json',
-				},
-				body: JSON.stringify({
-					q: debouncedSearchTerm.trim(),
-					selection: {
-						type: selectionModel.type,
-						ids: Array.from(selectionModel.ids).map((value) => String(value)),
-					},
-				}),
-			});
-
-			const json = await res.json().catch(() => null);
-
-			if (!res.ok) {
-				const message = json?.message || `Failed to delete selected products (${res.status})`;
-				throw new Error(message);
-			}
-
-			const deletedCount = typeof json?.data?.deletedRows === 'number'
-				? json.data.deletedRows
-				: selectedCount;
-
-			dispatch(setFeedback({
-				severity: 'success',
-				title: `Deleted ${deletedCount} product${deletedCount === 1 ? '' : 's'} from the products table.`,
-			}));
-			setSelectionModel({
-				type: 'include',
-				ids: new Set<string>(),
-			});
-			setRefreshNonce((value) => value + 1);
-			notifyProductsCountRefresh();
-		} catch (e: unknown) {
-			const message = e instanceof Error ? e.message : String(e);
-			dispatch(setFeedback({
-				severity: 'warning',
-				title: message || 'Failed to delete selected products.',
-			}));
-		} finally {
-			setDeleting(false);
-		}
-	}, [debouncedSearchTerm, deleting, dispatch, selectedCount, selectionModel]);
-
 	React.useEffect(() => {
 		dispatch(setLeida('header', {
-			title: 'Leida Products',
+			title: 'List',
 			icon: 'list',
 		}));
 	}, [dispatch]);
@@ -299,7 +224,7 @@ const ListProducts = ({
 		return [
 			{
 				field: 'title',
-				headerName: 'Title',
+				headerName: '',
 				flex: 1.6,
 				minWidth: 280,
 				sortable: true,
@@ -343,115 +268,81 @@ const ListProducts = ({
 	return (
 		<Stack spacing={2}>
 			<Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
-				<Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%' }}>
+				<Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%', ml: { md: 'auto' } }}>
 					<Editable
-						variant="outlined"
+						variant="standard"
 						placeholder="Search products"
 						value={searchTerm}
 						onChange={(value: string) => {
 							setPage(1);
 							setSearchTerm(value);
 						}}
-						disabled={deleting}
 						startAdornment={'search'}
+						endAdornment={(
+							<MightyButton
+								kind="icon"
+								icon="cancel"
+								disabled={!searchTerm.trim()}
+								onClick={() => {
+									setPage(1);
+									setSearchTerm('');
+									setDebouncedSearchTerm('');
+								}}
+							/>
+						)}
 					/>
 				</Box>
-				<MightyButton
-					kind="icon"
-					icon="reset"
-					disabled={!searchTerm.trim() || deleting}
-					onClick={() => {
-						setPage(1);
-						setSearchTerm('');
-						setDebouncedSearchTerm('');
-					}}
-				/>
-				<Button
-					variant="outlined"
-					color="error"
-					disabled={!selectedCount || deleting}
-					onClick={() => setConfirmDeleteOpen(true)}
-				>
-					{deleting ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
-				</Button>
 			</Stack>
 
-			<Box sx={{ width: '100%', minHeight: 560 }}>
-				<DataGrid
-					rows={rows}
-					columns={columns}
-					initialState={{
-						columns: {
-							columnVisibilityModel: {
-								category: false,
-								price: false,
-								updated: false,
+			{loading || rows.length > 0 ? (
+				<Box sx={{ width: '100%', minHeight: 560 }}>
+					<DataGrid
+						rows={rows}
+						columns={columns}
+						initialState={{
+							columns: {
+								columnVisibilityModel: {
+									category: false,
+									price: false,
+									updated: false,
+								},
 							},
-						},
-					}}
-					loading={loading}
-					checkboxSelection
-					disableRowSelectionOnClick
-					pagination
-					paginationMode="server"
-					sortingMode="server"
-					rowCount={total}
-					pageSizeOptions={RESULTS_PER_PAGE_OPTIONS}
-					paginationModel={{ page: page - 1, pageSize: resultsPerPage }}
-					onPaginationModelChange={(model) => {
-						setPage((typeof model?.page === 'number' ? model.page : 0) + 1);
-						if (typeof model?.pageSize === 'number' && model.pageSize !== resultsPerPage) {
-							setPage(1);
-							setResultsPerPage(model.pageSize);
-						}
-					}}
-					sortModel={sortModel}
-					onSortModelChange={(nextModel) => {
-						const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
-							? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'desc' ? 'desc' : 'asc' }]
-							: [{ field: 'title', sort: 'asc' as const }];
-						setPage(1);
-						setSortModel(normalized);
-					}}
-					rowSelectionModel={selectionModel}
-					onRowSelectionModelChange={(nextSelection) => {
-						const nextIds = new Set(Array.from(nextSelection.ids).map((value) => String(value)));
-						setSelectionModel({
-							type: nextSelection.type,
-							ids: nextIds,
-						});
-
-						if (nextSelection.type === 'include' && nextIds.size > 0) {
-							const firstId = Array.from(nextIds)[0];
-							const selectedRow = rows.find((row) => row.id === firstId);
-							if (selectedRow) {
-								onProductSelect?.(selectedRow.product);
+						}}
+						loading={loading}
+						disableRowSelectionOnClick
+						pagination
+						paginationMode="server"
+						sortingMode="server"
+						rowCount={total}
+						pageSizeOptions={RESULTS_PER_PAGE_OPTIONS}
+						paginationModel={{ page: page - 1, pageSize: resultsPerPage }}
+						onPaginationModelChange={(model) => {
+							setPage((typeof model?.page === 'number' ? model.page : 0) + 1);
+							if (typeof model?.pageSize === 'number' && model.pageSize !== resultsPerPage) {
+								setPage(1);
+								setResultsPerPage(model.pageSize);
 							}
-						}
-					}}
-					onCellClick={(params) => {
-						if (params.field === '__check__') {
-							return;
-						}
-						onProductSelect?.(params.row.product as T_Product);
-					}}
-					sx={{
-						border: 0,
-						'& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
-							outline: 'none',
-						},
-					}}
-				/>
-			</Box>
-
-			<ConfirmAction
-				open={confirmDeleteOpen}
-				icon="delete"
-				title="Delete selected products?"
-				body={`This will permanently delete ${selectedCount} product${selectedCount === 1 ? '' : 's'} from the products table.`}
-				handleConfirm={handleDeleteConfirm}
-				handleClose={() => setConfirmDeleteOpen(false)}
-			/>
+						}}
+						sortModel={sortModel}
+						onSortModelChange={(nextModel) => {
+							const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
+								? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'desc' ? 'desc' : 'asc' }]
+								: [{ field: 'title', sort: 'asc' as const }];
+							setPage(1);
+							setSortModel(normalized);
+						}}
+						onCellClick={(params) => {
+							onProductSelect?.(params.row.product as T_Product);
+						}}
+						sx={{
+							border: 0,
+							'& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
+								outline: 'none',
+							},
+						}}
+					/>
+				</Box>
+			) : null}
 		</Stack>
 	);
 };

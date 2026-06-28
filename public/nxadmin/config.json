@@ -33,12 +33,12 @@
                 },
                 "dark": {
                     "mode": "dark",
-                    "primary": "#F47798",
-                    "secondary": "#D8ECF5",
-                    "text": "#F7F7F4",
-                    "background": "#2C2C2A",
-                    "paper": "#131311",
-                    "border": "#111110"
+                    "primary": "#94CE7C",
+                    "secondary": "#78CB54",
+                    "text": "#D3D3D5",
+                    "background": "#090909",
+                    "paper": "#121212",
+                    "border": "#232323"
                 }
             }
         }

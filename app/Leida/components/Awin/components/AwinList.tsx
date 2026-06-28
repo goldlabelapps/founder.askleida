@@ -105,7 +105,7 @@ export default function AwinList({
         ];
     }, [onOpenProduct]);
 
-    return (
+    return loading || rows.length > 0 ? (
         <Box sx={{ width: '100%', minHeight: 560 }}>
             <DataGrid
                 rows={rows}
@@ -152,5 +152,5 @@ export default function AwinList({
                 }}
             />
         </Box>
-    );
+    ) : null;
 }

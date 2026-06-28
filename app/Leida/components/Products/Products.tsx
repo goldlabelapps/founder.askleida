@@ -54,7 +54,7 @@ export default function Products() {
 							<ListItem disablePadding>
 								<ListItemText primary="DELETE /api/products: bulk-remove processed products." />
 							</ListItem>
-						</List>					
+						</List>
 					</CardContent>
 					
 				</Card>
