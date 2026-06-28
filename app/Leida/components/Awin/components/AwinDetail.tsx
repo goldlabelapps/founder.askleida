@@ -2,7 +2,6 @@
 import * as React from 'react';
 import {
 	Box,
-	Button,
 	CardMedia,
 	Dialog,
 	DialogActions,
@@ -13,7 +12,7 @@ import {
 	Typography,
 } from '@mui/material';
 import {Icon} from '../../../../NX/DesignSystem';
-import { AwinProcess } from '../../../index';
+import { AwinProcess, MightyButton } from '../../../index';
 import type { I_AwinDetail } from '../../../types.d';
 
 export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinDetail) {
@@ -37,7 +36,14 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 	const description = pickText(awin?.description, data.description) || 'No description available.';
 	const merchant = pickText(data.merchant_name);
 	const category = pickText(awin?.category_name, data.category_name, data.merchant_category);
-	const imageUrl = pickText(data.merchant_image_url, data.aw_image_url);
+	const imageUrl = pickText(
+		data.thumbnail,
+		data.thumb_url,
+		data.merchant_thumb_url,
+		data.image_url,
+		data.merchant_image_url,
+		data.aw_image_url,
+	);
 	const merchantLink = pickText(data.merchant_deep_link);
 	const awinLink = pickText(awin?.aw_deep_link, data.aw_deep_link);
 	const displayPrice = pickText(data.display_price);
@@ -58,7 +64,7 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 			onClose={onClose}
 			maxWidth="md"
 			fullWidth
-			fullScreen={true}
+			fullScreen={false}
 			sx={{ zIndex: (muiTheme) => muiTheme.zIndex.modal + 100 }}
 		>
 			<DialogTitle sx={{  }}>
@@ -71,10 +77,48 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 						top: 12,
 					}}
 				>
-					<Icon icon="cancel" />
+					<Icon icon="close" />
 				</IconButton>
 			</DialogTitle>
-			<DialogContent dividers>
+			<DialogContent>
+					<Box>
+						{!isProcessing ? (
+							<MightyButton
+								kind="icon"
+								icon={'api'}
+								onClick={() => setShowRawData((prev) => !prev)}
+							>
+								{showRawData ? 'Hide raw data' : 'Show raw data'}
+							</MightyButton>
+						) : null}
+						<MightyButton
+							kind="icon"
+							icon="queue"
+							onClick={() => setIsProcessing((prev) => !prev)}
+						>
+							{isProcessing ? 'Back' : 'Add to Queue'}
+						</MightyButton>
+					</Box>
+
+				{showRawData ? (
+					<Box
+						component="pre"
+						sx={{
+							m: 0,
+							p: 2,
+							borderRadius: 1,
+							bgcolor: 'grey.100',
+							overflowX: 'auto',
+							whiteSpace: 'pre-wrap',
+							wordBreak: 'break-word',
+							fontSize: 13,
+						}}
+					>
+						{JSON.stringify(awin ?? {}, null, 2)}
+					</Box>
+				) : null}
+
+
 				{isProcessing ? (
 					<AwinProcess
 						awin={awin}
@@ -115,54 +159,33 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 
 						<Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
 							{merchantLink ? (
-								<Button component="a" href={merchantLink} target="_blank" rel="noreferrer" variant="outlined">
+								<MightyButton
+									variant="outlined"
+									onClick={() => {
+										window.open(merchantLink, '_blank', 'noopener,noreferrer');
+									}}
+								>
 									Open merchant page
-								</Button>
+								</MightyButton>
 							) : null}
 							{awinLink ? (
-								<Button component="a" href={awinLink} target="_blank" rel="noreferrer" variant="outlined">
+								<MightyButton
+									variant="outlined"
+									onClick={() => {
+										window.open(awinLink, '_blank', 'noopener,noreferrer');
+									}}
+								>
 									Open AWIN link
-								</Button>
+								</MightyButton>
 							) : null}
 						</Stack>
 
-						{showRawData ? (
-							<Box
-								component="pre"
-								sx={{
-									m: 0,
-									p: 2,
-									borderRadius: 1,
-									bgcolor: 'grey.100',
-									overflowX: 'auto',
-									whiteSpace: 'pre-wrap',
-									wordBreak: 'break-word',
-									fontSize: 13,
-								}}
-							>
-								{JSON.stringify(awin ?? {}, null, 2)}
-							</Box>
-						) : null}
+						
 					</Stack>
 				)}
 			</DialogContent>
 			<DialogActions sx={{ px: 3, pb: 2.5, pt: 2 }}>
-				{!isProcessing ? (
-					<Button
-						variant="outlined"
-						onClick={() => setShowRawData((prev) => !prev)}
-					>
-						{showRawData ? 'Hide raw data' : 'Show raw data'}
-					</Button>
-				) : null}
-				<Button
-					fullWidth
-					variant={isProcessing ? 'outlined' : 'contained'}
-					startIcon={<Icon icon={isProcessing ? 'left' : 'claude'} />}
-					onClick={() => setIsProcessing((prev) => !prev)}
-				>
-					{isProcessing ? 'Back to product data' : 'Process product'}
-				</Button>
+				ksjf
 			</DialogActions>
 		</Dialog>
 	);

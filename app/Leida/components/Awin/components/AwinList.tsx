@@ -120,6 +120,13 @@ export default function AwinList({
                 onSortModelChange={onSortModelChange}
                 rowSelectionModel={selectionModel}
                 onRowSelectionModelChange={onRowSelectionModelChange}
+                onCellClick={(params) => {
+                    if (params.field === '__check__') {
+                        return;
+                    }
+
+                    onOpenProduct(params.row.product as T_AwinProduct, String(params.row.id));
+                }}
                 sx={{
                     border: 0,
                     '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {

@@ -7,7 +7,6 @@ import {
     Button,
     CircularProgress,
     Stack,
-    TextField,
     Typography,
 } from '@mui/material';
 import {
@@ -17,9 +16,11 @@ import {
 import { useDispatch } from '../../../NX/Uberedux';
 import { usePaywall } from '../../../NX/Paywall';
 import { Icon } from '../../../NX/DesignSystem';
+import { Editable } from '../../../NX/NXAdmin';
 import {
     asText,
     fetchLeida,
+    MightyButton,
     orderByFromSortField,
     productCategory,
     productDeepLink,
@@ -50,11 +51,11 @@ export default function Awin() {
     const [page, setPage] = React.useState(typeof awin?.query?.page === 'number' ? awin.query.page : 1);
     const [searchTerm, setSearchTerm] = React.useState(typeof awin?.query?.q === 'string' ? awin.query.q : '');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState(typeof awin?.query?.q === 'string' ? awin.query.q : '');
-    const [resultsPerPage, setResultsPerPage] = React.useState(typeof awin?.query?.limit === 'number' ? awin.query.limit : 25);
+    const [resultsPerPage, setResultsPerPage] = React.useState(typeof awin?.query?.limit === 'number' ? awin.query.limit : 5);
     const [sortModel, setSortModel] = React.useState<GridSortModel>([
         {
             field: sortFieldFromQuery(awin?.query?.orderBy),
-            sort: awin?.query?.orderDir === 'asc' ? 'asc' : 'desc',
+            sort: awin?.query?.orderDir === 'desc' ? 'desc' : 'asc',
         },
     ]);
     const [selectionModel, setSelectionModel] = React.useState<GridRowSelectionModel>({
@@ -69,7 +70,7 @@ export default function Awin() {
     const [bulkDecision, setBulkDecision] = React.useState<'queue' | 'delete' | null>(null);
     const [refreshNonce, setRefreshNonce] = React.useState(0);
 
-    const activeSort = sortModel[0] || { field: 'product_name', sort: 'desc' as const };
+    const activeSort = sortModel[0] || { field: 'product_name', sort: 'asc' as const };
     const orderBy = orderByFromSortField(activeSort.field);
     const orderDir = activeSort.sort === 'asc' ? 'asc' : 'desc';
 
@@ -266,29 +267,29 @@ export default function Awin() {
         <Box sx={{ p: 2 }}>
             <Stack spacing={2}>
                 <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
-                    <TextField
-                        size="small"
-                        label="Search products"
-                        placeholder="Search by product name"
-                        value={searchTerm}
-                        sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%' }}
-                        onChange={(event) => {
-                            setPage(1);
-                            setSearchTerm(event.target.value);
-                        }}
-                    />
-                    <Button
-                        variant="text"
-                        color="inherit"
+                    <Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%' }}>
+                        <Editable
+                            variant="outlined"
+                            placeholder="Search Awin"
+                            value={searchTerm}
+                            onChange={(value: string) => {
+                                setPage(1);
+                                setSearchTerm(value);
+                            }}
+                            disabled={Boolean(bulkDecision)}
+                            startAdornment={'search'}
+                        />
+                    </Box>
+                    <MightyButton
+                        kind="icon"
+                        icon="reset"
                         disabled={!searchTerm.trim() || Boolean(bulkDecision)}
                         onClick={() => {
                             setPage(1);
                             setSearchTerm('');
                             setDebouncedSearchTerm('');
                         }}
-                    >
-                        Reset
-                    </Button>
+                    />
                     <Button
                         variant="contained"
                         disabled={!selectedCount || Boolean(bulkDecision)}
@@ -333,7 +334,7 @@ export default function Awin() {
                     onSortModelChange={(nextModel) => {
                         const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
                             ? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'asc' ? 'asc' : 'desc' }]
-                            : [{ field: 'product_name', sort: 'desc' as const }];
+                            : [{ field: 'product_name', sort: 'asc' as const }];
                         setPage(1);
                         setSortModel(normalized);
                     }}
@@ -345,16 +346,6 @@ export default function Awin() {
                         });
                     }}
                     onOpenProduct={(product, rowId) => {
-                        setSelectionModel((current) => {
-                            const nextIds = current.type === 'include'
-                                ? new Set<string>(Array.from(current.ids).map((value) => String(value)))
-                                : new Set<string>();
-                            nextIds.add(String(rowId));
-                            return {
-                                type: 'include',
-                                ids: nextIds,
-                            };
-                        });
                         setSelectedAwin(product);
                     }}
                 />
