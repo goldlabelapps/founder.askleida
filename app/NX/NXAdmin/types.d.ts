@@ -16,8 +16,8 @@ export type EditableBaseProps = {
 	multiline?: boolean;
 	minRows?: number;
 	variant?: 'standard' | 'outlined' | 'filled';
-	startAdornment?: IconName;
-	endAdornment?: IconName;
+    startAdornment?: IconName | ReactNode;
+    endAdornment?: IconName | ReactNode;
 	editableType?: 'text' | 'date' | 'select' | 'chips';
 	options?: readonly string[];
 	checkboxProps?: Omit<CheckboxProps, 'checked' | 'onChange' | 'disabled' | 'required'>;

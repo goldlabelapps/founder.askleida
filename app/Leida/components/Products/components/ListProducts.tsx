@@ -15,8 +15,6 @@ import {
 	type GridRowSelectionModel,
 	type GridSortModel,
 } from '@mui/x-data-grid';
-import { ConfirmAction } from '../../../../NX/DesignSystem';
-import { Editable } from '../../../../NX/NXAdmin';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	formatUkPrice,
@@ -24,13 +22,19 @@ import {
 	getProductName,
 	getProductPrice,
 	getProductUpdatedAt,
+	Editable,
+	ConfirmAction,
+	fetchProducts,
 	initProducts,
 	MightyButton,
+	setLeida
 } from '../../../../Leida';
 import type { T_ListProductsProps, T_Product } from '../../../types.d';
 
+
 const RESULTS_PER_PAGE_OPTIONS = [5, 10, 25, 50, 100];
 const SEARCH_DEBOUNCE_MS = 350;
+const PRODUCTS_COUNT_REFRESH_EVENT = 'leida:products-count-refresh';
 
 type T_ProductListRow = {
 	id: string;
@@ -41,8 +45,11 @@ type T_ProductListRow = {
 	product: T_Product;
 };
 
+function notifyProductsCountRefresh() {
+	window.dispatchEvent(new Event(PRODUCTS_COUNT_REFRESH_EVENT));
+}
+
 const ListProducts = ({
-	showFindProduct = true,
 	onVisibleProductsChange,
 	onProductSelect,
 }: T_ListProductsProps) => {
@@ -52,7 +59,7 @@ const ListProducts = ({
 	const [page, setPage] = React.useState(1);
 	const [searchTerm, setSearchTerm] = React.useState('');
 	const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState('');
-	const [resultsPerPage, setResultsPerPage] = React.useState(25);
+	const [resultsPerPage, setResultsPerPage] = React.useState(10);
 	const [sortModel, setSortModel] = React.useState<GridSortModel>([
 		{ field: 'title', sort: 'asc' },
 	]);
@@ -96,6 +103,9 @@ const ListProducts = ({
 
 	const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
 	const activeQuery = debouncedSearchTerm.trim();
+
+
+
 
 	const statusMessage = React.useMemo(() => {
 		if (loading) {
@@ -158,6 +168,7 @@ const ListProducts = ({
 				ids: new Set<string>(),
 			});
 			setRefreshNonce((value) => value + 1);
+			notifyProductsCountRefresh();
 		} catch (e: unknown) {
 			const message = e instanceof Error ? e.message : String(e);
 			setBulkError(message || 'Failed to delete selected products.');
@@ -165,6 +176,13 @@ const ListProducts = ({
 			setDeleting(false);
 		}
 	}, [debouncedSearchTerm, deleting, selectedCount, selectionModel]);
+
+	React.useEffect(() => {
+		dispatch(setLeida('header', {
+			title: 'Leida Products',
+			icon: 'list',
+		}));
+	}, [dispatch]);
 
 	React.useEffect(() => {
 		const timeoutId = window.setTimeout(() => {
@@ -190,36 +208,24 @@ const ListProducts = ({
 			setError(null);
 
 			try {
-				const params = new URLSearchParams({
-					page: String(page),
-					pageSize: String(resultsPerPage),
-					q: debouncedSearchTerm,
+				const result = await dispatch(fetchProducts({
+					page,
+					pageSize: resultsPerPage,
 					sortBy,
 					sortOrder,
-				});
-
-				const res = await fetch(`/api/products?${params.toString()}`, {
-					method: 'GET',
-					headers: { Accept: 'application/json' },
-				});
-
-				const json = await res.json().catch(() => null);
-
-				if (!res.ok) {
-					const message = json?.message || `Failed to fetch products (${res.status})`;
-					throw new Error(message);
-				}
-
-				const data = json?.data || {};
-				const rows = Array.isArray(data?.rows) ? data.rows : [];
-				const nextTotal = typeof data?.total === 'number' ? data.total : rows.length;
+					q: debouncedSearchTerm,
+				}));
 
 				if (cancelled) {
 					return;
 				}
 
-				setProducts(rows as T_Product[]);
-				setTotal(nextTotal);
+				if (!result?.ok) {
+					throw new Error(result?.error || 'Products query failed');
+				}
+
+				setProducts(Array.isArray(result.rows) ? result.rows as T_Product[] : []);
+				setTotal(typeof result.total === 'number' ? result.total : 0);
 				setHasLoadedOnce(true);
 			} catch (e: unknown) {
 				if (cancelled) {
@@ -356,9 +362,9 @@ const ListProducts = ({
 				{statusMessage}
 			</Typography>
 
-			{error ? <Alert severity="error">{error}</Alert> : null}
-			{deleting ? <Alert severity="info">Deleting selected products...</Alert> : null}
-			{bulkError ? <Alert severity="error">{bulkError}</Alert> : null}
+			{error ? <Alert severity="warning">{error}</Alert> : null}
+			{deleting ? <Alert severity="warning">Deleting selected products...</Alert> : null}
+			{bulkError ? <Alert severity="warning">{bulkError}</Alert> : null}
 			{successMessage ? <Alert severity="success">{successMessage}</Alert> : null}
 
 			{!loading && !error && rows.length === 0 ? (

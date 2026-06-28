@@ -341,7 +341,16 @@ async function processSingleAwinProduct({
   decision: T_Decision;
   awinProduct: T_JsonObject;
 }): Promise<T_ProcessResult> {
-  const sourceProductId = normalizeIdentifier(awinProduct.aw_product_id)
+  const sourceProductId = firstText(
+    awinProduct.product_name,
+    awinProduct.title,
+    awinProduct.name,
+    (awinProduct.data as T_JsonObject | undefined)?.product_name,
+    (awinProduct.data as T_JsonObject | undefined)?.title,
+    (awinProduct.data as T_JsonObject | undefined)?.name,
+    (awinProduct.product_basic as T_JsonObject | undefined)?.title,
+    (awinProduct.product_basic as T_JsonObject | undefined)?.name,
+  ) || normalizeIdentifier(awinProduct.aw_product_id)
     || normalizeIdentifier(awinProduct.merchant_product_id)
     || normalizeIdentifier(awinProduct.id)
     || normalizeIdentifier(awinProduct.unique_key);

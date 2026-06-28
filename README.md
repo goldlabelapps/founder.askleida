@@ -1,243 +1,198 @@
-# Leida Founder (NX Module)
+# Leida Products
 
-Leida is a client-side dashboard module used inside the NX Admin app shell.
+This repository contains the Leida founder/admin workflows for affiliate products, plus the runtime app shell that renders public-facing experiences.
 
-This README is written as a handoff for a React/Next developer who needs to continue work without the original author.
+The most important pipeline in this codebase is:
 
-## What this module provides
+1. Ingest raw AWIN Lookfantastic Product Feed
+2. Decide queue vs delete in admin UI
+3. Stage selected items in product_queue
+4. Process into cleaned products rows (AI-enhanced path)
+5. Consume products in Leida/public UI
 
-- Dashboard UI entry points:
-	- `FounderDash`
-	- `Supabase`
-	- `SupabaseDash`
-	- `DashNav`
-- Redux-oriented actions/hooks for Leida state:
-	- `initLeida()`
-	- `fetchLeida(route)`
-	- `setLeida(key, value)`
-	- `useLeida()`
-	- `useLeidaBus(route)`
-- Founder dashboard scoped state helpers:
-	- `initDash()`
-	- `setDash(key, value)`
-	- `useDash()`
-- Utility:
-	- `normalizeLeidaRouteKey(route)`
+## End-to-end data flow
 
-All public exports are re-exported from `index.tsx`.
-
-## Current architecture
-
-Leida assumes a global Redux tree managed by the host app (via `Uberedux`), and uses `redux-thunk` style async actions.
-
-### State shape used by Leida
-
-Leida reads/writes these keys:
-
-```ts
-state.redux.leida = {
-	initted?: boolean,
-	bus?: {
-		[route: string]: {
-			loading: boolean,
-			error: string | null,
-			data: any[]
-		}
-	}
-}
-
-state.redux.nxAdmin = {
-	header?: {
-		title?: string,
-		icon?: string
-	},
-	dash?: {
-		title?: string,
-		hero?: string,
-		panels?: string[]
-	}
-}
+```mermaid
+flowchart LR
+  A[AWIN source data] --> B[DB table: awin_lookfantastic]
+  B --> C[GET /api/awin]
+  C --> D[Leida Awin screen]
+  D -->|queue or delete| E[POST /api/awin/lookfantastic/queue]
+  E -->|queue| F[DB table: product_queue status=pending]
+  E -->|queue or delete| G[remove from awin_lookfantastic]
+  F --> H[Queue review: GET /api/products/queue]
+  H --> I[processing worker/manual save path]
+  I --> J[DB table: products]
+  J --> K[GET /api/products]
+  K --> L[Leida products UI + public consumers]
 ```
 
-### Data flow
+## What each layer does
 
-1. `initLeida()` sets `leida.initted = true` once.
-2. `initLeida()` immediately dispatches `fetchLeida('/api/supabase')`.
-3. `fetchLeida(route)` normalizes route keys using `normalizeLeidaRouteKey()`.
-4. Route-specific bus state is updated in `leida.bus[routeKey]`:
-	 - set loading true
-	 - fetch GET JSON
-	 - parse list-like data into `data`
-	 - set loading false and persist data or error
-5. Errors are mirrored to global `redux.error` via `setUbereduxKey({ key: 'error', value: msg })`.
+## 1) AWIN source table and search API
 
-## Important files
+Raw affiliate rows are queried from a Postgres table (default `awin_lookfantastic`) by:
 
-- `index.tsx`: module export surface
-- `actions/initLeida.tsx`: one-time module initialization and initial fetch
-- `actions/fetchLeida.tsx`: route-scoped fetch + bus cache updates
-- `actions/setLeida.tsx`: immutable merge updates to `redux.leida`
-- `hooks/useLeida.tsx`: selectors for full leida slice and route bus entries
-- `components/FounderDash/FounderDash.tsx`: main founder dashboard page
-- `components/DashNav/DashNav.tsx`: local dashboard navigation + sign out confirmation
-- `lib/normalizeLeidaRouteKey.ts`: route key normalization utility
+- [app/api/awin/get.ts](app/api/awin/get.ts)
+- [app/api/awin/route.ts](app/api/awin/route.ts)
 
-## Using Leida in Next.js
+Supported behavior includes:
 
-Leida components/hooks are client-side (`'use client'`). Use them only in client components.
+- text/category/brand filtering
+- pagination via `limit` + `offset`
+- sorting by `created_at`, `id`, `product_name`, `category_name`, `search_price`, and brand pseudo-sort
 
-Minimal example:
+The Leida admin screen that consumes this endpoint is:
 
-```tsx
-'use client';
+- [app/Leida/components/Awin/Awin.tsx](app/Leida/components/Awin/Awin.tsx)
 
-import * as React from 'react';
-import { useDispatch } from '../NX/Uberedux';
-import { initLeida, useLeidaBus } from '../Leida';
+This screen uses:
 
-export default function ExampleLeidaConsumer() {
-	const dispatch = useDispatch();
-	const didInit = React.useRef(false);
-	const supabaseBus = useLeidaBus('/api/supabase');
+- [app/Leida/components/Awin/actions/fetchAwin.tsx](app/Leida/components/Awin/actions/fetchAwin.tsx)
+- [app/Leida/components/Awin/components/AwinList.tsx](app/Leida/components/Awin/components/AwinList.tsx)
+- [app/Leida/components/Awin/components/AwinDetail.tsx](app/Leida/components/Awin/components/AwinDetail.tsx)
 
-	React.useEffect(() => {
-		if (!didInit.current) {
-			dispatch(initLeida());
-			didInit.current = true;
-		}
-	}, [dispatch]);
+Important UI behavior:
 
-	if (supabaseBus.loading) return <div>Loading...</div>;
-	if (supabaseBus.error) return <div>Error: {supabaseBus.error}</div>;
+- DataGrid server pagination/sort/search
+- title-first list defaults
+- row selection + bulk actions
+- detail dialog for per-product actions
 
-	return <pre>{JSON.stringify(supabaseBus.data, null, 2)}</pre>;
-}
-```
+## 2) Queue/delete decision from AWIN
 
-## Route normalization behavior
+When a founder selects products in Awin, decisions are posted to:
 
-`normalizeLeidaRouteKey(route)` converts values as follows:
+- [app/api/awin/lookfantastic/queue/route.ts](app/api/awin/lookfantastic/queue/route.ts)
 
-- `https://...` or `http://...` -> unchanged
-- `/api/foo` -> unchanged
-- `/foo` -> `/api/foo`
-- `foo` -> `/api/foo`
-- empty string -> `''` (fetch is aborted with a global error)
+The route supports:
 
-This means `useLeidaBus('/supabase')` and `useLeidaBus('supabase')` both resolve to the same bus key: `/api/supabase`.
+- single product payload (`awinProduct`)
+- filtered selection payload (`awinQuery` + `selection`)
+- decisions: `queue` or `delete`
 
-## Extending this module
+Behavior:
 
-### Add a new data source
+- `queue`: insert a pending row into `product_queue` (dedupe protected), then remove source row(s) from `awin_lookfantastic`
+- `delete`: remove source row(s) from `awin_lookfantastic` without queue insert
 
-1. Pick a route (for example `/api/newSource`).
-2. Dispatch `fetchLeida('/api/newSource')` from an init flow or user action.
-3. Read it via `useLeidaBus('/api/newSource')`.
-4. Render loading/error/data states from the bus entry.
+Related bulk route:
 
-### Add a new nav destination
+- [app/api/awin/lookfantastic/queue/bulk/route.ts](app/api/awin/lookfantastic/queue/bulk/route.ts)
 
-1. Add item in `components/DashNav/DashNav.tsx` `navItems` array.
-2. Create corresponding page/component in the host app route.
-3. Keep route strings aligned with `buildAdminPath()` behavior.
+Client-side delete/queue calls are wired through:
 
-### Add stronger typing
+- [app/Leida/components/Awin/actions/processAwin.tsx](app/Leida/components/Awin/actions/processAwin.tsx)
+- [app/Leida/components/Awin/components/AwinProcess.tsx](app/Leida/components/Awin/components/AwinProcess.tsx)
+- [app/Leida/components/Awin/components/AwinDetail.tsx](app/Leida/components/Awin/components/AwinDetail.tsx)
 
-Current code intentionally uses `any` in several selectors/actions for speed.
-Good next step is introducing:
+## 3) Queue table
 
-- `LeidaState`
-- `LeidaBusEntry<T>`
-- typed thunk `Dispatch`
-- typed root selector state
+Queue storage schema is documented in:
 
-## Current status and known gaps
+- [app/api/awin/sql/product_queue.sql](app/api/awin/sql/product_queue.sql)
 
-- `components/Supabase/components/SupabaseDash.tsx` is currently a placeholder UI.
-- `components/README.tsx` currently does not render user-facing content.
-- Error handling is functional but globally coarse (`redux.error` string).
-- No dedicated tests in this module yet.
+Read API:
 
-## Recommended next tasks
+- [app/api/products/queue/get.ts](app/api/products/queue/get.ts)
+- [app/api/products/queue/route.ts](app/api/products/queue/route.ts)
 
-1. Add unit tests for `normalizeLeidaRouteKey()` and `parseArrayData()` behavior.
-2. Add integration tests for `fetchLeida()` bus transitions:
-	 - idle -> loading -> success
-	 - idle -> loading -> error
-3. Replace `any` with typed interfaces for Leida and NX Admin slices.
-4. Flesh out `SupabaseDash` with real data rendering from `useLeidaBus('/api/supabase')`.
+Leida queue UI:
 
-## Notes for maintainers
+- [app/Leida/components/Awin/components/Queue.tsx](app/Leida/components/Awin/components/Queue.tsx)
 
-- Keep all Leida route keys normalized before indexing `leida.bus`.
-- Preserve immutable updates when touching nested Redux state.
-- Avoid duplicate fetches by honoring the existing `loading` guard in `fetchLeida()`.
+This table is intended to hold pending decisions and processing status transitions (`pending`, `done`, `failed`).
 
+## 4) Products table (cleaned/AI-ready objects)
 
+The long-lived products used across Leida are in `public.products`.
 
-## Leida Dashboard
+Read and delete APIs:
 
-- Practitioners
-- Products
-    - Awin afilliate / Lookfantastic 
+- [app/api/products/get.ts](app/api/products/get.ts)
+- [app/api/products/delete.ts](app/api/products/delete.ts)
+- [app/api/products/route.ts](app/api/products/route.ts)
+- [app/api/products/[product_id]/route.ts](app/api/products/[product_id]/route.ts)
 
-## Awin Lookfantastic Data
+Current explicit save path from AWIN payload to products:
 
-### awin_lookfantastic
+- [app/api/awin/lookfantastic/save/route.ts](app/api/awin/lookfantastic/save/route.ts)
 
-- 25,707 product rows from a single Lookfantastic snapshot are currently stored here.
-- Every row is for LOOKFANTASTIC UK and uses GBP pricing.
+That route normalizes and inserts into `products`, including source metadata under `data`.
 
-The table is structured as flattened product fields plus a raw JSON payload.
-Core populated fields include:
+## 5) Products admin UI (processed products)
 
-- aw_product_id
-- merchant_product_id
-- product_name
-- search_price
-- aw_deep_link
-- merchant_deep_link
-- merchant_name
-- category_name
+Processed products are now rendered with a DataGrid pattern matching AwinList in:
 
-The raw data payload typically contains keys like:
+- [app/Leida/components/Products/components/ListProducts.tsx](app/Leida/components/Products/components/ListProducts.tsx)
 
-- product_name
-- description
-- category_name
-- category_id
-- aw_image_url
-- merchant_image_url
-- display_price
-- store_price
-- delivery_cost
-- language
-- data_feed_id
+Behavior:
 
-Largest categories right now:
+- server-side paging/sorting/search via `/api/products`
+- checkbox selection
+- default visible columns: title + checkbox only
+- bulk delete with confirmation (`ConfirmAction`)
 
-- Cosmetics (11,723)
-- Skincare (7,203)
-- Haircare (3,757)
-- Fragrance (2,677)
+Note: [app/Leida/components/Products/Products.tsx](app/Leida/components/Products/Products.tsx) currently renders a lightweight placeholder panel; the table view is exposed on the list route.
 
-Price range:
+## 6) Public-facing consumption
 
-- minimum: 1.40
-- maximum: 2160
-- average: ~42.70
+The app shell entrypoint is:
 
-Identifier fields currently empty across the table include:
+- [app/[[...slug]]/page.tsx](app/[[...slug]]/page.tsx)
 
-- ean
-- upc
-- isbn
-- mpn
-- product_gtin
-- stock_quantity
-- source_last_updated
-    
-![NextJS](public/shared/png/python.png)  
-> Wei Zang's son
+Routing for Leida sections is handled by:
 
-_[powered by °NX](https://goldlabel.pro/nx/nx-admin)_ 
+- [app/Leida/PageRouter.tsx](app/Leida/PageRouter.tsx)
+
+A direct example of products consumption in UI is:
+
+- [app/Leida/components/AffiliatePlayer/AffiliatePlayer.tsx](app/Leida/components/AffiliatePlayer/AffiliatePlayer.tsx)
+
+`AffiliatePlayer` pulls from `/api/products` (via Leida bus/slice) and renders a product carousel experience. This is the practical bridge from processed product records to user-facing presentation.
+
+## Leida state and fetch model
+
+Leida uses Redux/Uberedux + thunk-style actions.
+
+Common patterns:
+
+- route-fetch bus cache: `fetchLeida('/api/...')`
+- slice selectors: `useAwin()`, `useProducts()`, `useQueue()`, `useLeidaBus(route)`
+- mutable UX state in component-local hooks (search term, selection models, dialogs)
+
+Relevant actions/hooks include:
+
+- [app/Leida/actions/fetchLeida.tsx](app/Leida/actions/fetchLeida.tsx)
+- [app/Leida/components/Awin/hooks/useAwin.tsx](app/Leida/components/Awin/hooks/useAwin.tsx)
+- [app/Leida/components/Products/hooks/useProducts.tsx](app/Leida/components/Products/hooks/useProducts.tsx)
+- [app/Leida/components/Products/hooks/useQueue.tsx](app/Leida/components/Products/hooks/useQueue.tsx)
+
+## Environment and tables
+
+Core environment variables used in this flow:
+
+- `DATABASE_URL` or `POSTGRES_URL` or `SUPABASE_DB_URL`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `AWIN_LOOKFANTASTIC_TABLE` (default `awin_lookfantastic`)
+- `AWIN_PRODUCT_QUEUE_TABLE` (default `product_queue`)
+- `NEXT_PUBLIC_TENANT` (optional response envelope context)
+
+## Operational notes
+
+- If you see `ERR_EMPTY_RESPONSE` for local `/api/...` URLs in browser logs, this is usually a local server/runtime issue (dev server crash, env mismatch, or networking), not a client-side routing issue.
+- AWIN UI actions intentionally remove source rows after queue/delete decisions to keep the source list actionable and reduce repeated triage.
+- Queue insertion has unique-index protection for duplicate pending decisions.
+
+## Known current gaps
+
+- There is no clearly visible in-repo worker that turns `product_queue` pending rows into `products` and marks queue rows done/failed. The contract is implied by queue schema/status and the save route.
+- [app/Leida/components/Products/Products.tsx](app/Leida/components/Products/Products.tsx) is currently a high-level placeholder view rather than embedding the table directly.
+
+## Quick mental model
+
+- Awin screen = triage raw affiliate feed data
+- Queue table = staging and decision tracking
+- Products table = curated, cleaned objects for real app use
+- AffiliatePlayer/public surfaces = read from products table output

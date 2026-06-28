@@ -322,7 +322,6 @@ export type T_RenderProductProps = {
 };
 
 export type T_ListProductsProps = {
-    showFindProduct?: boolean;
     onVisibleProductsChange?: (products: T_Product[]) => void;
     onProductSelect?: (product: T_Product) => void;
 };

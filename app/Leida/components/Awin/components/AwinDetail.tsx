@@ -14,7 +14,7 @@ import {
 import { ConfirmAction, Icon } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { usePaywall } from '../../../../NX/Paywall';
-import { AwinProcess, MightyButton } from '../../../index';
+import { MightyButton } from '../../../index';
 import { asText } from '../../../lib/asText';
 import { processAwin } from '../actions/processAwin';
 import type { I_AwinDetail } from '../../../types.d';
@@ -22,10 +22,11 @@ import type { I_AwinDetail } from '../../../types.d';
 export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinDetail) {
 	const dispatch = useDispatch();
 	const paywall = usePaywall();
-	const [isProcessing, setIsProcessing] = React.useState(false);
 	const [showRawData, setShowRawData] = React.useState(false);
 	const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
 	const [deleting, setDeleting] = React.useState(false);
+	const [queueing, setQueueing] = React.useState(false);
+	const [queueError, setQueueError] = React.useState<string | null>(null);
 
 	const practitionerId = asText(paywall?.uid) || asText(paywall?.user?.uid);
 
@@ -63,12 +64,40 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 
 	React.useEffect(() => {
 		if (open) {
-			setIsProcessing(false);
 			setShowRawData(false);
 			setConfirmDeleteOpen(false);
 			setDeleting(false);
+			setQueueing(false);
+			setQueueError(null);
 		}
 	}, [open]);
+
+	const handleQueueConfirm = async () => {
+		if (!awin || !practitionerId || queueing) {
+			return;
+		}
+
+		setQueueing(true);
+		setQueueError(null);
+
+		const result = await dispatch(
+			processAwin({
+				awin,
+				decision: 'queue',
+				practitionerId,
+			}) as any,
+		);
+
+		setQueueing(false);
+
+		if (!result?.ok) {
+			setQueueError(typeof result?.error === 'string' ? result.error : 'Failed to add product to queue.');
+			return;
+		}
+
+		await onProcessed?.({ decision: 'queue', awin });
+		onClose();
+	};
 
 	const handleDeleteConfirm = async () => {
 		if (!awin || !practitionerId || deleting) {
@@ -125,13 +154,6 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 				/>
 				<MightyButton
 					kind="icon"
-					icon={'delete'}
-					disabled={!awin || !practitionerId || deleting}
-					onClick={() => setConfirmDeleteOpen(true)}>
-					{deleting ? 'Deleting...' : 'Delete from Awin'}
-				</MightyButton>
-				<MightyButton
-					kind="icon"
 					onClick={onClose}
 					icon="close"
 				/>
@@ -156,75 +178,78 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 					</Box>
 				) : null}
 
-				
-				{isProcessing ? (
-					<AwinProcess
-						awin={awin}
-						onProcessed={async (payload) => {
-							await onProcessed?.(payload);
-							onClose();
-						}}
-					/>
-				) : (
+				<Box
+					sx={{
+						display: 'grid',
+						gridTemplateColumns: { xs: '1fr', md: '260px 1fr' },
+						gap: 2,
+						alignItems: 'start',
+					}}
+				>
 					<Box
 						sx={{
+							bgcolor: 'grey.100',
+							borderRadius: 2,
+							minHeight: 220,
 							display: 'grid',
-							gridTemplateColumns: { xs: '1fr', md: '260px 1fr' },
-							gap: 2,
-							alignItems: 'start',
+							placeItems: 'center',
+							overflow: 'hidden',
 						}}
 					>
-						<Box
-							sx={{
-								bgcolor: 'grey.100',
-								borderRadius: 2,
-								minHeight: 220,
-								display: 'grid',
-								placeItems: 'center',
-								overflow: 'hidden',
-							}}
-						>
-							{thumbnailUrl ? (
-								<CardMedia
-									component="img"
-									image={thumbnailUrl}
-									alt={title}
-									sx={{
-										width: '100%',
-										height: 260,
-										objectFit: 'contain',
-										p: 1,
-									}}
-								/>
-							) : (
-								<Typography variant="body2" color="text.secondary">No thumbnail</Typography>
-							)}
-						</Box>
-
-						<Stack spacing={1.5}>
-							
-							<Typography variant="h6">
-								{title}
-							</Typography>
-
-							<Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-								{description}
-							</Typography>
-						</Stack>
+						{thumbnailUrl ? (
+							<CardMedia
+								component="img"
+								image={thumbnailUrl}
+								alt={title}
+								sx={{
+									width: '100%',
+									height: 260,
+									objectFit: 'contain',
+									p: 1,
+								}}
+							/>
+						) : (
+							<Typography variant="body2" color="text.secondary">No thumbnail</Typography>
+						)}
 					</Box>
-				)}
+
+					<Stack spacing={1.5}>
+						<Typography variant="h6">
+							{title}
+						</Typography>
+
+						<Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+							{description}
+						</Typography>
+					</Stack>
+				</Box>
+
+				{queueError ? <Typography variant="body2" color="error">{queueError}</Typography> : null}
 			</DialogContent>
-			<DialogActions sx={{ px: 3, pb: 2.5, pt: 2, justifyContent: 'flex-end' }}>
-
-				
-				
-				<MightyButton 
-					startIcon={'queue'}
-					variant={isProcessing ? 'outlined' : 'contained'} 
-					onClick={() => setIsProcessing((prev) => !prev)}>
-
-					{isProcessing ? 'Back to details' : 'Add to Queue'}
-				</MightyButton>
+			<DialogActions sx={{ px: 3, pb: 2.5, pt: 2 }}>
+				<Stack
+					direction={{ xs: 'column', md: 'row' }}
+					spacing={1}
+					sx={{ width: '100%' }}
+				>
+					<MightyButton
+						startIcon={'delete'}
+						variant="outlined"
+						color="error"
+						fullWidth
+						disabled={!awin || !practitionerId || deleting || queueing}
+						onClick={() => setConfirmDeleteOpen(true)}>
+						{deleting ? 'Deleting...' : 'Delete from Awin'}
+					</MightyButton>
+					<MightyButton
+						startIcon={'queue'}
+						variant="contained"
+						fullWidth
+						disabled={!awin || !practitionerId || queueing || deleting}
+						onClick={() => { void handleQueueConfirm(); }}>
+						{queueing ? 'Adding...' : 'Add to Queue'}
+					</MightyButton>
+				</Stack>
 			</DialogActions>
 
 			<ConfirmAction

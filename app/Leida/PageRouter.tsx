@@ -39,6 +39,10 @@ export function PageRouter({ active }: I_PageRouter) {
       return <SupabasePostgres />;
     case 'supabase/users':
       return <SupabaseUsers />;
+    case 'products/awin':
+      return <Awin />;
+    case 'products/awin/search':
+      return <AwinSearch />;
     case 'awin':
       return <Awin />;
     case 'awin/search':

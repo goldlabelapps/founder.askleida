@@ -1,7 +1,6 @@
 'use client';
 import { I_Icon } from '../../types';
 import * as React from 'react';
-
 import AwinIcon from './SVGIcons/_AwinIcon';
 import SupabaseIcon from './SVGIcons/_SupabaseIcon';
 import LeidaIcon from './SVGIcons/_LeidaIcon';
@@ -201,6 +200,9 @@ import RandomIcon from '@mui/icons-material/Shuffle';
 import PractitionerIcon from '@mui/icons-material/Face6';
 import PractitionerAddIcon from '@mui/icons-material/FaceRetouchingNatural';
 
+import StartIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+
 export default function Icon({ icon, color }: I_Icon) {
   if (!color) color = 'inherit';
   let iconFragment = <React.Fragment />;
@@ -208,7 +210,12 @@ export default function Icon({ icon, color }: I_Icon) {
     case 'stop':
       iconFragment = <StopIcon color={color} />;
       break;
-
+    case 'pause':
+      iconFragment = <PauseIcon color={color} />;
+      break;
+    case 'start':
+      iconFragment = <StartIcon color={color} />;
+      break;
     case 'claude':
       iconFragment = <ClaudeIcon color={color} />;
       break;
@@ -945,6 +952,11 @@ export default function Icon({ icon, color }: I_Icon) {
     case 'logs':
       iconFragment = <LogsIcon color={color} />;
       break;
+
+    case 'list':
+      iconFragment = <LogsIcon color={color} />;
+      break;
+      
     case 'experience':
       iconFragment = <ExperienceIcon color={color} />;
       break;

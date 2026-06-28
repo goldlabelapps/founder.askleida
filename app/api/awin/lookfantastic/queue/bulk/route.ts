@@ -194,7 +194,10 @@ export async function POST(req: Request) {
     if (decision === 'queue') {
       for (const row of sourceRows) {
         const rowData = ((row as Record<string, unknown>).data || {}) as T_JsonObject;
-        const sourceProductId = normalizeIdentifier(rowData.aw_product_id)
+        const sourceProductId = normalizeText(rowData.product_name)
+          || normalizeText(rowData.title)
+          || normalizeText(rowData.name)
+          || normalizeIdentifier(rowData.aw_product_id)
           || normalizeIdentifier(rowData.merchant_product_id)
           || normalizeIdentifier(rowData.id)
           || normalizeIdentifier(rowData.unique_key);

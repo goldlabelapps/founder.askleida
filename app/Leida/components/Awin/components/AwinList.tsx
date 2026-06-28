@@ -1,14 +1,15 @@
 'use client';
 import * as React from 'react';
 import type { T_AwinListProps, T_AwinProduct } from '../../../types.d';
-import { Box, Button, IconButton, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, IconButton, Typography } from '@mui/material';
 import {
     DataGrid,
     type GridColDef,
     type GridRenderCellParams,
 } from '@mui/x-data-grid';
-import { formatUkPrice } from '../../../../Leida';
+import { formatUkPrice, setLeida, } from '../../../../Leida';
 import { Icon } from '../../../../NX/DesignSystem';
+import { useDispatch } from '../../../../NX/Uberedux';
 
 export default function AwinList({
     rows,
@@ -23,12 +24,24 @@ export default function AwinList({
     onSortModelChange,
     onRowSelectionModelChange,
     onOpenProduct,
+    
 }: T_AwinListProps) {
+
+    const dispatch = useDispatch();
+
+    React.useEffect(() => {
+        dispatch(setLeida('header', {
+            title: 'Awin',
+            icon: 'awin',
+        }));
+    }, [dispatch]);
+    
     const columns = React.useMemo<GridColDef[]>(() => {
         return [
             {
                 field: 'product_name',
-                headerName: 'Title',
+                headerName: ' ',
+                renderHeader: () => null,
                 flex: 1.6,
                 minWidth: 260,
                 sortable: true,
@@ -131,6 +144,10 @@ export default function AwinList({
                     border: 0,
                     '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
                         outline: 'none',
+                    },
+                    '& .MuiDataGrid-menuIconButton': {
+                        color: 'primary.main',
+                        opacity: 1,
                     },
                 }}
             />

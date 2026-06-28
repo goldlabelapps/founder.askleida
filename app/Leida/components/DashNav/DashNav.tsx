@@ -7,7 +7,6 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../NX/Uberedux';
 import { MiniListItem } from '../../../NX/NXAdmin';
-import { useLeidaBus } from '../../hooks/useLeida';
 import { initAwin } from '../Awin/actions/initAwin';
 import { initQueue } from '../Products/actions/initQueue';
 import { LoggedInAs } from './components/index';
@@ -25,7 +24,56 @@ export default function DashNav({
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const queueBus = useLeidaBus('/api/products/queue');
+  const [queueCount, setQueueCount] = React.useState<number | null>(null);
+  const [productCount, setProductCount] = React.useState<number | null>(null);
+  const refreshQueueCount = React.useCallback(async () => {
+    try {
+      const params = new URLSearchParams({
+        page: '1',
+        pageSize: '1',
+        status: 'pending',
+      });
+
+      const res = await fetch(`/api/products/queue?${params.toString()}`, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+      });
+
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(json?.message || `Failed to fetch queue count (${res.status})`);
+      }
+
+      setQueueCount(typeof json?.data?.total === 'number' ? json.data.total : 0);
+    } catch {
+      setQueueCount((current) => current ?? null);
+    }
+  }, []);
+
+  const refreshProductCount = React.useCallback(async () => {
+    try {
+      const params = new URLSearchParams({
+        page: '1',
+        pageSize: '1',
+      });
+
+      const res = await fetch(`/api/products?${params.toString()}`, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+      });
+
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(json?.message || `Failed to fetch product count (${res.status})`);
+      }
+
+      setProductCount(typeof json?.data?.total === 'number' ? json.data.total : 0);
+    } catch {
+      setProductCount((current) => current ?? null);
+    }
+  }, []);
 
   React.useEffect(() => {
     dispatch(initAwin());
@@ -60,13 +108,35 @@ export default function DashNav({
     });
   }, [normalizedPathname]);
 
-  const queueCount = React.useMemo(() => {
-    if (!Array.isArray(queueBus?.data)) return 0;
-    return queueBus.data.length;
-  }, [queueBus?.data]);
+  React.useEffect(() => {
+    const handleRefresh = () => {
+      void refreshQueueCount();
+    };
+
+    const handleProductRefresh = () => {
+      void refreshProductCount();
+    };
+
+    void refreshQueueCount();
+    void refreshProductCount();
+
+    const intervalId = window.setInterval(() => {
+      void refreshQueueCount();
+      void refreshProductCount();
+    }, 15000);
+    window.addEventListener('leida:queue-count-refresh', handleRefresh);
+    window.addEventListener('leida:products-count-refresh', handleProductRefresh);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('leida:queue-count-refresh', handleRefresh);
+      window.removeEventListener('leida:products-count-refresh', handleProductRefresh);
+    };
+  }, [pathname, refreshProductCount, refreshQueueCount]);
 
   const renderItem = React.useCallback((item: DashNavItem, nested = false) => (
     <React.Fragment key={item.route}>
+      {item.route === '/products/queue' && queueCount === 0 ? null : (
       <MiniListItem
         open={open}
         selected={isRouteActive(item.activeRoutes)}
@@ -76,13 +146,18 @@ export default function DashNav({
           icon: item.icon,
           route: item.route,
           nested,
-          badgeContent: item.route === '/products/queue' ? queueCount : undefined,
+          badgeContent: item.route === '/products/queue'
+            ? (typeof queueCount === 'number' && queueCount > 0 ? queueCount : undefined)
+            : item.route === '/products/list'
+              ? productCount ?? undefined
+              : undefined,
         }}
       />
+      )}
       {item.children?.map((child) => renderItem(child, true))}
       {!nested ? <Divider /> : null}
     </React.Fragment>
-  ), [isRouteActive, navigateToRoute, open, queueCount]);
+  ), [isRouteActive, navigateToRoute, open, productCount, queueCount]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>

@@ -51,6 +51,14 @@ export default function Editable({
 	startAdornment,
 	endAdornment,
 }: EditableProps) {
+	const renderAdornmentContent = React.useCallback((adornment?: IconName | React.ReactNode) => {
+		if (!adornment) return null;
+		if (typeof adornment === 'string') {
+			return <Icon icon={adornment} />;
+		}
+		return adornment;
+	}, []);
+
 	const [dateAnchorEl, setDateAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
 	const handleOpenDatePicker = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -197,12 +205,12 @@ export default function Editable({
 						input: {
 							startAdornment: startAdornment ? (
 								<InputAdornment position="start">
-									<Icon icon={startAdornment} />
+									{renderAdornmentContent(startAdornment)}
 								</InputAdornment>
 							) : undefined,
 							endAdornment: endAdornment ? (
 								<InputAdornment position="end">
-									<Icon icon={endAdornment} />
+									{renderAdornmentContent(endAdornment)}
 								</InputAdornment>
 							) : undefined,
 						},
@@ -248,13 +256,13 @@ export default function Editable({
 						startAdornment: startAdornment ? (
 							<InputAdornment position="start">
 								<Box sx={{ mr: 2 }}>
-									<Icon icon={startAdornment} />
+									{renderAdornmentContent(startAdornment)}
 								</Box>
 							</InputAdornment>
 						) : undefined,
 						endAdornment: endAdornment ? (
 							<InputAdornment position="end">
-								<Icon icon={endAdornment} />
+								{renderAdornmentContent(endAdornment)}
 							</InputAdornment>
 						) : undefined,
 					},

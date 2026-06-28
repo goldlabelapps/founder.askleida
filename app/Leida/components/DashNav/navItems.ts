@@ -17,8 +17,14 @@ export const navItems: DashNavItem[] = [
     label: 'Products',
     icon: 'products',
     route: '/products',
-    activeRoutes: ['/products', '/awin', '/products/queue', '/products/list'],
+    activeRoutes: ['/products', '/products/awin', '/awin', '/products/queue', '/products/list'],
     children: [
+      {
+        label: 'Awin',
+        icon: 'awin',
+        route: '/products/awin',
+        activeRoutes: ['/products/awin', '/awin'],
+      },
       {
         label: 'Queue',
         icon: 'queue',
@@ -26,18 +32,11 @@ export const navItems: DashNavItem[] = [
         activeRoutes: ['/products/queue'],
       },
       {
-        label: 'Leida Products',
-        icon: 'leida',
+        label: 'List',
+        icon: 'list',
         route: '/products/list',
         activeRoutes: ['/products/list'],
       },
-      {
-        label: 'Awin',
-        icon: 'awin',
-        route: '/awin',
-        activeRoutes: ['/awin'],
-      },
-      
     ],
   }
 ];
