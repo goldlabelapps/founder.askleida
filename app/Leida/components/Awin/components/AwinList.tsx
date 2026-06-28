@@ -1,14 +1,15 @@
 'use client';
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import type { T_AwinListProps, T_AwinProduct } from '../../../types.d';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import {
     DataGrid,
     type GridColDef,
     type GridRenderCellParams,
 } from '@mui/x-data-grid';
 import { formatUkPrice, setLeida, } from '../../../../Leida';
-import { Icon } from '../../../../NX/DesignSystem';
+import { Icon, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 
 export default function AwinList({
@@ -28,6 +29,7 @@ export default function AwinList({
 }: T_AwinListProps) {
 
     const dispatch = useDispatch();
+    const router = useRouter();
 
     React.useEffect(() => {
         dispatch(setLeida('header', {
@@ -104,6 +106,27 @@ export default function AwinList({
             },
         ];
     }, [onOpenProduct]);
+
+    if (!loading && rows.length === 0) {
+        return (
+            <Box sx={{ width: '100%', py: 6 }}>
+                <Stack spacing={2} alignItems="center" textAlign="center" sx={{ maxWidth: 560, mx: 'auto' }}>
+                    <Typography variant="h6">
+                        Nothing to show yet.
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                        Pull in Awin products first, then come back here to review and manage them.
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        onClick={() => dispatch(navigateTo(router, '/products'))}
+                    >
+                        Go to Products
+                    </Button>
+                </Stack>
+            </Box>
+        );
+    }
 
     return loading || rows.length > 0 ? (
         <Box sx={{ width: '100%', minHeight: 560 }}>

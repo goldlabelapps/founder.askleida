@@ -63,6 +63,9 @@ import { fetchProducts } from './components/Products/actions/fetchProducts';
 import { initQueue } from './components/Products/actions/initQueue';
 import { fetchQueue } from './components/Products/actions/fetchQueue';
 import { deleteQueueSelection } from './components/Products/actions/deleteQueueSelection';
+import { deleteProductQueueRecords } from './components/Products/actions/deleteProductQueueRecords';
+import { fetchAwinFeedIngestPreflight } from './components/Products/actions/fetchAwinFeedIngestPreflight';
+import { fetchAwinFeedSnapshot } from './components/Products/actions/fetchAwinFeedSnapshot';
 import { setProducts } from './components/Products/actions/setProducts';
 import { setQueue } from './components/Products/actions/setQueue';
 import { initClaude } from './components/Claude/actions/initClaude';
@@ -196,6 +199,9 @@ export {
     fetchLeida,
     fetchQueue,
     deleteQueueSelection,
+    deleteProductQueueRecords,
+    fetchAwinFeedIngestPreflight,
+    fetchAwinFeedSnapshot,
     fetchSupabaseRows,
     setLeida,
     setAwin,

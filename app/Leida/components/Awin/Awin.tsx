@@ -289,13 +289,11 @@ export default function Awin() {
     }, [debouncedSearchTerm, dispatch, orderBy, orderDir, page, refreshNonce, resultsPerPage]);
 
     React.useEffect(() => {
-        if (dash && dash.title) {
-            dispatch(setLeida('header', {
-                title: 'Awin',
-                icon: 'awin',
-            }));
-        }
-    }, [dispatch, dash?.title]);
+        dispatch(setLeida('header', {
+            title: `Awin (Total ${total})`,
+            icon: 'awin',
+        }));
+    }, [dispatch, total]);
 
     return (
         <Box sx={{ p: 2 }}>
