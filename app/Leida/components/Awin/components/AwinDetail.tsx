@@ -11,64 +11,44 @@ import {
 	IconButton,
 	Stack,
 	Typography,
-	useMediaQuery,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import {Icon} from '../../../../NX/DesignSystem';
 import { AwinProcess } from '../../../index';
-import { asText } from '../../../lib/asText';
-import type { I_AwinDetail, T_ImageMeta } from '../../../types.d';
-
-const INITIAL_IMAGE_META: T_ImageMeta = {
-	status: 'idle',
-	width: 0,
-	height: 0,
-};
+import type { I_AwinDetail } from '../../../types.d';
 
 export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinDetail) {
-	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-	const [imageMeta, setImageMeta] = React.useState<T_ImageMeta>(INITIAL_IMAGE_META);
-	const [isProcessing, setIsProcessing] = React.useState(true);
+	const [isProcessing, setIsProcessing] = React.useState(false);
+	const [showRawData, setShowRawData] = React.useState(false);
 
-	const preferredData = awin?.data && typeof awin.data === 'object'
+	const data = awin?.data && typeof awin.data === 'object'
 		? (awin.data as Record<string, unknown>)
 		: {};
 
-	// Prefer AWIN feed payload under data for duplicated fields.
-	const preferredAwin = awin
-		? {
-			...awin,
-			...preferredData,
-			data: awin.data,
+	const pickText = (...values: unknown[]): string => {
+		for (const value of values) {
+			if (typeof value === 'string' && value.trim()) {
+				return value.trim();
+			}
 		}
-		: null;
-	const preferredRecord = preferredAwin as Record<string, unknown> | null;
+		return '';
+	};
 
-	const title = typeof preferredAwin?.product_name === 'string' && preferredAwin.product_name.trim()
-		? preferredAwin.product_name
-		: 'Awin Detail';
-
-	const description = typeof preferredAwin?.description === 'string' && preferredAwin.description.trim()
-		? preferredAwin.description
-		: 'No description available.';
-
-	const imageUrl = [
-		asText(preferredRecord?.large_image),
-		asText(preferredRecord?.image_url),
-		asText(preferredRecord?.merchant_image_url),
-		asText(preferredRecord?.aw_image_url),
-		asText(preferredRecord?.merchant_thumb_url),
-	].find(Boolean) || '';
-	const deepLink = asText(preferredRecord?.merchant_deep_link) || asText(preferredRecord?.aw_deep_link);
-
-	React.useEffect(() => {
-		setImageMeta(INITIAL_IMAGE_META);
-	}, [imageUrl, open]);
+	const title = pickText(awin?.product_name, data.product_name) || 'AWIN Product';
+	const description = pickText(awin?.description, data.description) || 'No description available.';
+	const merchant = pickText(data.merchant_name);
+	const category = pickText(awin?.category_name, data.category_name, data.merchant_category);
+	const imageUrl = pickText(data.merchant_image_url, data.aw_image_url);
+	const merchantLink = pickText(data.merchant_deep_link);
+	const awinLink = pickText(awin?.aw_deep_link, data.aw_deep_link);
+	const displayPrice = pickText(data.display_price);
+	const searchPrice = pickText(awin?.search_price, data.search_price);
+	const currency = pickText(awin?.currency, data.currency);
+	const price = displayPrice || (searchPrice ? `${currency || ''}${searchPrice}` : 'N/A');
 
 	React.useEffect(() => {
 		if (open) {
-			setIsProcessing(true);
+			setIsProcessing(false);
+			setShowRawData(false);
 		}
 	}, [open]);
 
@@ -104,80 +84,85 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 						}}
 					/>
 				) : (
-					<Box
-						sx={{
-							display: 'grid',
-							gridTemplateColumns: { xs: '1fr', md: '1.15fr 0.85fr' },
-							gap: { xs: 2, md: 3 },
-							alignItems: 'start',
-						}}
-					>
-						<Stack spacing={1.25}>
-							<Typography
-								variant="body1"
+					<Stack spacing={2}>
+						<Typography variant="h6">{title}</Typography>
+
+						{imageUrl ? (
+							<CardMedia
+								component="img"
+								image={imageUrl}
+								alt={title}
 								sx={{
-									fontSize: { xs: '1rem', md: '1.05rem' },
-									lineHeight: 1.75,
-									color: 'text.primary',
+									width: '100%',
+									maxHeight: { xs: 260, md: 360 },
+									objectFit: 'contain',
+									borderRadius: 2,
+									bgcolor: 'grey.100',
+									p: 1,
 								}}
-							>
-								{description}
-							</Typography>
-							
+							/>
+						) : null}
+
+						<Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+							<Typography variant="body2"><strong>Price:</strong> {price}</Typography>
+							{merchant ? <Typography variant="body2"><strong>Merchant:</strong> {merchant}</Typography> : null}
+							{category ? <Typography variant="body2"><strong>Category:</strong> {category}</Typography> : null}
 						</Stack>
 
-						<Box>
-							{imageUrl ? (
-								<>
-									<CardMedia
-										component="img"
-										image={imageUrl}
-										alt={title}
-										sx={{
-											width: '100%',
-											maxHeight: { xs: 260, md: 360 },
-											objectFit: 'contain',
-											borderRadius: 2,
-											bgcolor: 'grey.100',
-											p: 1,
-										}}
-										onLoad={(event) => {
-											const img = event.currentTarget;
-											setImageMeta({ status: 'loaded', width: img.naturalWidth, height: img.naturalHeight });
-										}}
-										onError={() => setImageMeta({ status: 'error', width: 0, height: 0 })}
-									/>
-								</>
-							) : (
-								<Box
-									sx={{
-										height: { xs: 220, md: 320 },
-										display: 'grid',
-										placeItems: 'center',
-										bgcolor: 'grey.100',
-										borderRadius: 2,
-									}}
-								>
-									<Typography variant="body2" color="text.secondary">
-										No image available
-									</Typography>
-								</Box>
-							)}
-						</Box>
-					</Box>
+						<Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+							{description}
+						</Typography>
+
+						<Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+							{merchantLink ? (
+								<Button component="a" href={merchantLink} target="_blank" rel="noreferrer" variant="outlined">
+									Open merchant page
+								</Button>
+							) : null}
+							{awinLink ? (
+								<Button component="a" href={awinLink} target="_blank" rel="noreferrer" variant="outlined">
+									Open AWIN link
+								</Button>
+							) : null}
+						</Stack>
+
+						{showRawData ? (
+							<Box
+								component="pre"
+								sx={{
+									m: 0,
+									p: 2,
+									borderRadius: 1,
+									bgcolor: 'grey.100',
+									overflowX: 'auto',
+									whiteSpace: 'pre-wrap',
+									wordBreak: 'break-word',
+									fontSize: 13,
+								}}
+							>
+								{JSON.stringify(awin ?? {}, null, 2)}
+							</Box>
+						) : null}
+					</Stack>
 				)}
 			</DialogContent>
 			<DialogActions sx={{ px: 3, pb: 2.5, pt: 2 }}>
-				{!isProcessing && <>
+				{!isProcessing ? (
 					<Button
-						fullWidth
-						variant={isProcessing ? 'outlined' : 'contained'}
-						startIcon={<Icon icon={isProcessing ? 'left' : 'claude'} />}
-						onClick={() => setIsProcessing((prev) => !prev)}
+						variant="outlined"
+						onClick={() => setShowRawData((prev) => !prev)}
 					>
-						{isProcessing ? 'Back to product details' : 'Process product'}
-					</Button></>}
-				
+						{showRawData ? 'Hide raw data' : 'Show raw data'}
+					</Button>
+				) : null}
+				<Button
+					fullWidth
+					variant={isProcessing ? 'outlined' : 'contained'}
+					startIcon={<Icon icon={isProcessing ? 'left' : 'claude'} />}
+					onClick={() => setIsProcessing((prev) => !prev)}
+				>
+					{isProcessing ? 'Back to product data' : 'Process product'}
+				</Button>
 			</DialogActions>
 		</Dialog>
 	);

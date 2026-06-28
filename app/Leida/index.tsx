@@ -12,6 +12,7 @@ import {
 import DashAuth from './components/FounderDash/components/DashAuth';
 import Awin from './components/Awin/Awin';
 import AwinDetail from './components/Awin/components/AwinDetail';
+import AwinList from './components/Awin/components/AwinList';
 import AwinProcess from './components/Awin/components/AwinProcess';
 import Queue from './components/Awin/components/Queue';
 import Products from './components/Products/Products';
@@ -52,6 +53,7 @@ import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRo
 import { saveSupabaseRecord } from './components/Supabase/actions/saveSupabaseRecord';
 import { initAwin } from './components/Awin/actions/initAwin';
 import { setAwin } from './components/Awin/actions/setAwin';
+import { fetchAwin } from './components/Awin/actions/fetchAwin';
 import { processAwin } from './components/Awin/actions/processAwin';
 import { initProducts } from './components/Products/actions/initProducts';
 import { initQueue } from './components/Products/actions/initQueue';
@@ -136,6 +138,7 @@ export {
     DashSurface,
     Awin,
     AwinDetail,
+    AwinList,
     AwinProcess,
     AwinSearch,
     Products,
@@ -179,6 +182,7 @@ export {
     initQueue,
     initClaude,
     processAwin,
+    fetchAwin,
     fetchLeida,
     fetchQueue,
     fetchSupabaseRows,

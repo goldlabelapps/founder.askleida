@@ -5,6 +5,11 @@ import type {
     IconButtonProps,
     ListItemButtonProps,
 } from '@mui/material';
+import type {
+    GridPaginationModel,
+    GridRowSelectionModel,
+    GridSortModel,
+} from '@mui/x-data-grid';
 import type { I_Icon } from '../NX/types';
 
 export type T_SupabaseColumn = {
@@ -154,6 +159,30 @@ export interface I_AwinDetail {
     onClose: () => void;
     onProcessed?: (payload: T_AwinProcessedPayload) => void | Promise<void>;
 }
+
+export type T_AwinListRow = {
+    id: string;
+    product_name: string;
+    category_name: string;
+    price: number | null;
+    aw_deep_link: string;
+    product: T_AwinProduct;
+};
+
+export type T_AwinListProps = {
+    rows: T_AwinListRow[];
+    loading: boolean;
+    total: number;
+    page: number;
+    resultsPerPage: number;
+    pageSizeOptions: number[];
+    sortModel: GridSortModel;
+    selectionModel: GridRowSelectionModel;
+    onPaginationModelChange: (model: GridPaginationModel) => void;
+    onSortModelChange: (nextModel: GridSortModel) => void;
+    onRowSelectionModelChange: (nextSelection: GridRowSelectionModel) => void;
+    onOpenProduct: (product: T_AwinProduct, rowId: string) => void;
+};
 
 export type Product = {
     name?: string;
