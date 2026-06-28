@@ -211,6 +211,7 @@ export type RenderProductsProps = {
 
 export type T_Product = {
     id?: string;
+    product_id?: string | number;
     name?: string;
     title?: string;
     product_name?: string;

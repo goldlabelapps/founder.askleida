@@ -1,9 +1,11 @@
 'use client';
+
 import * as React from 'react';
 import type { T_Product } from '../../types.d';
 import { useRouter } from 'next/navigation';
 import {
 	Box,
+	Typography,
 } from '@mui/material';
 import { useDispatch } from '../../../NX/Uberedux';
 import {
@@ -38,11 +40,14 @@ export default function Products() {
 
 	return (
 		<Box sx={{}}>
-			<ListProducts
-				showFindProduct={showFindProduct}
-				onVisibleProductsChange={setVisibleProducts}
-				onProductSelect={setSelectedProduct}
-			/>
+
+			<Typography variant="h6" sx={{ mb: 1 }}>
+				High level actions
+			</Typography>
+			
+			<ul>
+				<li>Check Awin for updated Product Feed</li>
+			</ul>
 		</Box>
 	);
 }

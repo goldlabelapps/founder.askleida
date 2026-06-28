@@ -14,6 +14,7 @@ import {
   Awin,
   PractitionerNew,
   Products,
+  ListProducts,
   Queue,
   LeidaFlash,
 } from '../Leida';
@@ -51,6 +52,8 @@ export function PageRouter({ active }: I_PageRouter) {
       return <LeidaFlash />;
     case 'products':
       return <Products />;
+    case 'products/list':
+      return <ListProducts />;
     default:
       return <FounderDash />;
   }

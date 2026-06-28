@@ -11,13 +11,23 @@ import {
 	Stack,
 	Typography,
 } from '@mui/material';
-import {Icon} from '../../../../NX/DesignSystem';
+import { ConfirmAction, Icon } from '../../../../NX/DesignSystem';
+import { useDispatch } from '../../../../NX/Uberedux';
+import { usePaywall } from '../../../../NX/Paywall';
 import { AwinProcess, MightyButton } from '../../../index';
+import { asText } from '../../../lib/asText';
+import { processAwin } from '../actions/processAwin';
 import type { I_AwinDetail } from '../../../types.d';
 
 export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinDetail) {
+	const dispatch = useDispatch();
+	const paywall = usePaywall();
 	const [isProcessing, setIsProcessing] = React.useState(false);
 	const [showRawData, setShowRawData] = React.useState(false);
+	const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
+	const [deleting, setDeleting] = React.useState(false);
+
+	const practitionerId = asText(paywall?.uid) || asText(paywall?.user?.uid);
 
 	const data = awin?.data && typeof awin.data === 'object'
 		? (awin.data as Record<string, unknown>)
@@ -36,13 +46,13 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 	const description = pickText(awin?.description, data.description) || 'No description available.';
 	const merchant = pickText(data.merchant_name);
 	const category = pickText(awin?.category_name, data.category_name, data.merchant_category);
-	const imageUrl = pickText(
+	const thumbnailUrl = pickText(
 		data.thumbnail,
 		data.thumb_url,
 		data.merchant_thumb_url,
+		data.aw_image_url,
 		data.image_url,
 		data.merchant_image_url,
-		data.aw_image_url,
 	);
 	const merchantLink = pickText(data.merchant_deep_link);
 	const awinLink = pickText(awin?.aw_deep_link, data.aw_deep_link);
@@ -55,8 +65,33 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 		if (open) {
 			setIsProcessing(false);
 			setShowRawData(false);
+			setConfirmDeleteOpen(false);
+			setDeleting(false);
 		}
 	}, [open]);
+
+	const handleDeleteConfirm = async () => {
+		if (!awin || !practitionerId || deleting) {
+			setConfirmDeleteOpen(false);
+			return;
+		}
+
+		setDeleting(true);
+		const result = await dispatch(
+			processAwin({
+				awin,
+				decision: 'delete',
+				practitionerId,
+			}) as any,
+		);
+		setDeleting(false);
+		setConfirmDeleteOpen(false);
+
+		if (result?.ok) {
+			await onProcessed?.({ decision: 'delete', awin });
+			onClose();
+		}
+	};
 
 	return (
 		<Dialog
@@ -67,39 +102,42 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 			fullScreen={false}
 			sx={{ zIndex: (muiTheme) => muiTheme.zIndex.modal + 100 }}
 		>
-			<DialogTitle sx={{  }}>
-				<IconButton
-					aria-label="close dialog"
-					onClick={onClose}
-					sx={{
-						position: 'absolute',
-						right: 12,
-						top: 12,
+			<DialogTitle sx={{ display: 'flex' }}>
+				<Box sx={{ flexGrow: 1 }} />
+				<MightyButton
+					kind="icon"
+					icon="awin"
+					onClick={() => {
+						window.open(awinLink, '_blank', 'noopener,noreferrer');
 					}}
-				>
-					<Icon icon="close" />
-				</IconButton>
+				/>
+				<MightyButton
+					kind="icon"
+					icon="api"
+					onClick={() => setShowRawData((prev) => !prev)}
+				/>
+				<MightyButton
+					kind="icon"
+					icon="link"
+					onClick={() => {
+						window.open(merchantLink, '_blank', 'noopener,noreferrer');
+					}}
+				/>
+				<MightyButton
+					kind="icon"
+					icon={'delete'}
+					disabled={!awin || !practitionerId || deleting}
+					onClick={() => setConfirmDeleteOpen(true)}>
+					{deleting ? 'Deleting...' : 'Delete from Awin'}
+				</MightyButton>
+				<MightyButton
+					kind="icon"
+					onClick={onClose}
+					icon="close"
+				/>
 			</DialogTitle>
-			<DialogContent>
-					<Box>
-						{!isProcessing ? (
-							<MightyButton
-								kind="icon"
-								icon={'api'}
-								onClick={() => setShowRawData((prev) => !prev)}
-							>
-								{showRawData ? 'Hide raw data' : 'Show raw data'}
-							</MightyButton>
-						) : null}
-						<MightyButton
-							kind="icon"
-							icon="queue"
-							onClick={() => setIsProcessing((prev) => !prev)}
-						>
-							{isProcessing ? 'Back' : 'Add to Queue'}
-						</MightyButton>
-					</Box>
 
+			<DialogContent>
 				{showRawData ? (
 					<Box
 						component="pre"
@@ -118,7 +156,7 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 					</Box>
 				) : null}
 
-
+				
 				{isProcessing ? (
 					<AwinProcess
 						awin={awin}
@@ -128,65 +166,76 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 						}}
 					/>
 				) : (
-					<Stack spacing={2}>
-						<Typography variant="h6">{title}</Typography>
-
-						{imageUrl ? (
-							<CardMedia
-								component="img"
-								image={imageUrl}
-								alt={title}
-								sx={{
-									width: '100%',
-									maxHeight: { xs: 260, md: 360 },
-									objectFit: 'contain',
-									borderRadius: 2,
-									bgcolor: 'grey.100',
-									p: 1,
-								}}
-							/>
-						) : null}
-
-						<Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-							<Typography variant="body2"><strong>Price:</strong> {price}</Typography>
-							{merchant ? <Typography variant="body2"><strong>Merchant:</strong> {merchant}</Typography> : null}
-							{category ? <Typography variant="body2"><strong>Category:</strong> {category}</Typography> : null}
-						</Stack>
-
-						<Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-							{description}
-						</Typography>
-
-						<Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-							{merchantLink ? (
-								<MightyButton
-									variant="outlined"
-									onClick={() => {
-										window.open(merchantLink, '_blank', 'noopener,noreferrer');
+					<Box
+						sx={{
+							display: 'grid',
+							gridTemplateColumns: { xs: '1fr', md: '260px 1fr' },
+							gap: 2,
+							alignItems: 'start',
+						}}
+					>
+						<Box
+							sx={{
+								bgcolor: 'grey.100',
+								borderRadius: 2,
+								minHeight: 220,
+								display: 'grid',
+								placeItems: 'center',
+								overflow: 'hidden',
+							}}
+						>
+							{thumbnailUrl ? (
+								<CardMedia
+									component="img"
+									image={thumbnailUrl}
+									alt={title}
+									sx={{
+										width: '100%',
+										height: 260,
+										objectFit: 'contain',
+										p: 1,
 									}}
-								>
-									Open merchant page
-								</MightyButton>
-							) : null}
-							{awinLink ? (
-								<MightyButton
-									variant="outlined"
-									onClick={() => {
-										window.open(awinLink, '_blank', 'noopener,noreferrer');
-									}}
-								>
-									Open AWIN link
-								</MightyButton>
-							) : null}
-						</Stack>
+								/>
+							) : (
+								<Typography variant="body2" color="text.secondary">No thumbnail</Typography>
+							)}
+						</Box>
 
-						
-					</Stack>
+						<Stack spacing={1.5}>
+							
+							<Typography variant="h6">
+								{title}
+							</Typography>
+
+							<Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+								{description}
+							</Typography>
+						</Stack>
+					</Box>
 				)}
 			</DialogContent>
-			<DialogActions sx={{ px: 3, pb: 2.5, pt: 2 }}>
-				ksjf
+			<DialogActions sx={{ px: 3, pb: 2.5, pt: 2, justifyContent: 'flex-end' }}>
+
+				
+				
+				<MightyButton 
+					startIcon={'queue'}
+					variant={isProcessing ? 'outlined' : 'contained'} 
+					onClick={() => setIsProcessing((prev) => !prev)}>
+
+					{isProcessing ? 'Back to details' : 'Add to Queue'}
+				</MightyButton>
 			</DialogActions>
+
+			<ConfirmAction
+				open={confirmDeleteOpen}
+				icon="delete"
+				title="Delete this AWIN product?"
+				body="This will remove it from the AWIN source list."
+				handleConfirm={handleDeleteConfirm}
+				handleClose={() => setConfirmDeleteOpen(false)}
+				zIndex={1500}
+			/>
 		</Dialog>
 	);
 }

@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+
 import type { T_AwinProcessedPayload, T_AwinProduct } from '../../types.d';
 import {
     Alert,
@@ -177,8 +178,8 @@ export default function Awin() {
             }
 
             const actionLabel = decision === 'queue'
-                ? 'queued and removed from the AWIN source table'
-                : 'deleted';
+                ? 'Queued and removed.'
+                : 'Deleted.';
             setSuccessMessage(`${processedCount} product${processedCount === 1 ? '' : 's'} ${actionLabel}.`);
             setSelectionModel({
                 type: 'include',
@@ -311,8 +312,8 @@ export default function Awin() {
                     {statusMessage}
                 </Typography>
 
-                {error ? <Alert severity="error">{error}</Alert> : null}
-                {bulkError ? <Alert severity="error">{bulkError}</Alert> : null}
+                {error ? <Alert severity="warning">{error}</Alert> : null}
+                {bulkError ? <Alert severity="warning">{bulkError}</Alert> : null}
                 {successMessage ? <Alert severity="success">{successMessage}</Alert> : null}
 
                 <AwinList

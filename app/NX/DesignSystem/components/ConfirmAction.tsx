@@ -19,6 +19,7 @@ export interface I_ConfirmAction {
     body?: React.ReactNode;
     handleConfirm: () => void;
     handleClose: () => void;
+    zIndex?: number;
 }
 
 export default function ConfirmAction({
@@ -28,9 +29,16 @@ export default function ConfirmAction({
     body,
     handleConfirm,
     handleClose,
+    zIndex,
 }: I_ConfirmAction) {
     return (
-        <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
+        <Dialog
+            open={open}
+            onClose={handleClose}
+            fullWidth
+            maxWidth="xs"
+            sx={zIndex ? { zIndex } : undefined}
+        >
             <DialogTitle>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {icon ? <Icon icon={icon} /> : null}

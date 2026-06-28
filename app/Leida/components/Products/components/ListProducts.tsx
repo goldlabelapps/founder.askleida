@@ -3,112 +3,444 @@ import * as React from 'react';
 import {
 	Alert,
 	Box,
-	Grid,
-	LinearProgress,
+	Button,
+	CircularProgress,
 	Stack,
+	Typography,
 } from '@mui/material';
+import {
+	DataGrid,
+	type GridColDef,
+	type GridRenderCellParams,
+	type GridRowSelectionModel,
+	type GridSortModel,
+} from '@mui/x-data-grid';
+import { ConfirmAction } from '../../../../NX/DesignSystem';
+import { Editable } from '../../../../NX/NXAdmin';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
+	formatUkPrice,
+	getProductCategoryLabel,
+	getProductName,
+	getProductPrice,
+	getProductUpdatedAt,
 	initProducts,
-	useLeidaBus,
-	useProducts,
+	MightyButton,
 } from '../../../../Leida';
-import RenderProduct from './RenderProduct';
 import type { T_ListProductsProps, T_Product } from '../../../types.d';
+
+const RESULTS_PER_PAGE_OPTIONS = [5, 10, 25, 50, 100];
+const SEARCH_DEBOUNCE_MS = 350;
+
+type T_ProductListRow = {
+	id: string;
+	title: string;
+	category: string | null;
+	price: number | null;
+	updated: string | number | null;
+	product: T_Product;
+};
 
 const ListProducts = ({
 	showFindProduct = true,
 	onVisibleProductsChange,
 	onProductSelect,
 }: T_ListProductsProps) => {
-
 	const dispatch = useDispatch();
-	const productsSlice = useProducts();
-	const bus = useLeidaBus('/api/products');
-	const [visibleProducts, setVisibleProducts] = React.useState<T_Product[]>([]);
-	const [viewMode, setViewMode] = React.useState<'card' | 'list'>('list');
+	const [products, setProducts] = React.useState<T_Product[]>([]);
+	const [total, setTotal] = React.useState(0);
+	const [page, setPage] = React.useState(1);
+	const [searchTerm, setSearchTerm] = React.useState('');
+	const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState('');
+	const [resultsPerPage, setResultsPerPage] = React.useState(25);
+	const [sortModel, setSortModel] = React.useState<GridSortModel>([
+		{ field: 'title', sort: 'asc' },
+	]);
+	const [selectionModel, setSelectionModel] = React.useState<GridRowSelectionModel>({
+		type: 'include',
+		ids: new Set<string>(),
+	});
+	const [loading, setLoading] = React.useState(false);
+	const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false);
+	const [error, setError] = React.useState<string | null>(null);
+	const [bulkError, setBulkError] = React.useState<string | null>(null);
+	const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
+	const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
+	const [deleting, setDeleting] = React.useState(false);
+	const [refreshNonce, setRefreshNonce] = React.useState(0);
 
 	React.useEffect(() => {
 		dispatch(initProducts());
 	}, [dispatch]);
 
-	const sourceProducts = React.useMemo(() => {
-		const fromSlice = Array.isArray(productsSlice?.products)
-			? (productsSlice.products as T_Product[])
-			: [];
-		const fromBus = Array.isArray(bus?.data)
-			? (bus.data as T_Product[])
-			: [];
+	const activeSort = sortModel[0] || { field: 'title', sort: 'asc' as const };
+	const sortBy = (() => {
+		switch (activeSort.field) {
+			case 'created':
+				return 'created';
+			case 'updated':
+				return 'updated';
+			default:
+				return 'title';
+		}
+	})();
+	const sortOrder = activeSort.sort === 'desc' ? 'desc' : 'asc';
 
-		if (fromSlice.length > 0) return fromSlice;
-		return fromBus;
+	const selectedCount = React.useMemo(() => {
+		if (selectionModel.type === 'exclude') {
+			return Math.max(total - selectionModel.ids.size, 0);
+		}
 
-	}, [productsSlice?.products, bus?.data]);
+		return selectionModel.ids.size;
+	}, [selectionModel, total]);
+
+	const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
+	const activeQuery = debouncedSearchTerm.trim();
+
+	const statusMessage = React.useMemo(() => {
+		if (loading) {
+			return `Searching ${activeQuery ? `for "${activeQuery}"` : 'all products'}...`;
+		}
+
+		if (!hasLoadedOnce) {
+			return 'Ready to search';
+		}
+
+		if (total === 0 && activeQuery) {
+			return `Nothing found for "${activeQuery}"`;
+		}
+
+		const suffix = activeQuery ? ` for "${activeQuery}"` : '';
+		return `${total} results${suffix}, page ${page} of ${totalPages}.`;
+	}, [activeQuery, hasLoadedOnce, loading, page, total, totalPages]);
+
+	const handleDeleteConfirm = React.useCallback(async () => {
+		if (!selectedCount || deleting) {
+			setConfirmDeleteOpen(false);
+			return;
+		}
+
+		setConfirmDeleteOpen(false);
+		setDeleting(true);
+		setBulkError(null);
+		setSuccessMessage(null);
+
+		try {
+			const res = await fetch('/api/products', {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
+				body: JSON.stringify({
+					q: debouncedSearchTerm.trim(),
+					selection: {
+						type: selectionModel.type,
+						ids: Array.from(selectionModel.ids).map((value) => String(value)),
+					},
+				}),
+			});
+
+			const json = await res.json().catch(() => null);
+
+			if (!res.ok) {
+				const message = json?.message || `Failed to delete selected products (${res.status})`;
+				throw new Error(message);
+			}
+
+			const deletedCount = typeof json?.data?.deletedRows === 'number'
+				? json.data.deletedRows
+				: selectedCount;
+
+			setSuccessMessage(`Deleted ${deletedCount} product${deletedCount === 1 ? '' : 's'} from the products table.`);
+			setSelectionModel({
+				type: 'include',
+				ids: new Set<string>(),
+			});
+			setRefreshNonce((value) => value + 1);
+		} catch (e: unknown) {
+			const message = e instanceof Error ? e.message : String(e);
+			setBulkError(message || 'Failed to delete selected products.');
+		} finally {
+			setDeleting(false);
+		}
+	}, [debouncedSearchTerm, deleting, selectedCount, selectionModel]);
 
 	React.useEffect(() => {
-		setVisibleProducts(sourceProducts);
-	}, [sourceProducts]);
+		const timeoutId = window.setTimeout(() => {
+			setDebouncedSearchTerm(searchTerm);
+		}, SEARCH_DEBOUNCE_MS);
+
+		return () => {
+			window.clearTimeout(timeoutId);
+		};
+	}, [searchTerm]);
 
 	React.useEffect(() => {
-		onVisibleProductsChange?.(visibleProducts);
-	}, [visibleProducts, onVisibleProductsChange]);
+		if (page > totalPages) {
+			setPage(totalPages);
+		}
+	}, [page, totalPages]);
 
-	const loading = Boolean(productsSlice?.loading) || Boolean(bus?.loading);
-	const error = typeof productsSlice?.error === 'string' && productsSlice.error
-		? productsSlice.error
-		: (typeof bus?.error === 'string' ? bus.error : null);
+	React.useEffect(() => {
+		let cancelled = false;
+
+		const run = async () => {
+			setLoading(true);
+			setError(null);
+
+			try {
+				const params = new URLSearchParams({
+					page: String(page),
+					pageSize: String(resultsPerPage),
+					q: debouncedSearchTerm,
+					sortBy,
+					sortOrder,
+				});
+
+				const res = await fetch(`/api/products?${params.toString()}`, {
+					method: 'GET',
+					headers: { Accept: 'application/json' },
+				});
+
+				const json = await res.json().catch(() => null);
+
+				if (!res.ok) {
+					const message = json?.message || `Failed to fetch products (${res.status})`;
+					throw new Error(message);
+				}
+
+				const data = json?.data || {};
+				const rows = Array.isArray(data?.rows) ? data.rows : [];
+				const nextTotal = typeof data?.total === 'number' ? data.total : rows.length;
+
+				if (cancelled) {
+					return;
+				}
+
+				setProducts(rows as T_Product[]);
+				setTotal(nextTotal);
+				setHasLoadedOnce(true);
+			} catch (e: unknown) {
+				if (cancelled) {
+					return;
+				}
+				const message = e instanceof Error ? e.message : String(e);
+				setError(message || 'Products query failed');
+			} finally {
+				if (!cancelled) {
+					setLoading(false);
+				}
+			}
+		};
+
+		run();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [debouncedSearchTerm, page, refreshNonce, resultsPerPage, sortBy, sortOrder]);
+
+	const rows = React.useMemo<T_ProductListRow[]>(() => {
+		return products.map((product, index) => {
+			const productId = typeof product?.product_id === 'string' && product.product_id
+				? product.product_id
+				: (typeof product?.product_id === 'number' && Number.isFinite(product.product_id)
+					? String(Math.floor(product.product_id))
+					: '');
+			const fallbackId = typeof product?.id === 'string' && product.id
+				? product.id
+				: (typeof product?.id === 'number' && Number.isFinite(product.id)
+					? String(Math.floor(product.id))
+					: `product-row-${index}`);
+			const id = productId || fallbackId;
+			const numericPrice = Number(getProductPrice(product));
+
+			return {
+				id,
+				title: getProductName(product),
+				category: getProductCategoryLabel(product),
+				price: Number.isFinite(numericPrice) ? numericPrice : null,
+				updated: getProductUpdatedAt(product),
+				product,
+			};
+		});
+	}, [products]);
+
+	React.useEffect(() => {
+		onVisibleProductsChange?.(products);
+	}, [products, onVisibleProductsChange]);
+
+	const columns = React.useMemo<GridColDef[]>(() => {
+		return [
+			{
+				field: 'title',
+				headerName: 'Title',
+				flex: 1.6,
+				minWidth: 280,
+				sortable: true,
+				renderCell: (params: GridRenderCellParams) => (
+					<Button
+						variant="text"
+						sx={{ justifyContent: 'flex-start', textTransform: 'none', px: 0 }}
+						onClick={() => {
+							onProductSelect?.(params.row.product as T_Product);
+						}}
+					>
+						{params.value}
+					</Button>
+				),
+			},
+			{
+				field: 'category',
+				headerName: 'Category',
+				flex: 1,
+				minWidth: 180,
+				sortable: false,
+			},
+			{
+				field: 'price',
+				headerName: 'Price',
+				width: 140,
+				sortable: false,
+				align: 'right',
+				headerAlign: 'right',
+				renderCell: (params: GridRenderCellParams) => formatUkPrice(typeof params.value === 'number' ? params.value : null),
+			},
+			{
+				field: 'updated',
+				headerName: 'Updated',
+				width: 180,
+				sortable: true,
+			},
+		];
+	}, [onProductSelect]);
 
 	return (
 		<Stack spacing={2}>
-			
+			<Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
+				<Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%' }}>
+					<Editable
+						variant="outlined"
+						placeholder="Search products"
+						value={searchTerm}
+						onChange={(value: string) => {
+							setPage(1);
+							setSearchTerm(value);
+						}}
+						disabled={deleting}
+						startAdornment={'search'}
+					/>
+				</Box>
+				<MightyButton
+					kind="icon"
+					icon="reset"
+					disabled={!searchTerm.trim() || deleting}
+					onClick={() => {
+						setPage(1);
+						setSearchTerm('');
+						setDebouncedSearchTerm('');
+					}}
+				/>
+				<Button
+					variant="outlined"
+					color="error"
+					disabled={!selectedCount || deleting}
+					onClick={() => setConfirmDeleteOpen(true)}
+				>
+					{deleting ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
+				</Button>
+			</Stack>
 
-			<Box sx={{ height: 6 }}>
-				{loading ? <LinearProgress /> : null}
-			</Box>
+			<Typography variant="body2" color="text.secondary">
+				{statusMessage}
+			</Typography>
 
 			{error ? <Alert severity="error">{error}</Alert> : null}
+			{deleting ? <Alert severity="info">Deleting selected products...</Alert> : null}
+			{bulkError ? <Alert severity="error">{bulkError}</Alert> : null}
+			{successMessage ? <Alert severity="success">{successMessage}</Alert> : null}
 
-			{!loading && !error && visibleProducts.length === 0 ? (
+			{!loading && !error && rows.length === 0 ? (
 				<Alert severity="info">No products found.</Alert>
 			) : null}
 
-			{viewMode === 'card' ? (
-				<Grid container spacing={1.25}>
-					{visibleProducts.map((product, index) => {
-						const key = typeof product?.id === 'string' && product.id
-							? product.id
-							: `product-${index}`;
+			<Box sx={{ width: '100%', minHeight: 560 }}>
+				<DataGrid
+					rows={rows}
+					columns={columns}
+					initialState={{
+						columns: {
+							columnVisibilityModel: {
+								category: false,
+								price: false,
+								updated: false,
+							},
+						},
+					}}
+					loading={loading}
+					checkboxSelection
+					disableRowSelectionOnClick
+					pagination
+					paginationMode="server"
+					sortingMode="server"
+					rowCount={total}
+					pageSizeOptions={RESULTS_PER_PAGE_OPTIONS}
+					paginationModel={{ page: page - 1, pageSize: resultsPerPage }}
+					onPaginationModelChange={(model) => {
+						setPage((typeof model?.page === 'number' ? model.page : 0) + 1);
+						if (typeof model?.pageSize === 'number' && model.pageSize !== resultsPerPage) {
+							setPage(1);
+							setResultsPerPage(model.pageSize);
+						}
+					}}
+					sortModel={sortModel}
+					onSortModelChange={(nextModel) => {
+						const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
+							? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'desc' ? 'desc' : 'asc' }]
+							: [{ field: 'title', sort: 'asc' as const }];
+						setPage(1);
+						setSortModel(normalized);
+					}}
+					rowSelectionModel={selectionModel}
+					onRowSelectionModelChange={(nextSelection) => {
+						const nextIds = new Set(Array.from(nextSelection.ids).map((value) => String(value)));
+						setSelectionModel({
+							type: nextSelection.type,
+							ids: nextIds,
+						});
 
-						return (
-							<Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
-								<RenderProduct
-									product={product}
-									viewMode="card"
-									onAddToCart={onProductSelect}
-								/>
-							</Grid>
-						);
-					})}
-				</Grid>
-			) : (
-				<Stack spacing={1.25}>
-					{visibleProducts.map((product, index) => {
-						const key = typeof product?.id === 'string' && product.id
-							? product.id
-							: `product-${index}`;
+						if (nextSelection.type === 'include' && nextIds.size > 0) {
+							const firstId = Array.from(nextIds)[0];
+							const selectedRow = rows.find((row) => row.id === firstId);
+							if (selectedRow) {
+								onProductSelect?.(selectedRow.product);
+							}
+						}
+					}}
+					onCellClick={(params) => {
+						if (params.field === '__check__') {
+							return;
+						}
+						onProductSelect?.(params.row.product as T_Product);
+					}}
+					sx={{
+						border: 0,
+						'& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
+							outline: 'none',
+						},
+					}}
+				/>
+			</Box>
 
-						return (
-							<Box key={key}>
-								<RenderProduct
-									product={product}
-									viewMode="list"
-									onAddToCart={onProductSelect}
-								/>
-							</Box>
-						);
-					})}
-				</Stack>
-			)}
+			<ConfirmAction
+				open={confirmDeleteOpen}
+				icon="delete"
+				title="Delete selected products?"
+				body={`This will permanently delete ${selectedCount} product${selectedCount === 1 ? '' : 's'} from the products table.`}
+				handleConfirm={handleDeleteConfirm}
+				handleClose={() => setConfirmDeleteOpen(false)}
+			/>
 		</Stack>
 	);
 };
