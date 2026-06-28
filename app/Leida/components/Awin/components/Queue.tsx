@@ -503,7 +503,9 @@ export default function Queue() {
         fullWidth
         maxWidth="md"
       >
-        <DialogTitle>Confirm + edit queue payload</DialogTitle>
+        <DialogTitle>
+          Confirm + edit queue payload
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={1.5} sx={{ pt: 0.5 }}>
             <Typography variant="body2" color="text.secondary">

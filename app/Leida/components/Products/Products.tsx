@@ -6,18 +6,27 @@ import {
 	CardContent,
 	Box,
 	Stack,
-	List,
-	ListItem,
-	ListItemText,
 	Typography,
 } from '@mui/material';
+import { setFeedback } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
 import {
+	ConfirmAction,
+	deleteQueueSelection,
+	MightyButton,
 	setLeida,
 } from '../../../Leida';
 
+const QUEUE_COUNT_REFRESH_EVENT = 'leida:queue-count-refresh';
+
+function notifyQueueCountRefresh() {
+	window.dispatchEvent(new Event(QUEUE_COUNT_REFRESH_EVENT));
+}
+
 export default function Products() {
 	const dispatch = useDispatch();
+	const [confirmDeleteQueueOpen, setConfirmDeleteQueueOpen] = React.useState(false);
+	const [deletingQueue, setDeletingQueue] = React.useState(false);
 
 	React.useEffect(() => {
 			dispatch(setLeida('header', {
@@ -26,40 +35,66 @@ export default function Products() {
 			}));
 	}, [dispatch]);
 
+	const handleDeleteQueue = React.useCallback(async () => {
+		if (deletingQueue) {
+			return;
+		}
+
+		setConfirmDeleteQueueOpen(false);
+		setDeletingQueue(true);
+
+		try {
+			const result = await dispatch(deleteQueueSelection({
+				selection: {
+					type: 'exclude',
+					ids: [],
+				},
+			}));
+
+			if (!result?.ok) {
+				throw new Error(result?.error || 'Failed to delete queue items.');
+			}
+
+			dispatch(setFeedback({
+				severity: 'success',
+				title: `Deleted ${result.deletedRows} queue item${result.deletedRows === 1 ? '' : 's'}.`,
+			}));
+			notifyQueueCountRefresh();
+		} catch (e: unknown) {
+			const message = e instanceof Error ? e.message : String(e);
+			dispatch(setFeedback({
+				severity: 'warning',
+				title: message || 'Failed to delete queue items.',
+			}));
+		} finally {
+			setDeletingQueue(false);
+		}
+	}, [deletingQueue, dispatch]);
+
 	return (
-		<Box sx={{ p: 2 }}>
-			<Stack spacing={2}>
-
-				<Card variant="outlined">
-					<CardContent>
-
-
-						<Typography>
-							This area is the founder-facing summary of how AWIN products move from raw feed rows to curated products used across Leida and public UI. Think of it like this; Awin = triage raw feed. Queue = staging and decisions. Products = curated records for real app usage.
-						</Typography>
-
-						<List dense sx={{ py: 0, listStyleType: 'disc', pl: 3, '& .MuiListItem-root': { display: 'list-item', py: 0.25 } }}>
-							<ListItem disablePadding>
-								<ListItemText primary="GET /api/awin: search and page raw AWIN source rows." />
-							</ListItem>
-							<ListItem disablePadding>
-								<ListItemText primary="POST /api/awin/lookfantastic/queue: queue or delete decisions." />
-							</ListItem>
-							<ListItem disablePadding>
-								<ListItemText primary="GET /api/products/queue: inspect pending/processed queue items." />
-							</ListItem>
-							<ListItem disablePadding>
-								<ListItemText primary="GET /api/products: browse processed products." />
-							</ListItem>
-							<ListItem disablePadding>
-								<ListItemText primary="DELETE /api/products: bulk-remove processed products." />
-							</ListItem>
-						</List>
-					</CardContent>
-					
-				</Card>
-				
+		<Box sx={{  }}>
+			<Stack spacing={2} alignItems="flex-start">
+				<Typography variant="body1">
+					Queue cleanup is intentionally destructive. Use this only when you want to permanently remove every item from the queue.
+				</Typography>
+				<MightyButton
+					variant="outlined"
+					startIcon="delete"
+					disabled={deletingQueue}
+					onClick={() => setConfirmDeleteQueueOpen(true)}
+				>
+					{deletingQueue ? 'Deleting queue...' : 'Delete Queue'}
+				</MightyButton>
 			</Stack>
+
+			<ConfirmAction
+				open={confirmDeleteQueueOpen}
+				icon="delete"
+				title="Delete everything from the queue?"
+				body="This will permanently delete every item currently in the queue."
+				handleConfirm={handleDeleteQueue}
+				handleClose={() => setConfirmDeleteQueueOpen(false)}
+			/>
 		</Box>
 	);
 }

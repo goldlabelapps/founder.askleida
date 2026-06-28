@@ -1,9 +1,12 @@
 'use client';
 import * as React from 'react';
+import {useRouter} from 'next/navigation';
 import {
 	Box,
 	Button,
+	LinearProgress,
 	Stack,
+	Typography,
 } from '@mui/material';
 import {
 	DataGrid,
@@ -11,7 +14,7 @@ import {
 	type GridRenderCellParams,
 	type GridSortModel,
 } from '@mui/x-data-grid';
-import { setFeedback } from '../../../../NX/DesignSystem';
+import { setFeedback, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	formatUkPrice,
@@ -49,6 +52,7 @@ const ListProducts = ({
 	onVisibleProductsChange,
 	onProductSelect,
 }: T_ListProductsProps) => {
+	const router = useRouter();
 	const dispatch = useDispatch();
 	const [products, setProducts] = React.useState<T_Product[]>([]);
 	const [total, setTotal] = React.useState(0);
@@ -84,6 +88,8 @@ const ListProducts = ({
 
 	const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
 	const activeQuery = debouncedSearchTerm.trim();
+	const isResolvingInitialProducts = !hasLoadedOnce && !error;
+	const showEmptyLibraryState = !loading && !error && hasLoadedOnce && !activeQuery && total === 0;
 
 	React.useEffect(() => {
 		dispatch(setLeida('header', {
@@ -267,32 +273,52 @@ const ListProducts = ({
 
 	return (
 		<Stack spacing={2}>
-			<Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
-				<Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%', ml: { md: 'auto' } }}>
-					<Editable
-						variant="standard"
-						placeholder="Search products"
-						value={searchTerm}
-						onChange={(value: string) => {
-							setPage(1);
-							setSearchTerm(value);
+			{isResolvingInitialProducts ? (
+				<LinearProgress />
+			) : showEmptyLibraryState ? (
+				<Box sx={{ py: 4 }}>
+					<Typography variant="body1" color="text.secondary">
+						No products yet. Add products from Awin into the Queue, then process them to build your products library.
+					</Typography>
+					<MightyButton
+						variant="contained"
+						startIcon="awin"
+						sx={{ mt: 3 }}
+						onClick={() => {
+							dispatch(navigateTo(router, '/products/awin'));
 						}}
-						startAdornment={'search'}
-						endAdornment={(
-							<MightyButton
-								kind="icon"
-								icon="cancel"
-								disabled={!searchTerm.trim()}
-								onClick={() => {
-									setPage(1);
-									setSearchTerm('');
-									setDebouncedSearchTerm('');
-								}}
-							/>
-						)}
-					/>
+					>
+						Go to Awin
+					</MightyButton>
 				</Box>
-			</Stack>
+			) : (
+				<Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
+					<Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%', ml: { md: 'auto' } }}>
+						<Editable
+							variant="standard"
+							placeholder="Search products"
+							value={searchTerm}
+							onChange={(value: string) => {
+								setPage(1);
+								setSearchTerm(value);
+							}}
+							startAdornment={'search'}
+							endAdornment={(
+								<MightyButton
+									kind="icon"
+									icon="cancel"
+									disabled={!searchTerm.trim()}
+									onClick={() => {
+										setPage(1);
+										setSearchTerm('');
+										setDebouncedSearchTerm('');
+									}}
+								/>
+							)}
+						/>
+					</Box>
+				</Stack>
+			)}
 
 			{loading || rows.length > 0 ? (
 				<Box sx={{ width: '100%', minHeight: 560 }}>
