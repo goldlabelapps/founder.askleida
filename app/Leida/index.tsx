@@ -26,7 +26,7 @@ import Editable from '../NX/NXAdmin/components/UI/Editable';
 import { LeidaFlash } from './components/LeidaFlash';
 import Claude from './components/Claude/Claude';
 import ClaudePopup from './components/Claude/components/ClaudePopup';
-import { PractitionerList, PractitionerCard, PractitionerNew, PractitionerUpdate, Practitioners, usePractitioners } from './components/Practitioners';
+import { PractitionerList, PractitionerCard, SurfacePractitioners, PractitionerNew, PractitionerUpdate, Practitioners, usePractitioners } from './components/Practitioners';
 import Supabase from './components/Supabase/Supabase';
 import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
 import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
@@ -160,6 +160,7 @@ export {
     ClaudePopup,
     PractitionerList,
     PractitionerCard,
+    SurfacePractitioners,
     PractitionerNew,
     PractitionerUpdate,
     Practitioners,

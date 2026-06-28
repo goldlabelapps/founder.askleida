@@ -344,11 +344,6 @@ const PractitionerUpdate = () => {
 								}} sx={{ order: { xs: 2, sm: 1 } }}>
 									<Stack spacing={2} sx={{m:2}}>
 
-												<Typography variant="caption" color="text.secondary">
-													{email ? `${email}` : 'No email provided'},
-													Access level <strong>{accessLevelLabel}</strong>
-												</Typography>
-										
 										<Editable
 											placeholder="Name"
 											value={displayName}
@@ -357,8 +352,6 @@ const PractitionerUpdate = () => {
 											startAdornment="user"
 										/>
 
-										
-										
 										<Editable
 											placeholder="Clinic"
 											value={clinic}
@@ -374,6 +367,11 @@ const PractitionerUpdate = () => {
 											onChange={setWebsite}
 											startAdornment="link"
 										/>
+
+										<Typography variant="body1">
+											Access: <strong>{accessLevelLabel}</strong><br />
+											Email: <strong>{email ? `${email}` : 'No email provided'}</strong><br />
+										</Typography>
 
 										<Collapse
 											in={canSave || savingDisplayName}

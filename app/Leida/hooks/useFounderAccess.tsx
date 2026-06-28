@@ -4,27 +4,33 @@ import { useDispatch } from '../../NX/Uberedux';
 import { usePaywall } from '../../NX/Paywall';
 import { fetchLeida } from '../actions/fetchLeida';
 import { toAccessLevel } from '../lib/toAccessLevel';
-import { useLeidaBus } from './useLeida';
+import { useLeida, useLeidaBus } from './useLeida';
 
 const ALLOWED_ACCESS_LEVELS = new Set([3, 4]);
 
 export function useFounderAccess() {
     const dispatch = useDispatch();
     const paywall = usePaywall();
+    const leida = useLeida();
     const uid = typeof paywall?.uid === 'string' ? paywall.uid : null;
     const { loading, data } = useLeidaBus('practitioners');
     const [requestedUid, setRequestedUid] = React.useState<string | null>(null);
+    const practitionersRouteEntry = leida?.bus?.['/api/practitioners'];
 
     React.useEffect(() => {
         if (!uid) {
             setRequestedUid(null);
             return;
         }
+        if (practitionersRouteEntry) {
+            setRequestedUid(uid);
+            return;
+        }
         if (requestedUid === uid) return;
 
         setRequestedUid(uid);
         dispatch(fetchLeida('practitioners'));
-    }, [dispatch, requestedUid, uid]);
+    }, [dispatch, practitionersRouteEntry, requestedUid, uid]);
 
     const practitionerRecord = React.useMemo(() => {
         if (!uid || !Array.isArray(data)) return null;

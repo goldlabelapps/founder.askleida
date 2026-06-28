@@ -1,6 +1,7 @@
 export { default as Practitioners } from './Practitioners';
 export { default as PractitionerList } from './components/PractitionerList';
 export { default as PractitionerCard } from './components/PractitionerCard';
+export { default as SurfacePractitioners } from './components/SurfacePractitioners';
 export { default as PractitionerNew } from './components/PractitionerNew';
 export { default as PractitionerUpdate } from './components/PractitionerUpdate';
 export { createPractitioner } from './actions/createPractitioner';

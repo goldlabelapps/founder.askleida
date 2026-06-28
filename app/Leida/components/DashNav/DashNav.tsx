@@ -26,7 +26,14 @@ export default function DashNav({
   const pathname = usePathname();
   const [queueCount, setQueueCount] = React.useState<number | null>(null);
   const [productCount, setProductCount] = React.useState<number | null>(null);
+  const queueCountRequestRef = React.useRef<Promise<void> | null>(null);
+  const productCountRequestRef = React.useRef<Promise<void> | null>(null);
   const refreshQueueCount = React.useCallback(async () => {
+    if (queueCountRequestRef.current) {
+      return queueCountRequestRef.current;
+    }
+
+    queueCountRequestRef.current = (async () => {
     try {
       const params = new URLSearchParams({
         page: '1',
@@ -48,10 +55,20 @@ export default function DashNav({
       setQueueCount(typeof json?.data?.total === 'number' ? json.data.total : 0);
     } catch {
       setQueueCount((current) => current ?? null);
+    } finally {
+      queueCountRequestRef.current = null;
     }
+    })();
+
+    return queueCountRequestRef.current;
   }, []);
 
   const refreshProductCount = React.useCallback(async () => {
+    if (productCountRequestRef.current) {
+      return productCountRequestRef.current;
+    }
+
+    productCountRequestRef.current = (async () => {
     try {
       const params = new URLSearchParams({
         page: '1',
@@ -72,7 +89,12 @@ export default function DashNav({
       setProductCount(typeof json?.data?.total === 'number' ? json.data.total : 0);
     } catch {
       setProductCount((current) => current ?? null);
+    } finally {
+      productCountRequestRef.current = null;
     }
+    })();
+
+    return productCountRequestRef.current;
   }, []);
 
   React.useEffect(() => {
@@ -132,7 +154,7 @@ export default function DashNav({
       window.removeEventListener('leida:queue-count-refresh', handleRefresh);
       window.removeEventListener('leida:products-count-refresh', handleProductRefresh);
     };
-  }, [pathname, refreshProductCount, refreshQueueCount]);
+  }, [refreshProductCount, refreshQueueCount]);
 
   const renderItem = React.useCallback((item: DashNavItem, nested = false) => (
     <React.Fragment key={item.route}>

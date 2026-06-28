@@ -4,17 +4,17 @@ import { useRouter } from 'next/navigation';
 import {
     Box,
 } from '@mui/material';
-import { Icon, navigateTo } from '../../../NX/DesignSystem';
+import { navigateTo } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
 import { 
+    fetchLeida,
     setLeida,
     useLeida,
     initDash, 
-    initPractitioners, 
     useDash,
-    usePractitioners,
+    useLeidaBus,
+    SurfacePractitioners,
     MightyButton,
-    LeidaFlash,
 } from '../../../Leida';
 
 export default function FounderDash() {
@@ -23,15 +23,19 @@ export default function FounderDash() {
     const router = useRouter();
     const leida = useLeida();
     const dash = useDash();
-    const practitioners = usePractitioners();
+    const { data: practitionersData, loading: practitionersLoading } = useLeidaBus('/api/practitioners');
     const didInit = React.useRef(false);
+    const practitionersRouteEntry = leida?.bus?.['/api/practitioners'];
     
     React.useEffect(() => {
         if (!didInit.current) {
             if (!leida || !leida.dash) dispatch(initDash());
+            if (!practitionersRouteEntry) {
+                dispatch(fetchLeida('/api/practitioners'));
+            }
             didInit.current = true;
         }
-    }, [dispatch, leida]);
+    }, [dispatch, leida, practitionersRouteEntry]);
 
     React.useEffect(() => {
         if (dash && dash.title) {
@@ -44,13 +48,10 @@ export default function FounderDash() {
 
     return (
         <Box>
-            <MightyButton
-                kind="listItem"
-                icon="practitioner"
-                onClick={() => dispatch(navigateTo(router, '/practitioners'))}
-            >
-                Create & mangage practitioners
-            </MightyButton>
+            <SurfacePractitioners
+                practitioners={Array.isArray(practitionersData) ? practitionersData : []}
+                loading={practitionersLoading}
+            />
 
             <MightyButton
                 kind="listItem"
