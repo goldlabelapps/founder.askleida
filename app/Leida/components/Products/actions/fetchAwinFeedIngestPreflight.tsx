@@ -4,6 +4,8 @@ import { setUbereduxKey } from '../../../../NX/Uberedux';
 type T_FetchAWINFeedIngestPreflightResult = {
 	ok: true;
 	message: string;
+	configured: boolean;
+	skippedIngest: boolean;
 	rowLimit: number | null;
 	csvRows: number | null;
 	upserted: number | null;
@@ -36,6 +38,8 @@ export const fetchAWINFeedIngestPreflight = (): any =>
 				message: typeof json?.message === 'string'
 					? json.message
 					: 'AWIN products loaded successfully.',
+				configured: json?.data?.configured !== false,
+				skippedIngest: json?.data?.skipped === true,
 				rowLimit: typeof json?.data?.rowLimit === 'number' ? json.data.rowLimit : 300,
 				csvRows: typeof json?.data?.csvRows === 'number' ? json.data.csvRows : null,
 				upserted: typeof json?.data?.upserted === 'number' ? json.data.upserted : null,

@@ -126,6 +126,23 @@ function buildStoragePath(hash: string) {
   return `${LOOKFANTASTIC_SOURCE}/${year}/${month}/${day}/feed-${timestamp}-${shortHash}.csv`;
 }
 
+function makeSkippedSyncResponse(message: string, missingEnv: string[] = []) {
+  const res = makeRes({
+    tenant,
+    severity: 'warning',
+    message,
+    data: {
+      changed: false,
+      skipped: true,
+      configured: false,
+      missingEnv,
+      latest: null,
+    },
+  });
+
+  return NextResponse.json(res);
+}
+
 export async function GET() {
   const feedUrl = process.env.AWIN_LOOKFANTASTIC_FEED_URL?.trim();
   const tableName = normalizeTable(process.env.AWIN_FEED_SYNC_TABLE);
@@ -134,21 +151,20 @@ export async function GET() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!feedUrl) {
-    const res = makeRes({
-      tenant,
-      severity: 'error',
-      message: 'Missing AWIN_LOOKFANTASTIC_FEED_URL',
-    });
-    return NextResponse.json(res, { status: 500 });
+    return makeSkippedSyncResponse(
+      'AWIN feed sync is not configured. Set AWIN_LOOKFANTASTIC_FEED_URL to enable snapshots.',
+      ['AWIN_LOOKFANTASTIC_FEED_URL'],
+    );
   }
 
   if (!supabaseUrl || !serviceRoleKey) {
-    const res = makeRes({
-      tenant,
-      severity: 'error',
-      message: 'Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY',
-    });
-    return NextResponse.json(res, { status: 500 });
+    return makeSkippedSyncResponse(
+      'AWIN feed sync is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to store snapshots.',
+      [
+        ...(!supabaseUrl ? ['NEXT_PUBLIC_SUPABASE_URL'] : []),
+        ...(!serviceRoleKey ? ['SUPABASE_SERVICE_ROLE_KEY'] : []),
+      ],
+    );
   }
 
   const supabase = createClient(supabaseUrl, serviceRoleKey);
