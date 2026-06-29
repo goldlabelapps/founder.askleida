@@ -303,72 +303,68 @@ export default function Awin() {
     return (
         <Box sx={{ p: 2 }}>
             <Stack spacing={2}>
-                {!showEmptyAwinState ? (
-                    <>
-                        <Box sx={{
-                            width: { xs: '100%', md: 300 },
-                            maxWidth: '100%',
-                            ml: { md: 'auto' },
-                        }}>
-                            <Editable
-                                variant="standard"
-                                value={searchTerm}
-                                onChange={(value: string) => {
+                <Box sx={{
+                    width: { xs: '100%', md: 300 },
+                    maxWidth: '100%',
+                    ml: { md: 'auto' },
+                }}>
+                    <Editable
+                        variant="standard"
+                        value={searchTerm}
+                        onChange={(value: string) => {
+                            setPage(1);
+                            setSearchTerm(value);
+                        }}
+                        disabled={Boolean(bulkDecision)}
+                        startAdornment={'search'}
+                        endAdornment={(
+                            <MightyButton
+                                kind="icon"
+                                icon="cancel"
+                                disabled={!searchTerm.trim() || Boolean(bulkDecision)}
+                                onClick={() => {
                                     setPage(1);
-                                    setSearchTerm(value);
+                                    setSearchTerm('');
+                                    setDebouncedSearchTerm('');
                                 }}
-                                disabled={Boolean(bulkDecision)}
-                                startAdornment={'search'}
-                                endAdornment={(
-                                    <MightyButton
-                                        kind="icon"
-                                        icon="cancel"
-                                        disabled={!searchTerm.trim() || Boolean(bulkDecision)}
-                                        onClick={() => {
-                                            setPage(1);
-                                            setSearchTerm('');
-                                            setDebouncedSearchTerm('');
-                                        }}
-                                    />
-                                )}
                             />
-                        </Box>
+                        )}
+                    />
+                </Box>
 
-                        <Stack
-                            direction={{ xs: 'column', md: 'row' }}
-                            spacing={1.5}
-                            alignItems={{ xs: 'stretch', md: 'center' }}
-                            justifyContent="space-between"
+                <Stack
+                    direction={{ xs: 'column', md: 'row' }}
+                    spacing={1.5}
+                    alignItems={{ xs: 'stretch', md: 'center' }}
+                    justifyContent="space-between"
+                >
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+
+                        <MightyButton
+                            startIcon="queue"
+                            variant="outlined"
+                            disabled={!selectedCount || Boolean(bulkDecision)}
+                            onClick={() => handleBulkProcess('queue')}
                         >
-                            <Stack direction="row" spacing={1.5} alignItems="center">
+                            {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add to Queue${selectedCount ? ` (${selectedCount})` : ''}`}
+                        </MightyButton>
 
-                                <MightyButton
-                                    startIcon="queue"
-                                    variant="outlined"
-                                    disabled={!selectedCount || Boolean(bulkDecision)}
-                                    onClick={() => handleBulkProcess('queue')}
-                                >
-                                    {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add to Queue${selectedCount ? ` (${selectedCount})` : ''}`}
-                                </MightyButton>
+                        <MightyButton
+                            variant="text"
+                            startIcon="delete"
+                            disabled={!selectedCount || Boolean(bulkDecision)}
+                            onClick={() => handleBulkProcess('delete')}
+                        >
+                            {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
+                        </MightyButton>
 
-                                <MightyButton
-                                    variant="text"
-                                    startIcon="delete"
-                                    disabled={!selectedCount || Boolean(bulkDecision)}
-                                    onClick={() => handleBulkProcess('delete')}
-                                >
-                                    {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
-                                </MightyButton>
+                    </Stack>
+                </Stack>
 
-                            </Stack>
-                        </Stack>
-
-                        {activeQuery ? (
-                            <Typography variant="body2" color="text.secondary">
-                                {statusMessage}
-                            </Typography>
-                        ) : null}
-                    </>
+                {activeQuery ? (
+                    <Typography variant="body2" color="text.secondary">
+                        {statusMessage}
+                    </Typography>
                 ) : null}
 
                 <AwinList
