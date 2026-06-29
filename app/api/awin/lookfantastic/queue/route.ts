@@ -320,7 +320,7 @@ async function updateSourceProductQueueStatus(
     const rows = await sql<Array<Record<string, unknown>>>`
       update public.${sql(safeSourceTable)}
       set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
-        'queue_status', ${status},
+        'queue_status', ${status}::text,
         'queue_status_updated_at', now()
       )
       where products_awin_id = ${rowId}::uuid
@@ -332,7 +332,7 @@ async function updateSourceProductQueueStatus(
     const rows = await sql<Array<Record<string, unknown>>>`
       update public.${sql(safeSourceTable)}
       set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
-        'queue_status', ${status},
+        'queue_status', ${status}::text,
         'queue_status_updated_at', now()
       )
       where coalesce(data->>'unique_key', '') = ${uniqueKey}
@@ -344,7 +344,7 @@ async function updateSourceProductQueueStatus(
     const rows = await sql<Array<Record<string, unknown>>>`
       update public.${sql(safeSourceTable)}
       set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
-        'queue_status', ${status},
+        'queue_status', ${status}::text,
         'queue_status_updated_at', now()
       )
       where coalesce(data->>'aw_product_id', '') = ${awProductId}
@@ -356,7 +356,7 @@ async function updateSourceProductQueueStatus(
     const rows = await sql<Array<Record<string, unknown>>>`
       update public.${sql(safeSourceTable)}
       set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
-        'queue_status', ${status},
+        'queue_status', ${status}::text,
         'queue_status_updated_at', now()
       )
       where coalesce(data->>'merchant_product_id', '') = ${merchantProductId}
@@ -368,7 +368,7 @@ async function updateSourceProductQueueStatus(
     const rows = await sql<Array<Record<string, unknown>>>`
       update public.${sql(safeSourceTable)}
       set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
-        'queue_status', ${status},
+        'queue_status', ${status}::text,
         'queue_status_updated_at', now()
       )
       where coalesce(slug, '') = ${slug}

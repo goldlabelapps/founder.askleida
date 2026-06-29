@@ -254,7 +254,7 @@ export async function POST(req: Request) {
       const updated = await sql<Array<{ id: string }>>`
         update public.${sql(safeSourceTable)}
         set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
-          'queue_status', ${queueStatus},
+          'queue_status', ${queueStatus}::text,
           'queue_status_updated_at', now()
         )
         where ${idFilter}
