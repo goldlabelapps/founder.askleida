@@ -17,6 +17,7 @@ const DEFAULT_ADMIN_TABLE_ALLOWLIST = [
     'products',
     'practitioners',
     'awin_feed_snapshots',
+    'products_awin',
     'awin_lookfantastic',
 ];
 

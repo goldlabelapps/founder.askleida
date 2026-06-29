@@ -3,6 +3,8 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Box,
+    Grid,
+    Typography,
 } from '@mui/material';
 import { navigateTo } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
@@ -15,6 +17,7 @@ import {
     useLeidaBus,
     SurfacePractitioners,
     MightyButton,
+    PractitionerList,
 } from '../../../Leida';
 
 export default function FounderDash() {
@@ -47,19 +50,45 @@ export default function FounderDash() {
     }, [dispatch, dash?.title]);
 
     return (
-        <Box>
-            <SurfacePractitioners
-                practitioners={Array.isArray(practitionersData) ? practitionersData : []}
-                loading={practitionersLoading}
-            />
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+            
 
-            <MightyButton
-                kind="listItem"
-                icon="products"
-                onClick={() => dispatch(navigateTo(router, '/products'))}
-            >
-                Browse & manage Leida products & add from Awin
-            </MightyButton>
-        </Box>
+            <Grid size={{
+                xs: 12,
+                sm: 6,
+                lg: 4,
+            }}>
+                <Typography variant="overline">
+                    Practitioners
+                </Typography>
+                <PractitionerList />
+            </Grid>
+
+            <Grid size={{
+                xs: 12,
+                sm: 6,
+                lg: 4,
+            }}>
+                <Typography variant="overline">
+                    Products
+                </Typography>
+                <Box>
+
+                    <MightyButton
+                        kind="button"
+                        fullWidth
+                        alignLeft
+                        variant="outlined"
+                        startIcon="awin"
+                        onClick={() => dispatch(navigateTo(router, '/products/awin'))}
+                        >
+                        AWIN
+                    </MightyButton>
+                </Box>
+            </Grid>
+            
+
+            
+        </Grid>
     );
 }

@@ -101,7 +101,7 @@ export type T_SupabaseState = {
 
 export const EMPTY_SUPABASE_STATE: T_SupabaseState;
 
-export type T_AwinProductData = {
+export type T_AWINProductData = {
     display_price?: string | null;
     merchant_name?: string | null;
     merchant_category?: string | null;
@@ -111,7 +111,7 @@ export type T_AwinProductData = {
     [key: string]: unknown;
 };
 
-export type T_AwinProduct = {
+export type T_AWINProduct = {
     id?: string | number | null;
     unique_key?: string | null;
     product_name?: string | null;
@@ -124,54 +124,55 @@ export type T_AwinProduct = {
     merchant_product_id?: string | null;
     aw_deep_link?: string | null;
     created_at?: string | null;
-    data?: T_AwinProductData | null;
+    data?: T_AWINProductData | null;
     [key: string]: unknown;
 };
 
-export type T_AwinOrderBy = 'created_at' | 'id' | 'product_name' | 'category_name' | 'search_price' | 'brand';
+export type T_AWINOrderBy = 'created_at' | 'id' | 'product_name' | 'category_name' | 'search_price' | 'brand';
 
-export type T_AwinProcessDecision = 'queue' | 'delete';
+export type T_AWINProcessDecision = 'queue' | 'delete';
 
-export type T_AwinProcessedPayload = {
-    decision: T_AwinProcessDecision;
-    awin: T_AwinProduct;
+export type T_AWINProcessedPayload = {
+    decision: T_AWINProcessDecision;
+    awin: T_AWINProduct;
 };
 
-export interface I_ListAwin {
-    products: T_AwinProduct[];
+export interface I_ListAWIN {
+    products: T_AWINProduct[];
     query?: string;
-    onSelect?: (product: T_AwinProduct) => void;
+    onSelect?: (product: T_AWINProduct) => void;
 }
 
-export type T_RenderAwinMode = 'card' | 'list' | 'button';
+export type T_RenderAWINMode = 'card' | 'list' | 'button';
 
-export interface I_RenderAwin {
-    awin: T_AwinProduct;
-    mode?: T_RenderAwinMode;
+export interface I_RenderAWIN {
+    awin: T_AWINProduct;
+    mode?: T_RenderAWINMode;
     query?: string;
-    onClick?: (product: T_AwinProduct) => void;
+    onClick?: (product: T_AWINProduct) => void;
     buttonLabel?: string;
 }
 
-export interface I_AwinDetail {
+export interface I_AWINDetail {
     open: boolean;
-    awin?: T_AwinProduct | null;
+    awin?: T_AWINProduct | null;
     onClose: () => void;
-    onProcessed?: (payload: T_AwinProcessedPayload) => void | Promise<void>;
+    onProcessed?: (payload: T_AWINProcessedPayload) => void | Promise<void>;
 }
 
-export type T_AwinListRow = {
+export type T_AWINListRow = {
     id: string;
     product_name: string;
     category_name: string;
     price: number | null;
     aw_deep_link: string;
-    product: T_AwinProduct;
+    product: T_AWINProduct;
 };
 
-export type T_AwinListProps = {
-    rows: T_AwinListRow[];
+export type T_AWINListProps = {
+    rows: T_AWINListRow[];
     loading: boolean;
+    smokeTestLoading?: boolean;
     total: number;
     page: number;
     resultsPerPage: number;
@@ -181,7 +182,8 @@ export type T_AwinListProps = {
     onPaginationModelChange: (model: GridPaginationModel) => void;
     onSortModelChange: (nextModel: GridSortModel) => void;
     onRowSelectionModelChange: (nextSelection: GridRowSelectionModel) => void;
-    onOpenProduct: (product: T_AwinProduct, rowId: string) => void;
+    onOpenProduct: (product: T_AWINProduct, rowId: string) => void;
+    onRunSmokeTest?: () => void | Promise<void>;
 };
 
 export type Product = {
@@ -239,6 +241,7 @@ type MightyButtonBaseProps = {
     size?: 'small' | 'medium' | 'large';
     onClick?: React.MouseEventHandler<HTMLElement>;
     children?: React.ReactNode;
+    alignLeft?: boolean;
 };
 
 type MightyButtonButtonProps = MightyButtonBaseProps & ButtonProps & {
@@ -300,9 +303,9 @@ export type T_ImageMeta = {
     height: number;
 };
 
-export type AwinProcessProps = {
-    awin?: T_AwinProduct | null;
-    onProcessed?: (payload: { decision: T_AwinProcessDecision; awin: T_AwinProduct }) => void | Promise<void>;
+export type AWINProcessProps = {
+    awin?: T_AWINProduct | null;
+    onProcessed?: (payload: { decision: T_AWINProcessDecision; awin: T_AWINProduct }) => void | Promise<void>;
 };
 
 export type T_SortBy = 'relevance' | 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'updated-desc';

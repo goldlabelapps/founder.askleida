@@ -123,10 +123,7 @@ export default function NXAdmin({
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <CircularProgress />
-                <Typography variant="body1" sx={{ml: 1}}>
-                  {accessLoadingMessage}
-                </Typography>
+                <CircularProgress color="inherit" size={24} />
               </Box>
             </Container>
         : !hasFounderAccess

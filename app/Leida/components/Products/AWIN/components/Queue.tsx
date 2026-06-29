@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import {
+  Avatar,
   Box,
   Button,
   Chip,
@@ -19,12 +20,12 @@ import {
   type GridRenderCellParams,
   type GridSortModel,
 } from '@mui/x-data-grid';
-import { setFeedback } from '../../../../NX/DesignSystem';
-import { useDispatch } from '../../../../NX/Uberedux';
-import { initQueue, MightyButton, processQueueItem, setLeida } from '../../../../Leida';
-import type { T_QueueRow } from '../../../types.d';
-import { toDate } from '../../../lib/toDate';
-import { toLabel } from '../../../lib/toLabel';
+import { setFeedback } from '../../../../../NX/DesignSystem';
+import { useDispatch } from '../../../../../NX/Uberedux';
+import { initQueue, MightyButton, processQueueItem, setLeida } from '../../../../index';
+import type { T_QueueRow } from '../../../../types.d';
+import { toDate } from '../../../../lib/toDate';
+import { toLabel } from '../../../../lib/toLabel';
 
 const RESULTS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
 const QUEUE_COUNT_REFRESH_EVENT = 'leida:queue-count-refresh';
@@ -115,10 +116,10 @@ export default function Queue() {
 
   React.useEffect(() => {
       dispatch(setLeida('header', {
-        title: 'Queue',
+        title: `Queue (Total ${total})`,
         icon: 'queue',
       }));
-  }, [dispatch]);
+  }, [dispatch, total]);
 
   const activeSort = sortModel[0] || { field: 'created', sort: 'asc' as const };
   const sortBy = (() => {
@@ -422,11 +423,20 @@ export default function Queue() {
               p: 2,
             }}
           >
-            <Stack spacing={1}>
-              <Typography variant="subtitle1">
-                {selectedRow.title}
-              </Typography>
-              <Box>
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Avatar
+                sx={{ width: 40, height: 40, flex: '0 0 auto' }}
+              >
+                1
+              </Avatar>
+              <Stack spacing={1} sx={{ minWidth: 0, flex: 1 }}>
+                <Typography variant="overline">
+                  Next product
+                </Typography>
+                <Typography variant="subtitle1">
+                  {selectedRow.title}
+                </Typography>
+                <Box>
                 <MightyButton
                   variant="contained"
                   endIcon="start"
@@ -436,6 +446,7 @@ export default function Queue() {
                   {processing ? <CircularProgress size={18} color="inherit" /> : 'Start'}
                 </MightyButton>
               </Box>
+              </Stack>
             </Stack>
           </Box>
         ) : null}

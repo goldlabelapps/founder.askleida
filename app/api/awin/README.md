@@ -37,7 +37,9 @@ AWIN_LOOKFANTASTIC_FEED_URL=https://example.awin.com/path/to/lookfantastic/feed.
 # Optional sync storage/db settings:
 AWIN_FEED_SYNC_BUCKET=awin-feeds
 AWIN_FEED_SYNC_TABLE=awin_feed_snapshots
-AWIN_LOOKFANTASTIC_TABLE=awin_lookfantastic
+AWIN_PRODUCTS_TABLE=products_awin
+# Optional backward-compatible alias:
+AWIN_LOOKFANTASTIC_TABLE=products_awin
 AWIN_SYNC_LIMIT=optional_row_limit_for_ingest
 NEXT_PUBLIC_TENANT=optional_tenant_name
 ```
@@ -51,7 +53,7 @@ Notes:
 - `AWIN_LOOKFANTASTIC_FEED_URL` is required for `/lookfantastic/sync`.
 - `AWIN_FEED_SYNC_BUCKET` defaults to `awin-feeds`.
 - `AWIN_FEED_SYNC_TABLE` defaults to `awin_feed_snapshots`.
-- `AWIN_LOOKFANTASTIC_TABLE` defaults to `awin_lookfantastic`.
+- `AWIN_PRODUCTS_TABLE` defaults to `products_awin`.
 - `AWIN_SYNC_LIMIT` optionally caps ingested rows.
 
 ## 1) Search Route (Primary)
@@ -60,7 +62,7 @@ Notes:
 
 Purpose:
 
-- Query the `AWIN_LOOKFANTASTIC_TABLE` (defaults to `awin_lookfantastic`).
+- Query the AWIN products table (`AWIN_PRODUCTS_TABLE`, defaults to `products_awin`).
 - Return filtered, searched, and ordered results for UI consumption.
 
 - Supported query params:
@@ -72,11 +74,12 @@ Purpose:
 - `offset` (optional): pagination offset, clamped `0..20000`, default `0`.
 - `orderBy` (optional): one of `created_at`, `id`, `product_name`, `category_name`, `search_price`. Default `created_at`.
 - `orderDir` (optional): `asc` or `desc`. Default `desc`.
+- `includeQueued` (optional): include rows where `data.queue_status = "queued"`. Defaults to `false`.
 
 - Response data shape:
 
 - `table`, `query`, `category`, `brand`
-- `limit`, `offset`, `orderBy`, `orderDir`
+- `includeQueued`, `limit`, `offset`, `orderBy`, `orderDir`
 - `count` (total rows matching filter)
 - `rows` (paged row set)
 
@@ -206,12 +209,11 @@ curl "http://localhost:3000/api/awin/lookfantastic/feed?advertiserId=12345&local
 Purpose:
 
 - Takes a selected product from the Lookfantastic AWIN feed.
-- Normalizes key fields.
-- Inserts a row into `public.products`.
+- Builds a slug from the selected title/name.
+- Stores the populated incoming row as JSON in `public.products_awin.data`.
 
 Required body fields:
 
-- `practitioner_id` (string, uuid)
 - `awinProduct` (object) or `product` (object)
 
 Optional override body fields:
@@ -221,9 +223,9 @@ Optional override body fields:
 Normalization behavior:
 
 - `name` is inferred from override values first, then AWIN payload fields.
-- `title` defaults to `name`.
+- `slug` is slugified from `title`/`name` and trimmed to a sensible max length.
 - `price` is validated as a number `>= 0` when provided.
-- AWIN metadata is persisted into `data`, including source fields and full original product payload.
+- Persisted `data` is the populated merged object built from incoming fields.
 
 Example:
 
@@ -231,7 +233,6 @@ Example:
 curl -X POST "http://localhost:3000/api/awin/lookfantastic/save" \
   -H "Content-Type: application/json" \
   -d '{
-    "practitioner_id": "00000000-0000-0000-0000-000000000000",
     "awinProduct": {
       "id": "LF-123",
       "title": "Sample Product",
@@ -278,7 +279,14 @@ Purpose:
 
 - Supports two decisions:
   - `queue` (add to processing queue by creating a row in `public.product_queue`)
-  - `delete` (delete matching row(s) from `awin_lookfantastic` only; no queue row is created)
+  - `delete` (mark matching source row(s) as skipped in `products_awin`; no queue row is created)
+
+Queue behavior:
+
+- `queue` no longer deletes the AWIN source row.
+- Instead it updates `products_awin.data.queue_status = "queued"` (plus `queue_status_updated_at`).
+- `delete` also does not delete source rows; it updates `products_awin.data.queue_status = "skipped"`.
+- `GET /api/awin` excludes queued and skipped rows by default, so processed/ignored products are hidden from the main AWIN list while still retained for feed comparison/update workflows.
 
 Required body fields:
 
@@ -322,13 +330,13 @@ Purpose:
 
 - Loads the latest saved feed snapshot from Storage.
 - Parses CSV and normalizes product rows.
-- Upserts rows into `awin_lookfantastic` (or `AWIN_LOOKFANTASTIC_TABLE`).
-- Uses a unique key derived in this priority order: `ean`, `product_GTIN`, `upc`, `isbn`, `mpn`, `merchant_product_id`, `aw_product_id`, then fallback hash signature.
+- Upserts rows into `products_awin` (or `AWIN_PRODUCTS_TABLE`) as `slug + data`.
+- Uses a stable derived unique key for row identity and stores it under `data.unique_key`.
 
 Behavior:
 
 - Creates target table/indexes if missing.
-- Upserts by `unique_key`.
+- Upserts by `slug`.
 - Returns ingest summary (`csvRows`, `upserted`, `skipped`, `snapshot`).
 
 Optional query params:
@@ -364,7 +372,7 @@ Common failures and returned status:
 5. Call `/api/awin/lookfantastic/products` first for normal product search.
 6. Use `/api/awin/lookfantastic/feed?source=auto` only when you want feed fallback behavior.
 7. Trigger `/api/awin/lookfantastic/sync` from your cron job to persist updated CSV snapshots.
-8. Trigger `/api/awin/lookfantastic/ingest` to upsert latest snapshot rows into `awin_lookfantastic`.
+8. Trigger `/api/awin/lookfantastic/ingest` to upsert latest snapshot rows into `products_awin`.
 
 ## Security Notes
 

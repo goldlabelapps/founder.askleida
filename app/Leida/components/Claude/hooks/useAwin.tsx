@@ -1,7 +1,7 @@
 "use client";
 import { useSelector } from 'react-redux';
 
-export function useAwin() {
+export function useAWIN() {
   const slice = useSelector((state: any) => state.redux.leida?.awin);
   return slice;
 }

@@ -1,10 +1,11 @@
 import type { Dispatch } from 'redux';
-import { setUbereduxKey } from '../../../../NX/Uberedux';
-import { setLeida, fetchLeida } from '../../../../Leida';
+import { setUbereduxKey } from '../../../../../NX/Uberedux';
+import { setLeida } from '../../../../actions/setLeida';
+import { fetchLeida } from '../../../../actions/fetchLeida';
 
 const AWIN_ROUTE = '/api/awin?limit=25&orderBy=created_at&orderDir=desc';
 
-export const initAwin = (): any =>
+export const initAWIN = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {
         try {
             const leida = getState()?.redux?.leida || {};
@@ -38,9 +39,9 @@ export const initAwin = (): any =>
                 : products.length;
             const scanned = products.length;
 
-            const currentAwin = latestLeida?.awin || {};
+            const currentAWIN = latestLeida?.awin || {};
             await dispatch(setLeida('awin', {
-                ...currentAwin,
+                ...currentAWIN,
                 initted: true,
                 rows,
                 products,

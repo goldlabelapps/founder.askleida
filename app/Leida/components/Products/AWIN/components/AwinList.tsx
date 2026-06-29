@@ -1,19 +1,21 @@
 'use client';
 import * as React from 'react';
-import type { T_AwinListProps, T_AwinProduct } from '../../../types.d';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import type { T_AWINListProps, T_AWINProduct } from '../../../../types.d';
+import { Box, IconButton, LinearProgress, Stack, Typography } from '@mui/material';
 import {
     DataGrid,
     type GridColDef,
     type GridRenderCellParams,
 } from '@mui/x-data-grid';
-import { formatUkPrice, setLeida, } from '../../../../Leida';
-import { Icon } from '../../../../NX/DesignSystem';
-import { useDispatch } from '../../../../NX/Uberedux';
+import { formatUkPrice, MightyButton, setLeida, } from '../../../../index';
+import { Icon, navigateTo } from '../../../../../NX/DesignSystem';
+import { useDispatch } from '../../../../../NX/Uberedux';
 
-export default function AwinList({
+export default function AWINList({
     rows,
     loading,
+    smokeTestLoading = false,
     total,
     page,
     resultsPerPage,
@@ -24,14 +26,16 @@ export default function AwinList({
     onSortModelChange,
     onRowSelectionModelChange,
     onOpenProduct,
+    onRunSmokeTest,
     
-}: T_AwinListProps) {
+}: T_AWINListProps) {
 
     const dispatch = useDispatch();
+    const router = useRouter();
 
     React.useEffect(() => {
         dispatch(setLeida('header', {
-            title: 'Awin',
+            title: 'AWIN',
             icon: 'awin',
         }));
     }, [dispatch]);
@@ -46,15 +50,15 @@ export default function AwinList({
                 minWidth: 260,
                 sortable: true,
                 renderCell: (params: GridRenderCellParams) => (
-                    <Button
+                    <MightyButton
                         variant="text"
                         sx={{ justifyContent: 'flex-start', textTransform: 'none', px: 0 }}
                         onClick={() => {
-                            onOpenProduct(params.row.product as T_AwinProduct, String(params.row.id));
+                            onOpenProduct(params.row.product as T_AWINProduct, String(params.row.id));
                         }}
                     >
                         {params.value}
-                    </Button>
+                    </MightyButton>
                 ),
             },
             {
@@ -105,6 +109,44 @@ export default function AwinList({
         ];
     }, [onOpenProduct]);
 
+    if (loading && rows.length === 0) {
+        return (
+            <Box sx={{ width: '100%', py: 2 }}>
+                <LinearProgress />
+            </Box>
+        );
+    }
+
+    if (!loading && rows.length === 0) {
+        return (
+            <Box sx={{ width: '100%', py: 6 }}>
+                <Stack spacing={2} alignItems="center" textAlign="center" sx={{ maxWidth: 560, mx: 'auto' }}>
+                    <Typography variant="h6">
+                        AWIN table empty. Run Smoke Test.
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                        This will ingest the latest AWIN feed into products_awin.
+                    </Typography>
+                    <MightyButton
+                        startIcon="awin"
+                        variant="outlined"
+                        disabled={smokeTestLoading}
+                        onClick={() => {
+                            if (onRunSmokeTest) {
+                                onRunSmokeTest();
+                                return;
+                            }
+
+                            dispatch(navigateTo(router, '/products'));
+                        }}
+                    >
+                        {smokeTestLoading ? 'Ingesting...' : 'Ingest AWIN Feed'}
+                    </MightyButton>
+                </Stack>
+            </Box>
+        );
+    }
+
     return loading || rows.length > 0 ? (
         <Box sx={{ width: '100%', minHeight: 560 }}>
             <DataGrid
@@ -138,7 +180,7 @@ export default function AwinList({
                         return;
                     }
 
-                    onOpenProduct(params.row.product as T_AwinProduct, String(params.row.id));
+                    onOpenProduct(params.row.product as T_AWINProduct, String(params.row.id));
                 }}
                 sx={{
                     border: 0,

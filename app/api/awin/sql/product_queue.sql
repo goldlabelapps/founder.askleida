@@ -2,7 +2,7 @@ create table public.product_queue (
   queue_id uuid not null default gen_random_uuid(),
   practitioner_id uuid not null,
   source text not null default 'awin',
-  source_table text null default 'awin_lookfantastic',
+  source_table text null default 'products_awin',
   source_product_id text null,
   decision text not null,
   status text not null default 'pending',

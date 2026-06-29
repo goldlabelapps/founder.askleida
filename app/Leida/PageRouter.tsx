@@ -10,8 +10,8 @@ import {
   Practitioners,
   FounderDash,
   Claude,
-  AwinSearch,
-  Awin,
+  AWINSearch,
+  AWIN,
   PractitionerNew,
   Products,
   ListProducts,
@@ -40,13 +40,13 @@ export function PageRouter({ active }: I_PageRouter) {
     case 'supabase/users':
       return <SupabaseUsers />;
     case 'products/awin':
-      return <Awin />;
+      return <AWIN />;
     case 'products/awin/search':
-      return <AwinSearch />;
+      return <AWINSearch />;
     case 'awin':
-      return <Awin />;
+      return <AWIN />;
     case 'awin/search':
-      return <AwinSearch />;
+      return <AWINSearch />;
     case 'claude':
       return <Claude />;
     case 'queue':

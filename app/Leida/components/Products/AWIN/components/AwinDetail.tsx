@@ -11,15 +11,15 @@ import {
 	Stack,
 	Typography,
 } from '@mui/material';
-import { ConfirmAction, Icon } from '../../../../NX/DesignSystem';
-import { useDispatch } from '../../../../NX/Uberedux';
-import { usePaywall } from '../../../../NX/Paywall';
-import { MightyButton } from '../../../index';
-import { asText } from '../../../lib/asText';
-import { processAwin } from '../actions/processAwin';
-import type { I_AwinDetail } from '../../../types.d';
+import { ConfirmAction, Icon } from '../../../../../NX/DesignSystem';
+import { useDispatch } from '../../../../../NX/Uberedux';
+import { usePaywall } from '../../../../../NX/Paywall';
+import { MightyButton } from '../../../../index';
+import { asText } from '../../../../lib/asText';
+import { processAWIN } from '../actions/processAWIN';
+import type { I_AWINDetail } from '../../../../types.d';
 
-export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinDetail) {
+export default function AWINDetail({ open, awin, onClose, onProcessed }: I_AWINDetail) {
 	const dispatch = useDispatch();
 	const paywall = usePaywall();
 	const [showRawData, setShowRawData] = React.useState(false);
@@ -81,7 +81,7 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 		setQueueError(null);
 
 		const result = await dispatch(
-			processAwin({
+			processAWIN({
 				awin,
 				decision: 'queue',
 				practitionerId,
@@ -107,7 +107,7 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 
 		setDeleting(true);
 		const result = await dispatch(
-			processAwin({
+			processAWIN({
 				awin,
 				decision: 'delete',
 				practitionerId,
@@ -239,7 +239,7 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 						fullWidth
 						disabled={!awin || !practitionerId || deleting || queueing}
 						onClick={() => setConfirmDeleteOpen(true)}>
-						{deleting ? 'Deleting...' : 'Delete from Awin'}
+						{deleting ? 'Skipping...' : 'Skip in AWIN'}
 					</MightyButton>
 					<MightyButton
 						startIcon={'queue'}
@@ -255,8 +255,8 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 			<ConfirmAction
 				open={confirmDeleteOpen}
 				icon="delete"
-				title="Delete this AWIN product?"
-				body="This will remove it from the AWIN source list."
+				title="Skip this AWIN product?"
+				body="This will mark it as skipped and hide it from the AWIN source list."
 				handleConfirm={handleDeleteConfirm}
 				handleClose={() => setConfirmDeleteOpen(false)}
 				zIndex={1500}

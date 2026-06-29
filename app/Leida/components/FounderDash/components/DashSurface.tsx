@@ -30,7 +30,7 @@ const DashSurface = () => {
 
 			<Grid size={{ xs: 12 }}>
 				<DashCard
-					title="Awin"
+					title="AWIN"
 					description="Affiliate marketing data"
 					icon={'awin'}
 					cta={() => handleCardClick('/products/awin')}

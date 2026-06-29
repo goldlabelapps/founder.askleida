@@ -33,6 +33,7 @@ const MightyButton = ({
 	children,
 	startIcon,
 	endIcon,
+	alignLeft,
 	size = 'large',
 	...props
 }: MightyButtonProps) => {
@@ -72,10 +73,25 @@ const MightyButton = ({
 	}
 
 	const buttonProps = props as ButtonProps;
+	const buttonSx = Array.isArray(buttonProps.sx)
+		? buttonProps.sx
+		: buttonProps.sx
+			? [buttonProps.sx]
+			: [];
+	const resolvedButtonSx = alignLeft && buttonProps.fullWidth
+		? [
+			...buttonSx,
+			{
+				justifyContent: 'flex-start',
+				textAlign: 'left',
+			},
+		]
+		: buttonSx;
 
 	return (
 		<Button
 			{...buttonProps}
+			sx={resolvedButtonSx}
 			size={size}
 			onClick={onClick}
 			startIcon={resolvedStartIcon}

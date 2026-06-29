@@ -184,13 +184,19 @@ Good next step is introducing:
 
 ## Awin Lookfantastic Data
 
-### awin_lookfantastic
+### products_awin
 
-- 25,707 product rows from a single Lookfantastic snapshot are currently stored here.
+- AWIN product rows from Lookfantastic snapshots are stored here.
 - Every row is for LOOKFANTASTIC UK and uses GBP pricing.
 
-The table is structured as flattened product fields plus a raw JSON payload.
-Core populated fields include:
+The table is structured as:
+
+- `products_awin_id` (UUID primary key)
+- `slug` (slugified and trimmed product identifier)
+- `created` / `updated`
+- `data` (raw/populated JSON payload)
+
+Common keys in `data` include:
 
 - aw_product_id
 - merchant_product_id

@@ -52,9 +52,7 @@ const PractitionerList = () => {
 		<>
 		{/* <PractitionerNew /> */}
 			<Stack spacing={1.5}>
-				<Box sx={{ height: 12 }}>
-					{rowsState?.loading && <LinearProgress />}
-				</Box>
+				
 				{rowsState?.error && <Alert severity="error">{rowsState.error}</Alert>}
 				{!rowsState?.loading && sortedRows.length === 0 && (
 					<Alert severity="info">No practitioners found.</Alert>
@@ -65,6 +63,9 @@ const PractitionerList = () => {
 						: `practitioner-${index}`;
 					return <PractitionerCard key={key} practitioner={row} />;
 				})}
+				<Box sx={{ height: 12 }}>
+					{rowsState?.loading && <LinearProgress />}
+				</Box>
 			</Stack>
 		</>
 	);
