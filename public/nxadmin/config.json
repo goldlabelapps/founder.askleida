@@ -24,12 +24,12 @@
             "themes": {
                 "light": {
                     "mode": "light",
-                    "primary": "#6B3183",
-                    "secondary": "#8734AB",
-                    "background": "#f6f6f6",
-                    "paper": "#ededed",
-                    "border": "#dcdcdc",
-                    "text": "#2C2C2A"
+                    "primary": "#2C2C2A",
+                    "secondary": "#2c2c2a",
+                    "background": "#F7F7F4",
+                    "paper": "#FFF",
+                    "border": "#d4d4d4",
+                    "text": "#2c2c2a"
                 },
                 "dark": {
                     "mode": "dark",

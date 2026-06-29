@@ -109,13 +109,11 @@ const PractitionerCard = ({
 								sx={{ alignSelf: 'flex-start', backgroundColor: 'common.white', mr: 1 }}
 							/>
 						</Box>
-						<Box sx={{mx: 1}}>
-							<Typography variant="body1">
+						<Box sx={{m: 0.5}}>
+							<Typography variant="h6">
 								{displayName}
 							</Typography>
-							<Typography variant="body2" color="textSecondary">
-								{secondaryText}
-							</Typography>
+							
 						</Box>
 					</Box>
 					{/* <Box sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -131,3 +129,5 @@ const PractitionerCard = ({
 };
 
 export default PractitionerCard;
+
+

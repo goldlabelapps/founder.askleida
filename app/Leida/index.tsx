@@ -1,15 +1,17 @@
 // Components
 import { PageRouter } from './PageRouter';
-import { DashNav, navItems, LoggedInAs } from './components/DashNav';
 import {
-	FounderDash,
+    Dashboard,
+    DashNav,
+    navItems,
+    LoggedInAs,
+    DashAuth,
 	initDash,
 	useDash,
 	setDash,
 	DashCard,
 	DashSurface,
-} from './components/FounderDash';
-import DashAuth from './components/FounderDash/components/DashAuth';
+} from './components/Dashboard';
 import AWIN from './components/Products/components/Awin';
 import AWINDetail from './components/Products/components/AwinDetail';
 import AWINList from './components/Products/components/AwinList';
@@ -36,7 +38,7 @@ import { useQueue } from './components/Products/hooks/useQueue';
 import { initLeida } from './actions/initLeida';
 import { fetchLeida } from './actions/fetchLeida';
 import { setLeida } from './actions/setLeida';
-import { deletePractitioner } from './actions/deletePractitioner';
+import { deletePractitioner } from './components/Practitioners/actions/deletePractitioner';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
@@ -119,10 +121,11 @@ import { normalizeColumnsForPreset } from './lib/normalizeColumnsForPreset';
 const AWINSearch = AWIN;
 const Awin = AWIN;
 const AwinSearch = AWIN;
-const Supabase = FounderDash;
-const SupabaseUsers = FounderDash;
-const SupabasePostgres = FounderDash;
-const Claude = FounderDash;
+const FounderDash = Dashboard;
+const Supabase = Dashboard;
+const SupabaseUsers = Dashboard;
+const SupabasePostgres = Dashboard;
+const Claude = Dashboard;
 
 export {
     // Components
@@ -130,7 +133,7 @@ export {
     DashNav,
     navItems,
     LoggedInAs,
-    FounderDash,
+    Dashboard,
     DashAuth,
     DashCard,
     DashSurface,
@@ -141,6 +144,7 @@ export {
     AWINSearch,
     Awin,
     AwinSearch,
+    FounderDash,
     Supabase,
     SupabaseUsers,
     SupabasePostgres,

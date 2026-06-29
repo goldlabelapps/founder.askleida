@@ -17,7 +17,7 @@ import {
     PractitionerList,
 } from '../../../Leida';
 
-export default function FounderDash() {
+export default function Dashboard() {
     
     const dispatch = useDispatch();
     const router = useRouter();
