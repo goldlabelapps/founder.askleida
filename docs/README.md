@@ -1,20 +1,70 @@
-# Leida Founder Dashboard Documentation
+# NX° Framework Documentation
 
-This documentation is the primary source of truth for the **Leida Founder Dashboard** in this repository.
+Welcome to the official documentation for the **NX° Framework** — a modular, cartridge-based React/Next.js architecture built on Supabase, MUI, and Redux Toolkit.
 
-## Start Here
+---
 
-1. [Overview](./founder-dashboard/overview.md)
-2. [Architecture](./founder-dashboard/architecture.md)
-3. [Navigation and User Flows](./founder-dashboard/navigation-and-pages.md)
-4. [Data and API Surface](./founder-dashboard/data-and-apis.md)
-5. [Operations Runbook](./founder-dashboard/operations.md)
-6. [Developer Guide](./founder-dashboard/development-guide.md)
+## What is NX°?
 
-## Legacy README Migration
+NX° is a composable application framework. Rather than a monolithic codebase, NX° apps are assembled from self-contained **cartridges** — pluggable modules that can be switched on or off per project. Each cartridge owns its own components, actions, hooks, and Redux state slice, making it trivially portable between NX° host applications.
 
-All non-root `README.md` files were moved under:
+---
 
-- [`docs/source-readmes/`](./source-readmes/)
+## Documentation Index
 
-The original folder structure is preserved under `docs/source-readmes/` so previous documentation remains traceable and searchable.
+### Framework Core
+
+| Document | Description |
+|---|---|
+| [Framework Overview](./framework/overview.md) | Architecture, cartridge concept, file structure |
+| [Configuration](./framework/config.md) | `T_Config` schema and the `config.json` contract |
+| [Uberedux](./framework/uberedux.md) | NX° global state management layer |
+| [DesignSystem](./framework/design-system.md) | Theming, MUI integration, and the `DesignSystem` cartridge |
+
+### Cartridges
+
+| Cartridge | Description |
+|---|---|
+| [NX° Admin](./cartridges/nx-admin/README.md) | Back-office administration panel |
+
+---
+
+## Quick-start
+
+```tsx
+// app/layout.tsx (or your root page)
+import { UbereduxProvider } from '@/NX/Uberedux';
+import { NX } from '@/NX';
+import config from '@/config.json';
+
+export default function RootLayout({ children }) {
+  return (
+    <UbereduxProvider>
+      <NX config={config}>
+        {children}
+      </NX>
+    </UbereduxProvider>
+  );
+}
+```
+
+Mount the **NX° Admin** cartridge on a protected route:
+
+```tsx
+// app/admin/page.tsx
+import { NXAdmin } from '@/NX/NXAdmin';
+import config from '@/config.json';
+
+export default function AdminPage() {
+  return <NXAdmin config={config} />;
+}
+```
+
+---
+
+## Conventions
+
+- Every cartridge is located under `app/NX/<CartridgeName>/`.
+- Each cartridge exposes its public API through a barrel `index.tsx`.
+- State is stored in a single Redux store via Uberedux; each cartridge namespaces its slice under `state.redux.<cartridgeName>`.
+- Cartridge configuration lives in the top-level `config.json` under the `cartridges` key.
