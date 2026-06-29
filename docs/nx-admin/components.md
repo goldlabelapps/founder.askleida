@@ -2,7 +2,6 @@
 
 All components are exported from `app/NX/NXAdmin/index.tsx`.
 
----
 
 ## Layout Components
 
@@ -28,7 +27,6 @@ import { NXAdmin } from '@/NX/NXAdmin';
 - Shows `<SimpleSignIn>` when unauthenticated.
 - Shows `<MiniDrawer>` when authenticated.
 
----
 
 ### `<MiniDrawer>`
 
@@ -52,7 +50,6 @@ import { MiniDrawer } from '@/NX/NXAdmin';
 - Calls `pwaAlert()` once on mount.
 - Calls `useNotifications()` to listen for foreground FCM messages.
 
----
 
 ### `<Header>`
 
@@ -68,7 +65,6 @@ import { Header } from '@/NX/NXAdmin';
 
 No props. Reads from Redux: `state.redux.nxAdmin.header`.
 
----
 
 ### `<LeftDrawer>`
 
@@ -89,7 +85,6 @@ No props. Built-in navigation links:
 - Viruses° (`/virus`)
 - Fingerprints° (`/fingerprints`)
 
----
 
 ### `<PageRouter>`
 
@@ -107,7 +102,6 @@ import { PageRouter } from '@/NX/NXAdmin';
 |---|---|---|---|
 | `active` | `string \| null` | ✓ | Current route key. `null` renders `<MegaDash>` |
 
----
 
 ## Page Components
 
@@ -125,7 +119,6 @@ import { MegaDash } from '@/NX/NXAdmin';
 
 No props. On mount calls `initDash()` if not already initialised.
 
----
 
 ### `<Collection>`
 
@@ -161,7 +154,6 @@ import { Collection } from '@/NX/NXAdmin';
 - Automatically calls `initCollection(collection)` on first render.
 - Delegates to `<ReadDoc>`, `<CreateDoc>`, `<UpdateDoc>`, `<DeleteDoc>` based on `mode`.
 
----
 
 ### `<Accounts>`
 
@@ -172,7 +164,6 @@ import { Accounts } from '@/NX/NXAdmin';
 <Accounts />
 ```
 
----
 
 ### `<Prospects>` / `<Prospect>`
 
@@ -184,7 +175,6 @@ import { Prospects, Prospect } from '@/NX/NXAdmin';
 <Prospect />
 ```
 
----
 
 ### `<Avatars>`
 
@@ -195,7 +185,6 @@ import { Avatars } from '@/NX/NXAdmin';
 <Avatars />
 ```
 
----
 
 ### `<Queue>` / `<FilterSelect>`
 
@@ -207,7 +196,6 @@ import { Queue, FilterSelect } from '@/NX/NXAdmin';
 <FilterSelect />
 ```
 
----
 
 ### `<Viruses>`
 
@@ -218,7 +206,6 @@ import { Viruses } from '@/NX/NXAdmin';
 <Viruses />
 ```
 
----
 
 ### `<Fingerprints>`
 
@@ -229,7 +216,6 @@ import { Fingerprints } from '@/NX/NXAdmin';
 <Fingerprints />
 ```
 
----
 
 ## CRUD Components
 
@@ -249,7 +235,6 @@ import { CreateDoc } from '@/NX/NXAdmin';
 | `collection` | `string` | ✓ | Target Firestore collection |
 | `icon` | `string` | — | Icon key for the document |
 
----
 
 ### `<ReadDoc>`
 
@@ -262,7 +247,6 @@ import { ReadDoc } from '@/NX/NXAdmin';
 
 Clicking an item dispatches `setCRUD(collection, 'selected', doc)` and sets mode to `'update'`.
 
----
 
 ### `<UpdateDoc>`
 
@@ -273,7 +257,6 @@ import { UpdateDoc } from '@/NX/NXAdmin';
 <UpdateDoc collection="products" />
 ```
 
----
 
 ### `<DeleteDoc>`
 
@@ -284,7 +267,6 @@ import { DeleteDoc } from '@/NX/NXAdmin';
 <DeleteDoc collection="products" />
 ```
 
----
 
 ## Menu Components
 
@@ -299,7 +281,6 @@ import { NXAdminMenu } from '@/NX/NXAdmin';
 
 **Menu items:** Account, Dark/Light mode toggle, Sign out.
 
----
 
 ### `<MiniListItem>`
 
@@ -327,7 +308,6 @@ import { MiniListItem } from '@/NX/NXAdmin';
 | `options.icon` | `string` | ✓ | Icon key |
 | `options.route` | `string` | — | Route to navigate to |
 
----
 
 ### `<NotificationBell>`
 
@@ -340,7 +320,6 @@ import { NotificationBell } from '@/NX/NXAdmin';
 
 Reads from `state.redux.nxAdmin.notifications`.
 
----
 
 ### `<PWAAlert>`
 
@@ -351,19 +330,16 @@ import { PWAAlert } from '@/NX/NXAdmin';
 <PWAAlert />
 ```
 
----
 
 ### `<NXAdminBtn>` / `<CloseAdmin>` / `<CancelActive>`
 
 Utility menu buttons for opening the admin panel, closing it, and cancelling the active selection respectively.
 
----
 
 ### `<AccountCard>`
 
 Displays the current user's name, email, and avatar. Used inside `<NXAdminMenu>`.
 
----
 
 ## UI Primitives
 
@@ -385,7 +361,6 @@ import { InputString } from '@/NX/NXAdmin';
 />
 ```
 
----
 
 ### `<OptionSelect>`
 
@@ -395,7 +370,6 @@ A labelled MUI select/dropdown.
 import { OptionSelect } from '@/NX/NXAdmin';
 ```
 
----
 
 ### `<JSONInput>`
 
@@ -405,7 +379,6 @@ A raw JSON editor field.
 import { JSONInput } from '@/NX/NXAdmin';
 ```
 
----
 
 ### `<SoundPlayer>`
 
@@ -415,7 +388,6 @@ A hidden audio player component used for notification sounds.
 import { SoundPlayer } from '@/NX/NXAdmin';
 ```
 
----
 
 ### `<TypeScript>`
 

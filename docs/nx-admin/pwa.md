@@ -2,13 +2,11 @@
 
 NX° Admin includes built-in Progressive Web App (PWA) install prompt management. It detects browser install eligibility, exposes the deferred install prompt, and tracks install state — all in Redux.
 
----
 
 ## Overview
 
 The PWA system is driven by two actions (`pwaAlert`, `triggerPwaInstall`) and the `<PWAAlert>` component. State is stored under `state.redux.nxAdmin.pwa`.
 
----
 
 ## Redux State Shape
 
@@ -22,7 +20,6 @@ state.redux.nxAdmin.pwa = {
 }
 ```
 
----
 
 ## `pwaAlert()` Action
 
@@ -45,7 +42,6 @@ dispatch(pwaAlert());
 5. Registers `beforeinstallprompt` listener → saves the deferred prompt reference and sets `installable: true`.
 6. Registers `appinstalled` listener → sets `installed: true`, `installable: false`.
 
----
 
 ## `triggerPwaInstall()` Action
 
@@ -69,7 +65,6 @@ const accepted: boolean = await dispatch(triggerPwaInstall());
 4. Dispatches `lastOutcome` and `installable: false`.
 5. If accepted, also sets `installed: true`.
 
----
 
 ## `<PWAAlert>` Component
 
@@ -89,7 +84,6 @@ import { PWAAlert } from '@/NX/NXAdmin';
 - On button click, dispatches `triggerPwaInstall()`.
 - Hides itself once installed or dismissed.
 
----
 
 ## Checking PWA State in Components
 
@@ -110,7 +104,6 @@ function InstallBanner() {
 }
 ```
 
----
 
 ## Requirements
 
@@ -118,7 +111,6 @@ function InstallBanner() {
 - A **service worker** must be registered. The `supabase-messaging-sw.js` file in `public/` satisfies this requirement.
 - The app must meet the browser's [PWA installability criteria](https://web.dev/install-criteria/) (manifest, icons, etc.).
 
----
 
 ## Detecting Standalone Mode
 

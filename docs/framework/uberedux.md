@@ -2,7 +2,6 @@
 
 Uberedux is NX°'s shared Redux layer. It wraps Redux Toolkit's `configureStore` with a single, dot-notation-addressable slice, giving every cartridge a simple, consistent way to read and write global state without boilerplate.
 
----
 
 ## Philosophy
 
@@ -12,7 +11,6 @@ Instead of separate reducers for every cartridge, Uberedux uses a **single flat 
 - Cartridges namespace themselves by convention (e.g. `nxAdmin`, `paywall`, `designSystem`).
 - Selectors are simple `state.redux.<namespace>` reads.
 
----
 
 ## Store Structure
 
@@ -27,7 +25,6 @@ store.getState()
     }
 ```
 
----
 
 ## API
 
@@ -47,7 +44,6 @@ export default function RootLayout({ children }) {
 }
 ```
 
----
 
 ### `setUbereduxKey({ key, value })`
 
@@ -65,7 +61,6 @@ dispatch(setUbereduxKey({ key: 'nxAdmin.notifications.unreadCount', value: 5 }))
 
 Intermediate objects are created automatically if they don't exist.
 
----
 
 ### `resetUberedux()`
 
@@ -77,7 +72,6 @@ import { resetUberedux } from '@/NX/Uberedux';
 dispatch(resetUberedux());
 ```
 
----
 
 ### `useDispatch()`
 
@@ -92,7 +86,6 @@ function MyComponent() {
 }
 ```
 
----
 
 ### `useSlice(key)`
 
@@ -106,7 +99,6 @@ function MyComponent() {
 }
 ```
 
----
 
 ## Writing a Cartridge Action
 
@@ -129,7 +121,6 @@ export const myAction = (payload: string): any =>
   };
 ```
 
----
 
 ## TypeScript Types
 

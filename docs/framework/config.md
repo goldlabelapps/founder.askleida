@@ -2,7 +2,6 @@
 
 Every NX° application is driven by a single configuration object that is passed to the root `<NX>` (and to any cartridge that needs it). By convention this object is stored as `config.json` at the root of the app and imported directly into server or client components.
 
----
 
 ## Schema
 
@@ -37,7 +36,6 @@ type T_Config = {
 };
 ```
 
----
 
 ## `cartridges.designSystem`
 
@@ -102,7 +100,6 @@ type T_DesignSystemCartridge = {
 }
 ```
 
----
 
 ## How Config Flows Through the App
 
@@ -112,7 +109,6 @@ type T_DesignSystemCartridge = {
 4. `<NXAdmin>` reads the same design-system section, and also passes `config` to child components that need branding values (logo, site name, etc.).
 5. Individual cartridges can extend the `cartridges` map with their own typed keys.
 
----
 
 ## TypeScript tip
 

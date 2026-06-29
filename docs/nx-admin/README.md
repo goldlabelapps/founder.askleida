@@ -10,7 +10,6 @@ NX° Admin is a full back-office administration panel that plugs into any NX° h
 - PWA install prompt
 - Supabase Cloud Messaging (FCM) push notifications
 
----
 
 ## Documentation Index
 
@@ -24,7 +23,6 @@ NX° Admin is a full back-office administration panel that plugs into any NX° h
 | [Push Notifications](./notifications.md) | FCM push notification setup |
 | [PWA Support](./pwa.md) | Progressive Web App install prompt |
 
----
 
 ## Quick Start
 
@@ -84,7 +82,6 @@ Notes:
 - Supabase-managed auth emails are sent by Supabase using this SMTP configuration; no client-side mail code is required for auth invite/reset flows.
 - In this project, practitioner/auth invites are issued via Supabase Admin Auth APIs in `app/api/supabase/post.ts`.
 
----
 
 ## How It Works
 
@@ -130,7 +127,6 @@ The active route is derived from the URL pathname. `MiniDrawer` syncs the URL wi
 | `/virus` | `<Viruses />` |
 | `/fingerprints` | `<Fingerprints />` |
 
----
 
 ## Redux State Shape
 

@@ -12,7 +12,6 @@ NX° is built around the concept of **cartridges** — discrete, self-contained 
 
 This design makes it possible to add, remove, or swap an entire feature (e.g. Admin, Paywall, Flash, Shortcodes) without touching unrelated parts of the application.
 
----
 
 ## Directory Structure
 
@@ -32,7 +31,6 @@ app/
     └── lib/                     # Shared utilities (Supabase helpers, server hooks…)
 ```
 
----
 
 ## Core Components
 
@@ -55,7 +53,6 @@ import { NX } from '@/NX';
 | `config` | `T_Config` | ✓ | Application configuration object |
 | `children` | `ReactNode` | ✓ | Content to render inside the theme context |
 
----
 
 ## Lifecycle of a Request
 
@@ -68,7 +65,6 @@ Browser Request
                       └─ Page      (Collection / MegaDash / Accounts …)
 ```
 
----
 
 ## Shared Types (`types.d.ts`)
 
@@ -84,7 +80,6 @@ Key types shared across all cartridges:
 | `T_NavItem` | Navigation tree node |
 | `I_Icon` | Union of all valid icon identifiers |
 
----
 
 ## Available Cartridges
 

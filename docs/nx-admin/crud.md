@@ -2,13 +2,11 @@
 
 The NX° Admin CRUD system provides a zero-configuration, schema-driven way to manage any Firestore collection through a familiar Create / Read / Update / Delete interface.
 
----
 
 ## Overview
 
 Each collection managed by NX° Admin gets its own isolated state entry in `state.redux.nxAdmin.crud[collectionName]`. The system is driven by a **TypeScript schema document** — a special Firestore document named `typescript` within each collection — that describes the fields, their types, labels, and validation rules.
 
----
 
 ## The TypeScript Schema Document
 
@@ -65,7 +63,6 @@ The following field names are not rendered as form inputs and are managed automa
 | `label` | Auto-populated from the first required field |
 | `description` | Auto-populated from the second required field |
 
----
 
 ## Using the `<Collection>` Component
 
@@ -90,7 +87,6 @@ import { Collection } from '@/NX/NXAdmin';
 - "New" button (only shown when not in create mode)
 - TypeScript schema viewer/editor
 
----
 
 ## CRUD Mode Flow
 
@@ -133,7 +129,6 @@ dispatch(setCRUD('products', 'mode', 'read'));
 dispatch(setCRUD('products', 'selected', null));
 ```
 
----
 
 ## `initCollection` — Data Fetching
 
@@ -173,7 +168,6 @@ The search filter runs client-side on the following fields (normalised, diacriti
 - `email`
 - `company`
 
----
 
 ## Standalone CRUD Components
 
@@ -200,7 +194,6 @@ Renders a pre-filled edit form for `crud[collection].selected`. On save, calls `
 
 Confirmation dialog. On confirm, calls `collectionDelete`.
 
----
 
 ## Building a Custom Collection Page
 

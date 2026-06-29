@@ -2,7 +2,6 @@
 
 The `DesignSystem` cartridge provides MUI (Material UI v6) theming, global feedback toasts, an icon library, and a collection of shared UI primitives that all other cartridges consume.
 
----
 
 ## Mounting
 
@@ -16,7 +15,6 @@ import { DesignSystem } from '@/NX/DesignSystem';
 </DesignSystem>
 ```
 
----
 
 ## Public API (`app/NX/DesignSystem/index.tsx`)
 
@@ -56,7 +54,6 @@ import { DesignSystem } from '@/NX/DesignSystem';
 | `useMUITheme()` | Returns the MUI theme object |
 | `useMarkdown()` | Returns current markdown document from Redux |
 
----
 
 ## Theming
 
@@ -75,7 +72,6 @@ function ThemeToggle() {
 }
 ```
 
----
 
 ## Feedback Toasts
 
@@ -96,7 +92,6 @@ dispatch(setFeedback(null));
 
 The `<Feedback />` component must be mounted somewhere in the tree (it is included automatically by `<NX>` and `<NXAdmin>`).
 
----
 
 ## Icon Component
 

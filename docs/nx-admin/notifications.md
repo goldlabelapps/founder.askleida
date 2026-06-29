@@ -2,7 +2,6 @@
 
 NX° Admin integrates Supabase Cloud Messaging (FCM) to deliver push notifications to authenticated users. The system covers foreground messages (tab in focus), background messages (service worker), permission management, and OS app badge counts.
 
----
 
 ## Architecture
 
@@ -24,7 +23,6 @@ Server                    Client (tab open)          Background SW
   │                    increment badge
 ```
 
----
 
 ## Setup
 
@@ -53,7 +51,6 @@ Place `supabase-messaging-sw.js` in your `public/` root. This file handles backg
 
 Place `notification.mp3` at `public/nxadmin/mp3/notification.mp3`. This file is played when a foreground notification arrives.
 
----
 
 ## Permission & Token Flow
 
@@ -90,7 +87,6 @@ state.redux.nxAdmin.notifications = {
 }
 ```
 
----
 
 ## Foreground Messages (`useNotifications`)
 
@@ -114,7 +110,6 @@ function CustomShell() {
 3. **Unread count** — Increments `nxAdmin.notifications.unreadCount` in Redux.
 4. **OS badge** — Calls `navigator.setAppBadge(count)` (falls back silently on unsupported browsers).
 
----
 
 ## The Notification Bell (`<NotificationBell>`)
 
@@ -132,7 +127,6 @@ import { NotificationBell } from '@/NX/NXAdmin';
 - If permission is `'granted'`: clicking clears the count and calls `navigator.clearAppBadge()`.
 - The FCM token is logged to the console whenever it is available (useful for testing).
 
----
 
 ## Sending Notifications from the Server
 
@@ -154,7 +148,6 @@ const response = await fetch('/api/notify', {
 
 The route uses `supabase-admin` and `sendEachForMulticast` to fan the message out to all provided FCM tokens.
 
----
 
 ## Background Notifications
 
@@ -166,7 +159,6 @@ Background notifications are handled by `public/supabase-messaging-sw.js`. When 
 
 **Important:** The service worker must receive `SUPABASE_CONFIG` from the client before it can process messages. This is done automatically by `requestNotifications()` via `serviceWorker.active.postMessage(...)`.
 
----
 
 ## Testing Push Notifications
 
