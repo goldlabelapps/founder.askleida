@@ -2,7 +2,6 @@
 
 All actions are Redux thunks. They are exported from `app/NX/NXAdmin/index.tsx` and should be dispatched via the `useDispatch()` hook from Uberedux.
 
----
 
 ## `setNXAdmin(key, value)`
 
@@ -27,7 +26,6 @@ dispatch(setNXAdmin('header', { title: 'Accounts', icon: 'account' }));
 
 The action reads the current `nxAdmin` object, spreads it, overwrites the given key, and dispatches the result via `setUbereduxKey`.
 
----
 
 ## `setCRUD(collection, key, value)`
 
@@ -54,7 +52,6 @@ dispatch(setCRUD('products', 'saving', true));
 | `key` | `string` | Key within that collection's CRUD state |
 | `value` | `any` | Value to set |
 
----
 
 ## `initCollection(collection, options?)`
 
@@ -111,7 +108,6 @@ When `subscribe: true`, the action returns the Firestore `unsubscribe` function.
 
 **Note on the `typescript` document:** `initCollection` treats a Firestore document with `id === 'typescript'` as the schema definition document for that collection. It is separated from the `docs` array and stored in `crud[collection].typescript`. See the [CRUD System](./crud.md) docs for details.
 
----
 
 ## `saveNewDoc(collection, data)`
 
@@ -143,7 +139,6 @@ dispatch(saveNewDoc('products', {
 5. On error, dispatches `setCRUD(collection, 'error', msg)`.
 6. Always dispatches `setCRUD(collection, 'saving', false)` in `finally`.
 
----
 
 ## `edit(collection, data)`
 
@@ -157,7 +152,6 @@ import { edit } from '@/NX/NXAdmin';
 dispatch(edit('products', { id: 'abc123', label: 'Updated Widget' }));
 ```
 
----
 
 ## `collectionDelete(collection, id)`
 
@@ -171,7 +165,6 @@ import { collectionDelete } from '@/NX/NXAdmin';
 dispatch(collectionDelete('products', 'abc123'));
 ```
 
----
 
 ## `readTypescript(collection)`
 
@@ -185,7 +178,6 @@ import { readTypescript } from '@/NX/NXAdmin';
 dispatch(readTypescript('products'));
 ```
 
----
 
 ## `subscribeUser(uid)`
 
@@ -199,7 +191,6 @@ import { subscribeUser } from '@/NX/NXAdmin';
 dispatch(subscribeUser(uid));
 ```
 
----
 
 ## `requestNotifications()`
 
@@ -222,7 +213,6 @@ dispatch(requestNotifications());
 4. Saves the FCM token to `users/{uid}.fcmTokens` in Firestore (using `arrayUnion`).
 5. Dispatches token and permission to `nxAdmin.notifications`.
 
----
 
 ## `pwaAlert()`
 
@@ -238,7 +228,6 @@ dispatch(pwaAlert());
 
 See the [PWA Support](./pwa.md) document for full details.
 
----
 
 ## `triggerPwaInstall()`
 

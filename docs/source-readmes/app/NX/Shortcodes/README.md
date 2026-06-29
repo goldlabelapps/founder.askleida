@@ -11,7 +11,6 @@ The `Shortcodes` directory provides a way to extend markdown content with custom
 - Keep markdown files clean and readable
 - Empower non-developers to enhance content without editing code
 
----
 
 ## Example Usage
 
@@ -25,7 +24,6 @@ This is a warning message!
 
 When the markdown is rendered, the shortcode is replaced with the corresponding React component or HTML, displaying the alert box.
 
----
 
 ## How It Works
 
@@ -33,7 +31,6 @@ When the markdown is rendered, the shortcode is replaced with the corresponding 
 - Each shortcode maps to a React component or function in this directory.
 - Arguments and content inside the shortcode are passed as props to the component.
 
----
 
 ## Available Shortcodes
 
@@ -48,7 +45,6 @@ The following shortcodes are available out of the box:
 | `ContentCard`     | Embeds a card with markdown content by slug      | `[ContentCard slug="/docs/intro"]`                  |
 | `PageLink`        | Renders a styled link to a page or URL           | `[PageLink url="/about" title="About Us"]`         |
 
----
 
 ## Adding New Shortcodes
 
@@ -56,7 +52,6 @@ The following shortcodes are available out of the box:
 2. Register the shortcode in the main `index.tsx` and/or the shortcode handler (see `RenderMarkdown.tsx`).
 3. Document the usage for content creators.
 
----
 
 ## Technical Details
 
@@ -65,7 +60,6 @@ The following shortcodes are available out of the box:
 - Shortcodes can be used inline in markdown paragraphs, lists, or as standalone blocks.
 - The system is extensible: add new components and update the parser to support new shortcodes.
 
----
 
 ## Why Use Shortcodes?
 
@@ -74,7 +68,6 @@ The following shortcodes are available out of the box:
 - Centralize UI logic for embedded features
 - Make content more interactive and engaging
 
----
 
 
 

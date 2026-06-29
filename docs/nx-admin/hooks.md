@@ -2,7 +2,6 @@
 
 All hooks are exported from `app/NX/NXAdmin/index.tsx`. They are client-side only (`'use client'`).
 
----
 
 ## `useNXAdmin()`
 
@@ -30,7 +29,6 @@ function MyComponent() {
 | `pwa` | `PwaState` | PWA install state |
 | `dash` | `any` | MegaDash initialised data |
 
----
 
 ## `useCRUD()`
 
@@ -68,7 +66,6 @@ function MyComponent() {
 }
 ```
 
----
 
 ## `useCollection(collection)`
 
@@ -91,7 +88,6 @@ function ProductList() {
 
 **Returns:** The same object as `useCRUD()`, but pre-typed for the given collection name.
 
----
 
 ## `useActive()`
 
@@ -110,7 +106,6 @@ function NavItem({ collection }) {
 
 **Returns:** `string | null`
 
----
 
 ## `useNotifications()`
 
@@ -137,7 +132,6 @@ function CustomShell() {
 
 **Cleanup:** The Firestore `onMessage` unsubscribe function is called when the component unmounts.
 
----
 
 ## `useHeader()`
 
@@ -156,7 +150,6 @@ function MyHeader() {
 
 **Returns:** `{ title: string; icon?: string } | null`
 
----
 
 ## Setting the Header
 

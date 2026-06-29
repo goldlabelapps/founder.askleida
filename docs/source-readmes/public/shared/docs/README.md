@@ -2,13 +2,11 @@
 
 Welcome to the official documentation for the **NX° Framework** — a modular, cartridge-based React/Next.js architecture built on Supabase, MUI, and Redux Toolkit.
 
----
 
 ## What is NX°?
 
 NX° is a composable application framework. Rather than a monolithic codebase, NX° apps are assembled from self-contained **cartridges** — pluggable modules that can be switched on or off per project. Each cartridge owns its own components, actions, hooks, and Redux state slice, making it trivially portable between NX° host applications.
 
----
 
 ## Documentation Index
 
@@ -27,7 +25,6 @@ NX° is a composable application framework. Rather than a monolithic codebase, N
 |---|---|
 | [NX° Admin](./cartridges/nx-admin/README.md) | Back-office administration panel |
 
----
 
 ## Quick-start
 
@@ -60,7 +57,6 @@ export default function AdminPage() {
 }
 ```
 
----
 
 ## Conventions
 
