@@ -3,10 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 import { makeRes } from '../../../';
 
 type T_SaveAwinProductBody = {
-  practitioner_id?: string;
-  product_id?: string;
   title?: string;
   name?: string;
+  slug?: string;
   category?: string;
   sku?: string;
   price?: number | string | null;
@@ -21,6 +20,10 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const tenant = process.env.NEXT_PUBLIC_TENANT;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const PRODUCTS_AWIN_TABLE =
+  process.env.AWIN_PRODUCTS_TABLE?.trim()
+  || process.env.AWIN_LOOKFANTASTIC_TABLE?.trim()
+  || 'products_awin';
 
 const normalizeText = (value: unknown): string | null => {
   if (typeof value !== 'string') {
@@ -55,6 +58,45 @@ const firstText = (...values: unknown[]) => {
   return null;
 };
 
+const slugify = (value: string): string => value
+  .toLowerCase()
+  .trim()
+  .replace(/[\s\W-]+/g, '-')
+  .replace(/^-+|-+$/g, '');
+
+const prunePopulated = (value: unknown): unknown => {
+  if (value === null || value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed : undefined;
+  }
+
+  if (Array.isArray(value)) {
+    const normalized = value
+      .map((entry) => prunePopulated(entry))
+      .filter((entry) => entry !== undefined);
+
+    return normalized.length ? normalized : undefined;
+  }
+
+  if (typeof value === 'object') {
+    const output: Record<string, unknown> = {};
+    for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+      const normalized = prunePopulated(entry);
+      if (normalized !== undefined) {
+        output[key] = normalized;
+      }
+    }
+
+    return Object.keys(output).length ? output : undefined;
+  }
+
+  return value;
+};
+
 export async function POST(req: Request) {
   let body: T_SaveAwinProductBody;
 
@@ -67,12 +109,6 @@ export async function POST(req: Request) {
 
   if (typeof body !== 'object' || body === null || Array.isArray(body)) {
     const res = makeRes({ tenant, severity: 'error', message: 'Request body must be a JSON object' });
-    return NextResponse.json(res, { status: 400 });
-  }
-
-  const practitionerId = normalizeText(body.practitioner_id);
-  if (!practitionerId) {
-    const res = makeRes({ tenant, severity: 'error', message: 'practitioner_id is required' });
     return NextResponse.json(res, { status: 400 });
   }
 
@@ -149,38 +185,42 @@ export async function POST(req: Request) {
   );
 
   const notes = firstText(body.notes, dataObject.notes);
-  const title = firstText(body.title, name) || name;
+  const title = firstText(body.title, name, (awinProduct as Record<string, unknown>).title) || name;
+  const requestedSlug = normalizeText(body.slug);
+  const slugBase = requestedSlug || slugify(title);
+  const slug = (slugBase || slugify(name || '') || 'awin-product').slice(0, 96);
+
+  const mergedData = prunePopulated({
+    ...awinProduct,
+    ...dataObject,
+    source: 'awin',
+    advertiser: 'lookfantastic',
+    title,
+    name,
+    category,
+    sku,
+    price,
+    description,
+    notes,
+    awinProductId: firstText((awinProduct as Record<string, unknown>).id, basic.id),
+    awinDeepLink: firstText(
+      (awinProduct as Record<string, unknown>).aw_deep_link,
+      (awinProduct as Record<string, unknown>).deeplink,
+      basic.aw_deep_link
+    ),
+    awinMerchantId: firstText(
+      (awinProduct as Record<string, unknown>).advertiser_id,
+      (awinProduct as Record<string, unknown>).merchant_id,
+      basic.advertiser_id
+    ),
+  }) as Record<string, unknown> | undefined;
 
   const payload = {
-    ...(normalizeText(body.product_id) ? { product_id: normalizeText(body.product_id) } : {}),
-    practitioner_id: practitionerId,
-    title,
-    data: {
-      ...dataObject,
-      source: 'awin',
-      advertiser: 'lookfantastic',
-      name,
-      category,
-      sku,
-      price,
-      description,
-      notes,
-      awinProductId: firstText((awinProduct as Record<string, unknown>).id, basic.id),
-      awinDeepLink: firstText(
-        (awinProduct as Record<string, unknown>).aw_deep_link,
-        (awinProduct as Record<string, unknown>).deeplink,
-        basic.aw_deep_link
-      ),
-      awinMerchantId: firstText(
-        (awinProduct as Record<string, unknown>).advertiser_id,
-        (awinProduct as Record<string, unknown>).merchant_id,
-        basic.advertiser_id
-      ),
-      awin: awinProduct,
-    },
+    slug,
+    data: mergedData || {},
   };
 
-  const { data, error } = await supabase.from('products').insert([payload]).select().single();
+  const { data, error } = await supabase.from(PRODUCTS_AWIN_TABLE).insert([payload]).select().single();
 
   if (error) {
     const res = makeRes({ tenant, severity: 'error', message: error.message });
@@ -190,7 +230,7 @@ export async function POST(req: Request) {
   const res = makeRes({
     tenant,
     severity: 'success',
-    message: 'Saved AWIN product to products table',
+    message: 'Saved AWIN product to products_awin table',
     data,
   });
 

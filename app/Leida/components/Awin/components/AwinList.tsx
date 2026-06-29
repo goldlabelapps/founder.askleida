@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import type { T_AwinListProps, T_AwinProduct } from '../../../types.d';
-import { Box, IconButton, Stack, Typography } from '@mui/material';
+import { Box, IconButton, LinearProgress, Stack, Typography } from '@mui/material';
 import {
     DataGrid,
     type GridColDef,
@@ -15,6 +15,7 @@ import { useDispatch } from '../../../../NX/Uberedux';
 export default function AwinList({
     rows,
     loading,
+    smokeTestLoading = false,
     total,
     page,
     resultsPerPage,
@@ -25,6 +26,7 @@ export default function AwinList({
     onSortModelChange,
     onRowSelectionModelChange,
     onOpenProduct,
+    onRunSmokeTest,
     
 }: T_AwinListProps) {
 
@@ -107,22 +109,38 @@ export default function AwinList({
         ];
     }, [onOpenProduct]);
 
+    if (loading && rows.length === 0) {
+        return (
+            <Box sx={{ width: '100%', py: 2 }}>
+                <LinearProgress />
+            </Box>
+        );
+    }
+
     if (!loading && rows.length === 0) {
         return (
             <Box sx={{ width: '100%', py: 6 }}>
                 <Stack spacing={2} alignItems="center" textAlign="center" sx={{ maxWidth: 560, mx: 'auto' }}>
                     <Typography variant="h6">
-                        Nothing to show yet.
+                        Awin table empty. Run Smoke Test.
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                        Pull in Awin products first, then come back here to review and manage them.
+                        This will ingest the latest AWIN feed into products_awin.
                     </Typography>
                     <MightyButton
-                        startIcon="products"
-                        variant="contained"
-                        onClick={() => dispatch(navigateTo(router, '/products'))}
+                        startIcon="awin"
+                        variant="outlined"
+                        disabled={smokeTestLoading}
+                        onClick={() => {
+                            if (onRunSmokeTest) {
+                                onRunSmokeTest();
+                                return;
+                            }
+
+                            dispatch(navigateTo(router, '/products'));
+                        }}
                     >
-                        Go to Products
+                        {smokeTestLoading ? 'Ingesting...' : 'Ingest Awin Feed'}
                     </MightyButton>
                 </Stack>
             </Box>

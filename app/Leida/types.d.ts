@@ -172,6 +172,7 @@ export type T_AwinListRow = {
 export type T_AwinListProps = {
     rows: T_AwinListRow[];
     loading: boolean;
+    smokeTestLoading?: boolean;
     total: number;
     page: number;
     resultsPerPage: number;
@@ -182,6 +183,7 @@ export type T_AwinListProps = {
     onSortModelChange: (nextModel: GridSortModel) => void;
     onRowSelectionModelChange: (nextSelection: GridRowSelectionModel) => void;
     onOpenProduct: (product: T_AwinProduct, rowId: string) => void;
+    onRunSmokeTest?: () => void | Promise<void>;
 };
 
 export type Product = {

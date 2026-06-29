@@ -22,7 +22,7 @@ type T_JsonObject = {
 };
 
 type T_SourceRow = {
-  id: number;
+  id: string;
   unique_key?: string | null;
   aw_product_id?: string | null;
   merchant_product_id?: string | null;
@@ -30,7 +30,10 @@ type T_SourceRow = {
 };
 
 const tenant = process.env.NEXT_PUBLIC_TENANT;
-const LOOKFANTASTIC_TABLE = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_lookfantastic';
+const LOOKFANTASTIC_TABLE =
+  process.env.AWIN_PRODUCTS_TABLE?.trim()
+  || process.env.AWIN_LOOKFANTASTIC_TABLE?.trim()
+  || 'products_awin';
 const PRODUCT_QUEUE_TABLE = process.env.AWIN_PRODUCT_QUEUE_TABLE?.trim() || 'product_queue';
 const TABLE_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const BULK_MAX = Number(process.env.AWIN_BULK_MAX || 5000);
@@ -97,10 +100,11 @@ function buildSelectionFilter(
   }
 
   const idMatchers = selectionIds.map((selectionId) => sql`
-    id::text = ${selectionId}
-    or coalesce(unique_key, '') = ${selectionId}
-    or coalesce(aw_product_id, '') = ${selectionId}
-    or coalesce(merchant_product_id, '') = ${selectionId}
+    products_awin_id::text = ${selectionId}
+    or coalesce(slug, '') = ${selectionId}
+    or coalesce(data->>'unique_key', '') = ${selectionId}
+    or coalesce(data->>'aw_product_id', '') = ${selectionId}
+    or coalesce(data->>'merchant_product_id', '') = ${selectionId}
   `);
 
   const matcher = idMatchers.slice(1).reduce((acc, clause) => sql`${acc} or ${clause}`, idMatchers[0]);
@@ -146,28 +150,31 @@ export async function POST(req: Request) {
 
   try {
     const like = `%${query}%`;
+    const productNameExpr = sql`coalesce(data->>'product_name', data->>'name', data->>'title', '')`;
+    const categoryExpr = sql`coalesce(data->>'category_name', data->>'category', '')`;
+    const brandExpr = sql`coalesce(data->>'brand_name', '')`;
     const queryFilter = query
-      ? sql`lower(coalesce(product_name, '')) like ${like}`
+      ? sql`lower(${productNameExpr}) like ${like}`
       : sql`true`;
     const categoryFilter = category
-      ? sql`lower(coalesce(category_name, '')) = ${category}`
+      ? sql`lower(${categoryExpr}) = ${category}`
       : sql`true`;
     const brandFilter = brand
-      ? sql`lower(coalesce(data->>'brand_name', '')) = ${brand}`
+      ? sql`lower(${brandExpr}) = ${brand}`
       : sql`true`;
     const selectionFilter = buildSelectionFilter(sql, selectionType, selectionIds);
     const whereClause = sql`${queryFilter} and ${categoryFilter} and ${brandFilter} and ${selectionFilter}`;
 
     const sourceRows = await sql<Array<T_SourceRow>>`
       select
-        id,
-        unique_key,
-        aw_product_id,
-        merchant_product_id,
+        products_awin_id::text as id,
+        data->>'unique_key' as unique_key,
+        data->>'aw_product_id' as aw_product_id,
+        data->>'merchant_product_id' as merchant_product_id,
         to_jsonb(public.${sql(safeSourceTable)}.*) as data
       from public.${sql(safeSourceTable)}
       where ${whereClause}
-      order by id asc
+      order by created asc
       limit ${Math.max(1, BULK_MAX)}
     `;
 
@@ -235,16 +242,18 @@ export async function POST(req: Request) {
       }
     }
 
-    const sourceIds = sourceRows.map((row) => row.id).filter((id) => Number.isFinite(id));
+    const sourceIds = sourceRows
+      .map((row) => normalizeText(row.id))
+      .filter((id): id is string => Boolean(id));
     let deletedRows = 0;
 
     if (sourceIds.length > 0) {
-      const idMatchers = sourceIds.map((id) => sql`id = ${id}`);
+      const idMatchers = sourceIds.map((id) => sql`products_awin_id::text = ${id}`);
       const idFilter = idMatchers.slice(1).reduce((acc, clause) => sql`${acc} or ${clause}`, idMatchers[0]);
-      const deleted = await sql<Array<{ id: number }>>`
+      const deleted = await sql<Array<{ id: string }>>`
         delete from public.${sql(safeSourceTable)}
         where ${idFilter}
-        returning id
+        returning products_awin_id::text as id
       `;
       deletedRows = deleted.length;
     }

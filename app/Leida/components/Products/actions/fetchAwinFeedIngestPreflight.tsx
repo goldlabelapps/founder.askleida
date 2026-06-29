@@ -16,7 +16,7 @@ type T_FetchAwinFeedIngestPreflightResult = {
 export const fetchAwinFeedIngestPreflight = (): any =>
 	async (dispatch: Dispatch): Promise<T_FetchAwinFeedIngestPreflightResult> => {
 		try {
-			const res = await fetch('/api/awin/lookfantastic/ingest?limit=300&category=Skincare', {
+			const res = await fetch('/api/awin/lookfantastic/ingest?limit=30&category=Skincare', {
 				method: 'GET',
 				headers: {
 					Accept: 'application/json',
@@ -43,6 +43,7 @@ export const fetchAwinFeedIngestPreflight = (): any =>
 			};
 		} catch (e: unknown) {
 			const message = e instanceof Error ? e.message : String(e);
+			console.error('[Smoke Test] fetchAwinFeedIngestPreflight failed', e);
 			dispatch(setUbereduxKey({ key: 'error', value: message }));
 			return {
 				ok: false,

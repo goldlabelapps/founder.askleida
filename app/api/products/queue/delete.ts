@@ -19,7 +19,10 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const tenant = process.env.NEXT_PUBLIC_TENANT;
 const PRODUCT_QUEUE_TABLE = process.env.AWIN_PRODUCT_QUEUE_TABLE?.trim() || 'product_queue';
-const AWIN_LOOKFANTASTIC_TABLE = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_lookfantastic';
+const AWIN_PRODUCTS_TABLE =
+  process.env.AWIN_PRODUCTS_TABLE?.trim()
+  || process.env.AWIN_LOOKFANTASTIC_TABLE?.trim()
+  || 'products_awin';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const MAX_DELETE_FETCH = 5000;
 
@@ -73,7 +76,7 @@ export async function DELETE(req: Request) {
 
     try {
       sql = createSqlClient();
-      const safeTable = assertSafeTableName(AWIN_LOOKFANTASTIC_TABLE);
+      const safeTable = assertSafeTableName(AWIN_PRODUCTS_TABLE);
       await sql`truncate table public.${sql(safeTable)}`;
 
       const res = makeRes({
@@ -88,7 +91,7 @@ export async function DELETE(req: Request) {
 
       return NextResponse.json(res);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to truncate awin_lookfantastic';
+      const message = error instanceof Error ? error.message : 'Failed to truncate products_awin';
       const res = makeRes({ tenant, message, severity: 'error' });
       return NextResponse.json(res, { status: 500 });
     } finally {

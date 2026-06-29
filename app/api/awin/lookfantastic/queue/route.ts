@@ -45,16 +45,13 @@ type T_ProcessResult = {
 };
 
 const tenant = process.env.NEXT_PUBLIC_TENANT;
-const LOOKFANTASTIC_TABLE = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_lookfantastic';
+const LOOKFANTASTIC_TABLE =
+  process.env.AWIN_PRODUCTS_TABLE?.trim()
+  || process.env.AWIN_LOOKFANTASTIC_TABLE?.trim()
+  || 'products_awin';
 const PRODUCT_QUEUE_TABLE = process.env.AWIN_PRODUCT_QUEUE_TABLE?.trim() || 'product_queue';
 const TABLE_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
-const ORDER_BY_MAP = {
-  id: 'id',
-  created_at: 'created_at',
-  product_name: 'product_name',
-  category_name: 'category_name',
-  search_price: 'search_price',
-} as const;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function createSqlClient() {
   const databaseUrl =
@@ -116,16 +113,13 @@ function parseDecision(value: unknown): T_Decision | null {
   return value === 'queue' || value === 'delete' ? value : null;
 }
 
-function parseProductId(value: unknown): number | null {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return Math.floor(value);
+function parseSourceId(value: unknown): string | null {
+  const text = normalizeText(value);
+  if (!text) {
+    return null;
   }
 
-  if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
-    return Number(value.trim());
-  }
-
-  return null;
+  return UUID_PATTERN.test(text) ? text : null;
 }
 
 function isPgError(value: unknown): value is T_PgError {
@@ -135,7 +129,11 @@ function isPgError(value: unknown): value is T_PgError {
 function parseOrderBy(value: unknown): T_OrderByKey {
   const input = normalizeText(value)?.toLowerCase() || '';
   if (input === 'brand') return 'brand';
-  return (input in ORDER_BY_MAP ? input : 'created_at') as T_OrderByKey;
+  if (input === 'id') return 'id';
+  if (input === 'product_name') return 'product_name';
+  if (input === 'category_name') return 'category_name';
+  if (input === 'search_price') return 'search_price';
+  return 'created_at';
 }
 
 function parseOrderDir(value: unknown) {
@@ -178,7 +176,13 @@ function buildSelectionClause(
     };
   }
 
-  const idClauses = ids.map((id) => sql`id::text = ${id}`);
+  const idClauses = ids.map((id) => sql`
+    products_awin_id::text = ${id}
+    or coalesce(slug, '') = ${id}
+    or coalesce(data->>'unique_key', '') = ${id}
+    or coalesce(data->>'aw_product_id', '') = ${id}
+    or coalesce(data->>'merchant_product_id', '') = ${id}
+  `);
   const anyIdClause = combineOrClauses(sql, idClauses);
 
   return {
@@ -201,19 +205,29 @@ async function fetchMatchingSourceRows(
   const orderDir = parseOrderDir(awinQuery?.orderDir);
   const direction = orderDir === 'asc' ? sql`asc` : sql`desc`;
   const normalizedLike = `%${query}%`;
+  const productNameExpr = sql`coalesce(data->>'product_name', data->>'name', data->>'title', '')`;
+  const categoryExpr = sql`coalesce(data->>'category_name', data->>'category', '')`;
+  const brandExpr = sql`coalesce(data->>'brand_name', '')`;
+  const numericPriceExpr = sql`
+    case
+      when nullif(regexp_replace(coalesce(data->>'search_price', data->>'price', ''), '[^0-9.-]', '', 'g'), '') ~ '^-?[0-9]+(\\.[0-9]+)?$'
+        then (nullif(regexp_replace(coalesce(data->>'search_price', data->>'price', ''), '[^0-9.-]', '', 'g'), ''))::numeric
+      else null
+    end
+  `;
 
   const filter = query
     ? sql`(
-        lower(coalesce(product_name, '')) like ${normalizedLike}
+        lower(${productNameExpr}) like ${normalizedLike}
       )`
     : sql`true`;
 
   const categoryFilter = category
-    ? sql`lower(coalesce(category_name, '')) = ${category}`
+    ? sql`lower(${categoryExpr}) = ${category}`
     : sql`true`;
 
   const brandFilter = brand
-    ? sql`lower(coalesce(data->>'brand_name', '')) = ${brand}`
+    ? sql`lower(${brandExpr}) = ${brand}`
     : sql`true`;
 
   const selectionFilter = buildSelectionClause(sql, selection);
@@ -229,44 +243,53 @@ async function fetchMatchingSourceRows(
     ? sql`${filter} and ${categoryFilter} and ${brandFilter} and ${selectionFilter.clause}`
     : sql`${filter} and ${categoryFilter} and ${brandFilter}`;
 
+  const rowsBase = sql`
+    select
+      products_awin_id as id,
+      slug,
+      ${productNameExpr} as product_name,
+      nullif(coalesce(data->>'description', ''), '') as description,
+      nullif(${categoryExpr}, '') as category_name,
+      ${numericPriceExpr} as search_price,
+      nullif(coalesce(data->>'currency', ''), '') as currency,
+      nullif(coalesce(data->>'ean', ''), '') as ean,
+      nullif(coalesce(data->>'aw_product_id', ''), '') as aw_product_id,
+      nullif(coalesce(data->>'merchant_product_id', ''), '') as merchant_product_id,
+      nullif(coalesce(data->>'aw_deep_link', data->>'deeplink', ''), '') as aw_deep_link,
+      created as created_at,
+      data
+    from public.${sql(safeSourceTable)}
+    where ${whereClause}
+  `;
+
   const rows = orderBy === 'brand'
     ? await sql<Array<Record<string, unknown>>>`
-        select
-          id,
-          unique_key,
-          product_name,
-          description,
-          category_name,
-          search_price,
-          currency,
-          ean,
-          aw_product_id,
-          merchant_product_id,
-          aw_deep_link,
-          created_at,
-          data
-        from public.${sql(safeSourceTable)}
-        where ${whereClause}
-        order by lower(coalesce(data->>'brand_name', '')) ${direction}
+        ${rowsBase}
+        order by lower(${brandExpr}) ${direction}, created ${direction}
+      `
+    : orderBy === 'id'
+    ? await sql<Array<Record<string, unknown>>>`
+        ${rowsBase}
+        order by products_awin_id ${direction}
+      `
+    : orderBy === 'product_name'
+    ? await sql<Array<Record<string, unknown>>>`
+        ${rowsBase}
+        order by lower(${productNameExpr}) ${direction}, created ${direction}
+      `
+    : orderBy === 'category_name'
+    ? await sql<Array<Record<string, unknown>>>`
+        ${rowsBase}
+        order by lower(${categoryExpr}) ${direction}, created ${direction}
+      `
+    : orderBy === 'search_price'
+    ? await sql<Array<Record<string, unknown>>>`
+        ${rowsBase}
+        order by ${numericPriceExpr} ${direction} nulls last, created ${direction}
       `
     : await sql<Array<Record<string, unknown>>>`
-        select
-          id,
-          unique_key,
-          product_name,
-          description,
-          category_name,
-          search_price,
-          currency,
-          ean,
-          aw_product_id,
-          merchant_product_id,
-          aw_deep_link,
-          created_at,
-          data
-        from public.${sql(safeSourceTable)}
-        where ${whereClause}
-        order by ${sql(ORDER_BY_MAP[orderBy as keyof typeof ORDER_BY_MAP])} ${direction}
+        ${rowsBase}
+        order by created ${direction}
       `;
 
   return {
@@ -284,43 +307,53 @@ async function deleteSourceProduct(
   let deletedRows = 0;
   let deleteBy: string | null = null;
 
-  const rowId = parseProductId(awinProduct.id);
-  const uniqueKey = normalizeText(awinProduct.unique_key);
-  const awProductId = normalizeText(awinProduct.aw_product_id);
-  const merchantProductId = normalizeText(awinProduct.merchant_product_id);
+  const nested = (awinProduct.data as T_JsonObject | undefined) || {};
+  const rowId = parseSourceId(awinProduct.id);
+  const uniqueKey = firstText(awinProduct.unique_key, nested.unique_key);
+  const awProductId = firstText(awinProduct.aw_product_id, nested.aw_product_id);
+  const merchantProductId = firstText(awinProduct.merchant_product_id, nested.merchant_product_id);
+  const slug = firstText(awinProduct.slug, nested.slug);
 
-  if (rowId !== null) {
+  if (rowId) {
     const rows = await sql<Array<Record<string, unknown>>>`
       delete from public.${sql(safeSourceTable)}
-      where id = ${rowId}
-      returning id
+      where products_awin_id = ${rowId}::uuid
+      returning products_awin_id
     `;
     deletedRows = rows.length;
     deleteBy = 'id';
   } else if (uniqueKey) {
     const rows = await sql<Array<Record<string, unknown>>>`
       delete from public.${sql(safeSourceTable)}
-      where unique_key = ${uniqueKey}
-      returning id
+      where coalesce(data->>'unique_key', '') = ${uniqueKey}
+      returning products_awin_id
     `;
     deletedRows = rows.length;
     deleteBy = 'unique_key';
   } else if (awProductId) {
     const rows = await sql<Array<Record<string, unknown>>>`
       delete from public.${sql(safeSourceTable)}
-      where aw_product_id = ${awProductId}
-      returning id
+      where coalesce(data->>'aw_product_id', '') = ${awProductId}
+      returning products_awin_id
     `;
     deletedRows = rows.length;
     deleteBy = 'aw_product_id';
   } else if (merchantProductId) {
     const rows = await sql<Array<Record<string, unknown>>>`
       delete from public.${sql(safeSourceTable)}
-      where merchant_product_id = ${merchantProductId}
-      returning id
+      where coalesce(data->>'merchant_product_id', '') = ${merchantProductId}
+      returning products_awin_id
     `;
     deletedRows = rows.length;
     deleteBy = 'merchant_product_id';
+  } else if (slug) {
+    const rows = await sql<Array<Record<string, unknown>>>`
+      delete from public.${sql(safeSourceTable)}
+      where coalesce(slug, '') = ${slug}
+      returning products_awin_id
+    `;
+    deletedRows = rows.length;
+    deleteBy = 'slug';
   }
 
   return { deletedRows, deleteBy };

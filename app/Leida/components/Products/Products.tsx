@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import {
+	Alert,
 	Card,
 	CardContent,
 	Box,
@@ -289,7 +290,10 @@ export default function Products() {
 					result.skipped !== null ? `Skipped: ${result.skipped}` : null,
 				].filter(Boolean).join(' | ') || undefined,
 			});
+
+			dispatch(navigateTo(router, '/products/awin'));
 		} catch (e: unknown) {
+			console.error('[Smoke Test] Products page smoke test failed', e);
 			const message = e instanceof Error ? e.message : String(e);
 			setUpdateRunResult({
 				severity: 'warning',
@@ -299,7 +303,7 @@ export default function Products() {
 			setLoadingAwinProducts(false);
 			refreshAwinTotal();
 		}
-	}, [dispatch, loadingAwinProducts, refreshAwinTotal]);
+	}, [dispatch, loadingAwinProducts, refreshAwinTotal, router]);
 
 	return (
 		<Box sx={{  }}>
@@ -310,23 +314,23 @@ export default function Products() {
 						// border: '1px solid ',
 						// borderColor: '#b2d612',
 					}}>
+						<Typography variant="body1" sx={{ mb: 2 }}>
+							This will check Awin for an updated feed snapshot and determine if a new ingest is required.
+						</Typography>
 						<MightyButton
-							fullWidth
 							alignLeft
 							variant="outlined"
 							startIcon="awin"
 							disabled={checkingAwinFeedSnapshot}
 							onClick={handleCheckAwinFeedSnapshot}
 						>
-							{checkingAwinFeedSnapshot ? 'Checking Awin...' : 'Cron Awin check'}
+							{checkingAwinFeedSnapshot ? 'Running Awin Cron...' : 'Run Awin Cron'}
 						</MightyButton>
 					</Box>
 					
 					{updateCheckResult ? (
-						<Box sx={{}}>
-							<Typography
-								variant="body1"
-							>
+						<Alert severity="warning">
+							<Typography variant="body1">
 								{updateCheckResult.title}
 							</Typography>
 							{updateCheckResult.description ? (
@@ -334,51 +338,55 @@ export default function Products() {
 									{updateCheckResult.description}
 								</Typography>
 							) : null}
-						</Box>
+						</Alert>
 					) : null}
 
 					<Box sx={{}}>
+						<Typography variant="body1" sx={{my: 2}}>
+							This will ingest the latest AWIN feed into products_awin.
+						</Typography>
 						<MightyButton
-							fullWidth
 							alignLeft
 							variant="outlined"
 							startIcon="warning"
 							disabled={loadingAwinProducts}
 							onClick={handleLoadAwinProducts}
 						>
-							{loadingAwinProducts ? 'Smoke Testing...' : 'Smoke Test'}
+							{loadingAwinProducts ? 'Ingesting...' : 'Ingest Awin Feed'}
 						</MightyButton>
+						
 					</Box>
 
 					{awinTotal > 0 ? (
 						<Box sx={{}}>
+							<Typography variant="body1" sx={{ my: 2 }}>
+								This will permanently clear every record from the Awin table.
+							</Typography>
 							<MightyButton
-								fullWidth
 								alignLeft
 								variant="outlined"
 								startIcon="warning"
 								disabled={deletingProductQueue}
 								onClick={() => setConfirmDeleteProductQueueOpen(true)}
 							>
-								{deletingProductQueue ? 'Dropping Awin...' : 'Drop Awin'}
+								{deletingProductQueue ? 'Dropping Awin Table...' : 'Drop Awin Table'}
 							</MightyButton>
 						</Box>
 					) : null}
 
 					{queueTotal > 0 ? (
-						<Box sx={{
-							// border: '1px solid ',
-							// borderColor: '#d612b5',
-						}}>
+						<Box sx={{}}>
+							<Typography variant="body1" sx={{ my: 2 }}>
+								This will permanently clear every record from the Queue table.
+							</Typography>
 							<MightyButton
-								fullWidth
 								alignLeft
 								variant="outlined"
 								startIcon="warning"
 								disabled={deletingQueue}
 								onClick={() => setConfirmDeleteQueueOpen(true)}
 							>
-								{deletingQueue ? 'Dropping Queue...' : 'Drop Queue'}
+								{deletingQueue ? 'Dropping Queue Table...' : 'Drop Queue Table'}
 							</MightyButton>
 						</Box>
 					) : null}

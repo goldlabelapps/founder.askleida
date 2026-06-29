@@ -55,7 +55,7 @@ export default function FounderDash() {
 
             <Grid size={{
                 xs: 12,
-                md: 6,
+                sm: 6,
                 lg: 4,
             }}>
                 <Typography variant="overline">
@@ -66,7 +66,7 @@ export default function FounderDash() {
 
             <Grid size={{
                 xs: 12,
-                md: 6,
+                sm: 6,
                 lg: 4,
             }}>
                 <Typography variant="overline">
@@ -78,7 +78,7 @@ export default function FounderDash() {
                         kind="button"
                         fullWidth
                         alignLeft
-                        variant="contained"
+                        variant="outlined"
                         startIcon="awin"
                         onClick={() => dispatch(navigateTo(router, '/products/awin'))}
                         >

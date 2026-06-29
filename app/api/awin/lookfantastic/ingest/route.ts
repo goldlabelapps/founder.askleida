@@ -9,7 +9,10 @@ import { makeRes } from '../../../';
 const tenant = process.env.NEXT_PUBLIC_TENANT;
 const LOOKFANTASTIC_SOURCE = 'lookfantastic';
 const DEFAULT_SNAPSHOT_TABLE = process.env.AWIN_FEED_SYNC_TABLE?.trim() || 'awin_feed_snapshots';
-const DEFAULT_TARGET_TABLE = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_lookfantastic';
+const DEFAULT_TARGET_TABLE =
+  process.env.AWIN_PRODUCTS_TABLE?.trim()
+  || process.env.AWIN_LOOKFANTASTIC_TABLE?.trim()
+  || 'products_awin';
 const TABLE_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 type T_SnapshotRow = {
@@ -23,27 +26,7 @@ type T_SnapshotRow = {
 type T_RawRow = Record<string, unknown>;
 
 type T_ProductRow = {
-  unique_key: string;
-  ean: string | null;
-  upc: string | null;
-  isbn: string | null;
-  mpn: string | null;
-  product_gtin: string | null;
-  aw_product_id: string | null;
-  merchant_product_id: string | null;
-  product_name: string | null;
-  description: string | null;
-  aw_deep_link: string | null;
-  merchant_deep_link: string | null;
-  merchant_name: string | null;
-  merchant_id: string | null;
-  category_name: string | null;
-  category_id: string | null;
-  search_price: number | null;
-  currency: string | null;
-  stock_quantity: string | null;
-  source_last_updated: string | null;
-  snapshot_id: number;
+  slug: string;
   data: Record<string, unknown>;
 };
 
@@ -88,15 +71,62 @@ function normalizeText(value: unknown): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-function parsePrice(value: unknown): number | null {
-  const text = normalizeText(value);
-  if (!text) {
-    return null;
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[\s\W-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function toPopulatedObject(value: Record<string, unknown>) {
+  const output: Record<string, unknown> = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (entry === null || entry === undefined) {
+      continue;
+    }
+
+    if (typeof entry === 'string') {
+      const trimmed = entry.trim();
+      if (!trimmed.length) {
+        continue;
+      }
+      output[key] = trimmed;
+      continue;
+    }
+
+    if (Array.isArray(entry)) {
+      if (entry.length) {
+        output[key] = entry;
+      }
+      continue;
+    }
+
+    if (typeof entry === 'object') {
+      const nested = toPopulatedObject(entry as Record<string, unknown>);
+      if (Object.keys(nested).length) {
+        output[key] = nested;
+      }
+      continue;
+    }
+
+    output[key] = entry;
   }
 
-  const normalized = text.replace(/,/g, '.').replace(/[^0-9.-]/g, '');
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed : null;
+  return output;
+}
+
+function buildSlug(row: T_RawRow, fallbackKey: string) {
+  const title = normalizeText(row.product_name)
+    || normalizeText(row.title)
+    || normalizeText(row.name)
+    || normalizeText(row.aw_product_id)
+    || normalizeText(row.merchant_product_id)
+    || fallbackKey;
+
+  const base = slugify(title || fallbackKey) || fallbackKey;
+  const maxLength = 96;
+  return base.slice(0, maxLength);
 }
 
 function pickUniqueValue(row: T_RawRow): string {
@@ -144,39 +174,19 @@ function maybeGunzip(input: Buffer, storagePath: string): Buffer {
 async function ensureTargetTable(sql: Sql, tableName: string) {
   await sql.unsafe(`
     create table if not exists public.${tableName} (
-      id bigserial primary key,
-      unique_key text not null,
-      ean text,
-      upc text,
-      isbn text,
-      mpn text,
-      product_gtin text,
-      aw_product_id text,
-      merchant_product_id text,
-      product_name text,
-      description text,
-      aw_deep_link text,
-      merchant_deep_link text,
-      merchant_name text,
-      merchant_id text,
-      category_name text,
-      category_id text,
-      search_price numeric,
-      currency text,
-      stock_quantity text,
-      source_last_updated text,
-      snapshot_id bigint,
-      data jsonb not null default '{}'::jsonb,
-      created_at timestamptz not null default now(),
-      updated_at timestamptz not null default now(),
-      constraint ${tableName}_unique_key_key unique (unique_key)
+      products_awin_id uuid not null default gen_random_uuid(),
+      slug text,
+      created timestamptz null default now(),
+      updated timestamptz null default now(),
+      data jsonb null,
+      constraint ${tableName}_pkey primary key (products_awin_id)
     );
 
-    create index if not exists ${tableName}_snapshot_id_idx
-      on public.${tableName} (snapshot_id);
+    create unique index if not exists ${tableName}_slug_unique_idx
+      on public.${tableName} (slug);
 
-    create index if not exists ${tableName}_ean_idx
-      on public.${tableName} (ean);
+    create index if not exists ${tableName}_created_idx
+      on public.${tableName} (created);
   `);
 }
 
@@ -193,30 +203,21 @@ async function getLatestSnapshot(sql: Sql, tableName: string) {
   return rows[0] || null;
 }
 
-function toProductRow(row: T_RawRow, snapshotId: number): T_ProductRow {
-  return {
-    unique_key: pickUniqueValue(row),
-    ean: normalizeText(row.ean),
-    upc: normalizeText(row.upc),
-    isbn: normalizeText(row.isbn),
-    mpn: normalizeText(row.mpn),
-    product_gtin: normalizeText(row.product_GTIN),
-    aw_product_id: normalizeText(row.aw_product_id),
-    merchant_product_id: normalizeText(row.merchant_product_id),
-    product_name: normalizeText(row.product_name),
-    description: normalizeText(row.description),
-    aw_deep_link: normalizeText(row.aw_deep_link),
-    merchant_deep_link: normalizeText(row.merchant_deep_link),
-    merchant_name: normalizeText(row.merchant_name),
-    merchant_id: normalizeText(row.merchant_id),
-    category_name: normalizeText(row.category_name),
-    category_id: normalizeText(row.category_id),
-    search_price: parsePrice(row.search_price),
-    currency: normalizeText(row.currency),
-    stock_quantity: normalizeText(row.stock_quantity),
-    source_last_updated: normalizeText(row.last_updated),
+function toProductRow(row: T_RawRow, snapshotId: number, targetTable: string): T_ProductRow {
+  const uniqueKey = pickUniqueValue(row);
+  const data = toPopulatedObject({
+    ...row,
     snapshot_id: snapshotId,
-    data: row,
+    source: LOOKFANTASTIC_SOURCE,
+    source_table: targetTable,
+  });
+
+  return {
+    slug: buildSlug(row, uniqueKey),
+    data: {
+      ...data,
+      unique_key: uniqueKey,
+    },
   };
 }
 
@@ -225,61 +226,26 @@ async function upsertRows(sql: Sql, tableName: string, rows: T_ProductRow[]) {
     return 0;
   }
 
+  // Avoid Postgres ON CONFLICT double-hit errors when a single batch contains duplicate slugs.
+  const dedupedRows = Array.from(
+    rows.reduce((map, row) => map.set(row.slug, row), new Map<string, T_ProductRow>()).values(),
+  );
+
   const chunkSize = 500;
   let processed = 0;
 
-  for (let index = 0; index < rows.length; index += chunkSize) {
-    const chunk = rows.slice(index, index + chunkSize);
+  for (let index = 0; index < dedupedRows.length; index += chunkSize) {
+    const chunk = dedupedRows.slice(index, index + chunkSize);
 
     await sql`
       insert into public.${sql(tableName)} ${sql(chunk, [
-        'unique_key',
-        'ean',
-        'upc',
-        'isbn',
-        'mpn',
-        'product_gtin',
-        'aw_product_id',
-        'merchant_product_id',
-        'product_name',
-        'description',
-        'aw_deep_link',
-        'merchant_deep_link',
-        'merchant_name',
-        'merchant_id',
-        'category_name',
-        'category_id',
-        'search_price',
-        'currency',
-        'stock_quantity',
-        'source_last_updated',
-        'snapshot_id',
+        'slug',
         'data',
       ])}
-      on conflict (unique_key)
+      on conflict (slug)
       do update set
-        ean = excluded.ean,
-        upc = excluded.upc,
-        isbn = excluded.isbn,
-        mpn = excluded.mpn,
-        product_gtin = excluded.product_gtin,
-        aw_product_id = excluded.aw_product_id,
-        merchant_product_id = excluded.merchant_product_id,
-        product_name = excluded.product_name,
-        description = excluded.description,
-        aw_deep_link = excluded.aw_deep_link,
-        merchant_deep_link = excluded.merchant_deep_link,
-        merchant_name = excluded.merchant_name,
-        merchant_id = excluded.merchant_id,
-        category_name = excluded.category_name,
-        category_id = excluded.category_id,
-        search_price = excluded.search_price,
-        currency = excluded.currency,
-        stock_quantity = excluded.stock_quantity,
-        source_last_updated = excluded.source_last_updated,
-        snapshot_id = excluded.snapshot_id,
         data = excluded.data,
-        updated_at = now()
+        updated = now()
     `;
 
     processed += chunk.length;
@@ -318,7 +284,7 @@ async function runIngest(req: Request) {
   const supabaseUrl = requireEnv('NEXT_PUBLIC_SUPABASE_URL');
   const serviceRoleKey = requireEnv('SUPABASE_SERVICE_ROLE_KEY');
   const snapshotTable = assertSafeTableName(DEFAULT_SNAPSHOT_TABLE, 'AWIN_FEED_SYNC_TABLE');
-  const targetTable = assertSafeTableName(DEFAULT_TARGET_TABLE, 'AWIN_LOOKFANTASTIC_TABLE');
+  const targetTable = assertSafeTableName(DEFAULT_TARGET_TABLE, 'AWIN_PRODUCTS_TABLE');
   const envLimit = process.env.AWIN_SYNC_LIMIT?.trim() || null;
   const rowLimit = parseOptionalLimit(url.searchParams.get('limit'), parseOptionalLimit(envLimit, null));
   const categoryFilter = normalizeText(url.searchParams.get('category'));
@@ -368,7 +334,7 @@ async function runIngest(req: Request) {
 
     for (const row of parsedRows) {
       try {
-        products.push(toProductRow(row, snapshot.id));
+        products.push(toProductRow(row, snapshot.id, targetTable));
       } catch {
         skipped += 1;
       }
@@ -379,7 +345,7 @@ async function runIngest(req: Request) {
     const res = makeRes({
       tenant,
       severity: 'success',
-      message: 'Synced latest Lookfantastic snapshot into awin_lookfantastic',
+      message: `Synced latest Lookfantastic snapshot into ${targetTable}`,
       data: {
         snapshot: {
           id: snapshot.id,

@@ -3,7 +3,10 @@ import postgres from 'postgres';
 import { makeRes } from '../../../';
 
 const tenant = process.env.NEXT_PUBLIC_TENANT;
-const LOOKFANTASTIC_TABLE = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_lookfantastic';
+const LOOKFANTASTIC_TABLE =
+  process.env.AWIN_PRODUCTS_TABLE?.trim()
+  || process.env.AWIN_LOOKFANTASTIC_TABLE?.trim()
+  || 'products_awin';
 const TABLE_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 function createSqlClient() {
@@ -24,7 +27,7 @@ function createSqlClient() {
 
 function assertSafeTableName(tableName: string) {
   if (!TABLE_NAME_PATTERN.test(tableName)) {
-    throw new Error('Invalid AWIN_LOOKFANTASTIC_TABLE value');
+    throw new Error('Invalid AWIN_PRODUCTS_TABLE value');
   }
   return tableName;
 }
@@ -43,7 +46,7 @@ export async function GET(req: Request) {
 
   try {
     const categoryFilter = category
-      ? sql`lower(coalesce(category_name, '')) = ${category}`
+      ? sql`lower(coalesce(data->>'category_name', data->>'category', '')) = ${category}`
       : sql`true`;
 
     const brands = await sql<T_BrandRow[]>`

@@ -3,7 +3,10 @@ import postgres from 'postgres';
 import { makeRes } from '../../../';
 
 const tenant = process.env.NEXT_PUBLIC_TENANT;
-const LOOKFANTASTIC_TABLE = process.env.AWIN_LOOKFANTASTIC_TABLE?.trim() || 'awin_lookfantastic';
+const LOOKFANTASTIC_TABLE =
+  process.env.AWIN_PRODUCTS_TABLE?.trim()
+  || process.env.AWIN_LOOKFANTASTIC_TABLE?.trim()
+  || 'products_awin';
 const TABLE_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 function createSqlClient() {
@@ -24,7 +27,7 @@ function createSqlClient() {
 
 function assertSafeTableName(tableName: string) {
   if (!TABLE_NAME_PATTERN.test(tableName)) {
-    throw new Error('Invalid AWIN_LOOKFANTASTIC_TABLE value');
+    throw new Error('Invalid AWIN_PRODUCTS_TABLE value');
   }
   return tableName;
 }
@@ -43,12 +46,12 @@ export async function GET(req: Request) {
   try {
     const categories = await sql<T_CategoryRow[]>`
       select
-        category_name,
+        min(trim(coalesce(data->>'category_name', data->>'category'))) as category_name,
         count(*)::int as count
       from public.${sql(safeTable)}
-      where coalesce(trim(category_name), '') <> ''
-      group by category_name
-      order by count(*) desc, category_name asc
+      where coalesce(trim(coalesce(data->>'category_name', data->>'category')), '') <> ''
+      group by lower(trim(coalesce(data->>'category_name', data->>'category')))
+      order by count(*) desc, min(trim(coalesce(data->>'category_name', data->>'category'))) asc
       limit ${limit}
     `;
 

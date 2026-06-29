@@ -20,6 +20,7 @@ import { Editable } from '../../../NX/NXAdmin';
 import {
     asText,
     fetchLeida,
+    fetchAwinFeedIngestPreflight,
     MightyButton,
     orderByFromSortField,
     productCategory,
@@ -75,11 +76,12 @@ export default function Awin() {
         type: 'include',
         ids: new Set<string>(),
     });
-    const [loading, setLoading] = React.useState(false);
+    const [loading, setLoading] = React.useState(true);
     const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false);
     const [bulkDecision, setBulkDecision] = React.useState<'queue' | 'delete' | null>(null);
     const [refreshNonce, setRefreshNonce] = React.useState(0);
     const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+    const [runningSmokeTest, setRunningSmokeTest] = React.useState(false);
 
     const activeSort = sortModel[0] || { field: 'product_name', sort: 'asc' as const };
     const orderBy = orderByFromSortField(activeSort.field);
@@ -115,6 +117,8 @@ export default function Awin() {
 
     const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
     const activeQuery = debouncedSearchTerm.trim();
+    const isTableEmpty = !loading && !activeQuery && total === 0;
+    const showAwinControls = !loading && !isTableEmpty;
 
     const statusMessage = React.useMemo(() => {
         if (loading) {
@@ -229,6 +233,39 @@ export default function Awin() {
         }
     }, [debouncedSearchTerm, dispatch, orderBy, orderDir, practitionerId, router, selectedCount, visibleSelectedIds]);
 
+    const handleRunSmokeTest = React.useCallback(async () => {
+        if (runningSmokeTest) {
+            return;
+        }
+
+        setRunningSmokeTest(true);
+
+        try {
+            const result = await dispatch(fetchAwinFeedIngestPreflight());
+
+            if (!result?.ok) {
+                throw new Error(result?.error || 'Failed to run smoke test.');
+            }
+
+            dispatch(setFeedback({
+                severity: 'success',
+                title: 'Awin products updated successfully.',
+            }));
+
+            setRefreshNonce((value) => value + 1);
+            dispatch(navigateTo(router, '/products/awin'));
+        } catch (e: unknown) {
+            console.error('[Smoke Test] Awin page smoke test failed', e);
+            const message = e instanceof Error ? e.message : String(e);
+            dispatch(setFeedback({
+                severity: 'warning',
+                title: message || 'Failed to run smoke test.',
+            }));
+        } finally {
+            setRunningSmokeTest(false);
+        }
+    }, [dispatch, router, runningSmokeTest]);
+
     React.useEffect(() => {
         const timeoutId = window.setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
@@ -295,7 +332,7 @@ export default function Awin() {
 
     React.useEffect(() => {
         dispatch(setLeida('header', {
-            title: `Awin (Total ${total})`,
+            title: total > 0 ? `Awin (Total ${total})` : 'Awin',
             icon: 'awin',
         }));
     }, [dispatch, total]);
@@ -303,73 +340,78 @@ export default function Awin() {
     return (
         <Box sx={{ p: 2 }}>
             <Stack spacing={2}>
-                <Box sx={{
-                    width: { xs: '100%', md: 300 },
-                    maxWidth: '100%',
-                    ml: { md: 'auto' },
-                }}>
-                    <Editable
-                        variant="standard"
-                        value={searchTerm}
-                        onChange={(value: string) => {
-                            setPage(1);
-                            setSearchTerm(value);
-                        }}
-                        disabled={Boolean(bulkDecision)}
-                        startAdornment={'search'}
-                        endAdornment={(
-                            <MightyButton
-                                kind="icon"
-                                icon="cancel"
-                                disabled={!searchTerm.trim() || Boolean(bulkDecision)}
-                                onClick={() => {
+                {showAwinControls ? (
+                    <>
+                        <Box sx={{
+                            width: { xs: '100%', md: 300 },
+                            maxWidth: '100%',
+                            ml: { md: 'auto' },
+                        }}>
+                            <Editable
+                                variant="standard"
+                                value={searchTerm}
+                                onChange={(value: string) => {
                                     setPage(1);
-                                    setSearchTerm('');
-                                    setDebouncedSearchTerm('');
+                                    setSearchTerm(value);
                                 }}
+                                disabled={Boolean(bulkDecision)}
+                                startAdornment={'search'}
+                                endAdornment={(
+                                    <MightyButton
+                                        kind="icon"
+                                        icon="cancel"
+                                        disabled={!searchTerm.trim() || Boolean(bulkDecision)}
+                                        onClick={() => {
+                                            setPage(1);
+                                            setSearchTerm('');
+                                            setDebouncedSearchTerm('');
+                                        }}
+                                    />
+                                )}
                             />
-                        )}
-                    />
-                </Box>
+                        </Box>
 
-                <Stack
-                    direction={{ xs: 'column', md: 'row' }}
-                    spacing={1.5}
-                    alignItems={{ xs: 'stretch', md: 'center' }}
-                    justifyContent="space-between"
-                >
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-
-                        <MightyButton
-                            startIcon="queue"
-                            variant="outlined"
-                            disabled={!selectedCount || Boolean(bulkDecision)}
-                            onClick={() => handleBulkProcess('queue')}
+                        <Stack
+                            direction={{ xs: 'column', md: 'row' }}
+                            spacing={1.5}
+                            alignItems={{ xs: 'stretch', md: 'center' }}
+                            justifyContent="space-between"
                         >
-                            {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add to Queue${selectedCount ? ` (${selectedCount})` : ''}`}
-                        </MightyButton>
+                            <Stack direction="row" spacing={1.5} alignItems="center">
 
-                        <MightyButton
-                            variant="text"
-                            startIcon="delete"
-                            disabled={!selectedCount || Boolean(bulkDecision)}
-                            onClick={() => handleBulkProcess('delete')}
-                        >
-                            {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
-                        </MightyButton>
+                                <MightyButton
+                                    startIcon="queue"
+                                    variant="outlined"
+                                    disabled={!selectedCount || Boolean(bulkDecision)}
+                                    onClick={() => handleBulkProcess('queue')}
+                                >
+                                    {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add to Queue${selectedCount ? ` (${selectedCount})` : ''}`}
+                                </MightyButton>
 
-                    </Stack>
-                </Stack>
+                                <MightyButton
+                                    variant="text"
+                                    startIcon="delete"
+                                    disabled={!selectedCount || Boolean(bulkDecision)}
+                                    onClick={() => handleBulkProcess('delete')}
+                                >
+                                    {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
+                                </MightyButton>
 
-                {activeQuery ? (
-                    <Typography variant="body2" color="text.secondary">
-                        {statusMessage}
-                    </Typography>
+                            </Stack>
+                        </Stack>
+
+                        {activeQuery ? (
+                            <Typography variant="body2" color="text.secondary">
+                                {statusMessage}
+                            </Typography>
+                        ) : null}
+                    </>
                 ) : null}
 
                 <AwinList
                     rows={displayedRows}
                     loading={loading}
+                    smokeTestLoading={runningSmokeTest}
                     total={displayedTotal}
                     page={page}
                     resultsPerPage={resultsPerPage}
@@ -406,6 +448,7 @@ export default function Awin() {
                     onOpenProduct={(product, rowId) => {
                         setSelectedAwin(product);
                     }}
+                    onRunSmokeTest={handleRunSmokeTest}
                 />
             </Stack>
 
