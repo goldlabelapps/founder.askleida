@@ -16,7 +16,7 @@ type T_FetchAWINFeedIngestPreflightResult = {
 export const fetchAWINFeedIngestPreflight = (): any =>
 	async (dispatch: Dispatch): Promise<T_FetchAWINFeedIngestPreflightResult> => {
 		try {
-			const res = await fetch('/api/awin/lookfantastic/ingest?limit=30&category=Skincare', {
+			const res = await fetch('/api/awin/lookfantastic/ingest?&category=Skincare', {
 				method: 'GET',
 				headers: {
 					Accept: 'application/json',
