@@ -176,7 +176,7 @@ export default function DesktopLayout({ config }: { config: any }) {
             <Drawer variant="permanent" open={open} sx={{ border: 0, marginRight: 3 }}>
                 <DrawerHeader sx={{ border: 0 }}>
                     {open && <>
-                        <Box sx={{ p:2 ,maxWidth: 150, mx: 'auto' }}>
+                        <Box sx={{ p: 2, maxWidth: 150, ml: 0, mr: 'auto', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
                             <ButtonBase
                                 onClick={handleDrawerToggle}
                                 sx={{

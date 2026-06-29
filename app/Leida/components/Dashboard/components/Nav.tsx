@@ -5,15 +5,15 @@ import {
   Box,
   Divider,
 } from '@mui/material';
-import { useDispatch } from '../../../NX/Uberedux';
-import { MiniListItem } from '../../../NX/NXAdmin';
-import { initAWIN } from '../Products/actions/initAwin';
-import { initQueue } from '../Products/actions/initQueue';
-import { LoggedInAs } from './components/index';
-import { navItems } from './navItems';
-import type { DashNavItem } from '../../types.d';
+import { useDispatch } from '../../../../NX/Uberedux';
+import { MiniListItem } from '../../../../NX/NXAdmin';
+import { initAWIN } from '../../Products/actions/initAwin';
+import { initQueue } from '../../Products/actions/initQueue';
+import { LoggedInAs } from './index';
+import { navItems } from '../navItems';
+import type { DashNavItem } from '../../../types.d';
 
-export default function DashNav({
+export default function Nav({
   open = true,
   onNavigate,
 }: {

@@ -2,7 +2,7 @@
 import { PageRouter } from './PageRouter';
 import {
     Dashboard,
-    DashNav,
+    Nav,
     navItems,
     LoggedInAs,
     DashAuth,
@@ -122,6 +122,7 @@ const AWINSearch = AWIN;
 const Awin = AWIN;
 const AwinSearch = AWIN;
 const FounderDash = Dashboard;
+const DashNav = Nav;
 const Supabase = Dashboard;
 const SupabaseUsers = Dashboard;
 const SupabasePostgres = Dashboard;
@@ -130,6 +131,7 @@ const Claude = Dashboard;
 export {
     // Components
     PageRouter,
+    Nav,
     DashNav,
     navItems,
     LoggedInAs,
