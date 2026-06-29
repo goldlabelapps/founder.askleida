@@ -71,26 +71,6 @@ export default function AdminNav({
             route: '/awin',
           }}
         />
-
-
-        <MiniListItem
-          open={open}
-          onClick={navigateToRoute}
-          options={{
-            label: 'Supabase',
-            icon: 'supabase',
-            route: '/supabase',
-          }}
-        />
-        <MiniListItem
-          open={open}
-          onClick={navigateToRoute}
-          options={{
-            label: 'Claude',
-            icon: 'claude',
-            route: '/claude',
-          }}
-        />
         <Box sx={{ height: 50 }} />
 
         <ConfirmAction

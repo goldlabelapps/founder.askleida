@@ -12,16 +12,13 @@ import { Icon, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	createPractitioner,
-	initSupabase,
 	setLeida,
-	useSupabase,
 } from '../../../../Leida';
 import { Editable } from '../../../../NX/NXAdmin';
 
 const PractitionerNew = () => {
 	const dispatch = useDispatch();
 	const router = useRouter();
-	const supabase = useSupabase();
 	const [inviteEmail, setInviteEmail] = React.useState('');
 	const [createLoading, setCreateLoading] = React.useState(false);
 	const [createError, setCreateError] = React.useState<string | null>(null);
@@ -31,12 +28,6 @@ const PractitionerNew = () => {
 	const focusEmailField = React.useCallback(() => {
 		setEmailFocusKey((value) => value + 1);
 	}, []);
-
-	React.useEffect(() => {
-		if (!supabase?.initted) {
-			dispatch(initSupabase());
-		}
-	}, [dispatch, supabase?.initted]);
 
 	React.useEffect(() => {
 		dispatch(setLeida('header', {
@@ -72,7 +63,7 @@ const PractitionerNew = () => {
 		} finally {
 			setCreateLoading(false);
 		}
-	}, [dispatch, router, focusEmailField, inviteEmail]);
+	}, [dispatch, focusEmailField, inviteEmail, router]);
 
 	return (
 		<>

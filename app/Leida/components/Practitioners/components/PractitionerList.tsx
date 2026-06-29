@@ -2,22 +2,18 @@
 import * as React from 'react';
 import { Alert, Box, LinearProgress, Stack } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { initSupabase } from '../../Supabase/actions/initSupabase';
-import { fetchSupabaseRows } from '../../Supabase/actions/fetchSupabaseRows';
-import { useSupabase } from '../../Supabase/hooks/useSupabase';
-import { PractitionerNew } from '../../../../Leida';
+import { fetchLeida, useLeidaBus } from '../../../../Leida';
 import type { T_PractitionerRecord } from '../../../types.d';
 import PractitionerCard from './PractitionerCard';
 
-const PRACTITIONERS_TABLE = 'practitioners';
+const PRACTITIONERS_ROUTE = '/api/practitioners';
 
 const PractitionerList = () => {
 	const dispatch = useDispatch();
-	const supabase = useSupabase();
+	const practitionersBus = useLeidaBus(PRACTITIONERS_ROUTE);
 	const didRequestRows = React.useRef(false);
 
-	const rowsState = supabase?.rowsByTable?.[PRACTITIONERS_TABLE] || null;
-	const rows = (Array.isArray(rowsState?.rows) ? rowsState.rows : []) as T_PractitionerRecord[];
+	const rows = (Array.isArray(practitionersBus?.data) ? practitionersBus.data : []) as T_PractitionerRecord[];
 	const sortedRows = React.useMemo(() => {
 		return [...rows]
 			.filter((row) => {
@@ -36,25 +32,17 @@ const PractitionerList = () => {
 	}, [rows]);
 
 	React.useEffect(() => {
-		if (!supabase?.initted) {
-			dispatch(initSupabase());
-		}
-	}, [dispatch, supabase?.initted]);
-
-	React.useEffect(() => {
-		if (!supabase?.initted) return;
 		if (didRequestRows.current) return;
-		dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
+		dispatch(fetchLeida(PRACTITIONERS_ROUTE));
 		didRequestRows.current = true;
-	}, [dispatch, supabase?.initted]);
+	}, [dispatch]);
 
 	return (
 		<>
-		{/* <PractitionerNew /> */}
 			<Stack spacing={1.5}>
 				
-				{rowsState?.error && <Alert severity="error">{rowsState.error}</Alert>}
-				{!rowsState?.loading && sortedRows.length === 0 && (
+				{practitionersBus?.error && <Alert severity="error">{practitionersBus.error}</Alert>}
+				{!practitionersBus?.loading && sortedRows.length === 0 && (
 					<Alert severity="info">No practitioners found.</Alert>
 				)}
 				{sortedRows.map((row, index) => {
@@ -64,7 +52,7 @@ const PractitionerList = () => {
 					return <PractitionerCard key={key} practitioner={row} />;
 				})}
 				<Box sx={{ height: 12 }}>
-					{rowsState?.loading && <LinearProgress />}
+					{practitionersBus?.loading && <LinearProgress />}
 				</Box>
 			</Stack>
 		</>

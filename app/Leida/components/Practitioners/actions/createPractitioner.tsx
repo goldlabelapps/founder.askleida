@@ -1,12 +1,11 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
-import { fetchSupabaseRows } from '../../Supabase/actions/fetchSupabaseRows';
-import { saveSupabaseRecord } from '../../Supabase/actions/saveSupabaseRecord';
+import { fetchLeida } from '../../../actions/fetchLeida';
 import { updatePractitioner } from './updatePractitioner';
 import { setFeedback } from '../../../../NX/DesignSystem'
 import type { T_CreatePractitionerArgs, T_CreatePractitionerResult } from '../../../types.d';
 
-const PRACTITIONERS_TABLE = 'practitioners';
+const PRACTITIONERS_ROUTE = '/api/practitioners';
 const ACCESS_LEVEL = 3;
 const DEFAULT_AVATAR_URL = 'https://app.askleida.com/askleida/png/default-logo.png';
 
@@ -20,18 +19,37 @@ export const createPractitioner = ({ email }: T_CreatePractitionerArgs): any =>
 		}
 
 		try {
-			const response = await dispatch(saveSupabaseRecord({
-				resource: 'practitioner-onboard',
-				email: normalizedEmail,
-				user_metadata: {
-					invited_from: 'leida-supabase-module',
-					access_level: ACCESS_LEVEL,
-					avatar: DEFAULT_AVATAR_URL,
+			const response = await fetch(PRACTITIONERS_ROUTE, {
+				method: 'POST',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
 				},
-			}));
+				body: JSON.stringify({
+					email: normalizedEmail,
+					data: {
+						invited_from: 'leida-practitioner-module',
+						access_level: ACCESS_LEVEL,
+						avatar: DEFAULT_AVATAR_URL,
+					},
+				}),
+			});
 
-			const practitioner = response?.practitioner;
-			const user = response?.user;
+			let json: any = null;
+			try {
+				json = await response.json();
+			} catch {
+				json = null;
+			}
+
+			if (!response.ok) {
+				throw new Error(json?.message || `Failed to create practitioner (${response.status})`);
+			}
+
+			const payload = json?.data || json || {};
+
+			const practitioner = payload?.practitioner;
+			const user = payload?.user;
 			const practitionerId = practitioner?.practitioner_id || null;
 
 			if (practitionerId) {
@@ -42,8 +60,7 @@ export const createPractitioner = ({ email }: T_CreatePractitionerArgs): any =>
 				}));
 			}
 
-			await dispatch(fetchSupabaseRows({ table: PRACTITIONERS_TABLE }));
-			// dispatch(setUbereduxKey({ key: 'success', value: `Invited ${normalizedEmail}` }));
+			await dispatch(fetchLeida(PRACTITIONERS_ROUTE));
 
 			dispatch(setFeedback({
 				title: `Invited ${normalizedEmail}`,

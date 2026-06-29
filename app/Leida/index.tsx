@@ -10,36 +10,27 @@ import {
 	DashSurface,
 } from './components/FounderDash';
 import DashAuth from './components/FounderDash/components/DashAuth';
-import AWIN from './components/Products/AWIN/Awin';
-import AWINDetail from './components/Products/AWIN/components/AwinDetail';
-import AWINList from './components/Products/AWIN/components/AwinList';
-import AWINProcess from './components/Products/AWIN/components/AwinProcess';
-import Queue from './components/Products/AWIN/components/Queue';
+import AWIN from './components/Products/components/Awin';
+import AWINDetail from './components/Products/components/AwinDetail';
+import AWINList from './components/Products/components/AwinList';
+import AWINProcess from './components/Products/components/AwinProcess';
+import Queue from './components/Products/components/Queue';
 import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
-import { AffiliatePlayer } from './components/AffiliatePlayer';
 import MightyButton from './components/MightyButton/MightyButton';
 import ConfirmAction from '../NX/DesignSystem/components/ConfirmAction';
 import Editable from '../NX/NXAdmin/components/UI/Editable';
 import { LeidaFlash } from './components/LeidaFlash';
-import Claude from './components/Claude/Claude';
-import ClaudePopup from './components/Claude/components/ClaudePopup';
 import { PractitionerList, PractitionerCard, SurfacePractitioners, PractitionerNew, PractitionerUpdate, Practitioners, usePractitioners } from './components/Practitioners';
-import Supabase from './components/Supabase/Supabase';
-import SupabasePostgres from './components/Supabase/components/SupabasePostgres';
-import SupabaseUsers from './components/Supabase/components/SupabaseUsers';
-import SupabaseDash from './components/Supabase/components/SupabaseDash';
-import { getLeidaContextPrompt, testProduct } from './components/Claude/prompts';
 
 // Hooks
 import { useLeida, useLeidaBus } from './hooks/useLeida';
 import { useFounderAccess } from './hooks/useFounderAccess';
-import { useAWIN } from './components/Products/AWIN/hooks/useAwin';
+import { useAWIN } from './components/Products/hooks/useAwin';
 import { useProducts } from './components/Products/hooks/useProducts';
 import { useQueue } from './components/Products/hooks/useQueue';
-import { useClaude } from './components/Claude/hooks/useClaude';
 
 // Actions
 import { initLeida } from './actions/initLeida';
@@ -50,14 +41,11 @@ import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
 import { initPractitioners } from './components/Practitioners/actions/initPractitioners';
-import { initSupabase } from './components/Supabase/actions/initSupabase';
-import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRows';
-import { saveSupabaseRecord } from './components/Supabase/actions/saveSupabaseRecord';
-import { initAWIN } from './components/Products/AWIN/actions/initAwin';
-import { setAWIN } from './components/Products/AWIN/actions/setAwin';
-import { fetchAWIN } from './components/Products/AWIN/actions/fetchAwin';
-import { processAWIN } from './components/Products/AWIN/actions/processAwin';
-import { processQueueItem } from './components/Products/AWIN/actions/processQueueItem';
+import { initAWIN } from './components/Products/actions/initAwin';
+import { setAWIN } from './components/Products/actions/setAwin';
+import { fetchAWIN } from './components/Products/actions/fetchAwin';
+import { processAWIN } from './components/Products/actions/processAwin';
+import { processQueueItem } from './components/Products/actions/processQueueItem';
 import { initProducts } from './components/Products/actions/initProducts';
 import { fetchProducts } from './components/Products/actions/fetchProducts';
 import { initQueue } from './components/Products/actions/initQueue';
@@ -68,10 +56,6 @@ import { fetchAWINFeedIngestPreflight } from './components/Products/actions/fetc
 import { fetchAWINFeedSnapshot } from './components/Products/actions/fetchAwinFeedSnapshot';
 import { setProducts } from './components/Products/actions/setProducts';
 import { setQueue } from './components/Products/actions/setQueue';
-import { initClaude } from './components/Claude/actions/initClaude';
-import { setClaude } from './components/Claude/actions/setClaude';
-import { submitClaudePrompt } from './components/Claude/actions/submitClaudePrompt';
-import { useSupabase } from './components/Supabase/hooks/useSupabase';
 
 // Lib
 import { normalizeLeidaRouteKey } from './lib/normalizeLeidaRouteKey';
@@ -135,6 +119,10 @@ import { normalizeColumnsForPreset } from './lib/normalizeColumnsForPreset';
 const AWINSearch = AWIN;
 const Awin = AWIN;
 const AwinSearch = AWIN;
+const Supabase = FounderDash;
+const SupabaseUsers = FounderDash;
+const SupabasePostgres = FounderDash;
+const Claude = FounderDash;
 
 export {
     // Components
@@ -153,18 +141,19 @@ export {
     AWINSearch,
     Awin,
     AwinSearch,
+    Supabase,
+    SupabaseUsers,
+    SupabasePostgres,
+    Claude,
     Products,
     Queue,
     ListProducts,
     RenderProduct,
     FindProduct,
-    AffiliatePlayer,
     MightyButton,
     ConfirmAction,
     Editable,
     LeidaFlash,
-    Claude,
-    ClaudePopup,
     PractitionerList,
     PractitionerCard,
     SurfacePractitioners,
@@ -172,12 +161,6 @@ export {
     PractitionerUpdate,
     Practitioners,
     usePractitioners,
-    Supabase,
-    SupabasePostgres,
-    SupabaseUsers,
-    SupabaseDash,
-    getLeidaContextPrompt,
-    testProduct,
     // Hooks
     useLeida,
     useLeidaBus,
@@ -185,18 +168,14 @@ export {
     useAWIN,
     useProducts,
     useQueue,
-    useClaude,
     useDash,
-    useSupabase,
     // Actions
     initLeida,
     initDash,
-    initSupabase,
     initAWIN,
     initProducts,
     fetchProducts,
     initQueue,
-    initClaude,
     processAWIN,
     processQueueItem,
     fetchAWIN,
@@ -206,14 +185,10 @@ export {
     deleteProductQueueRecords,
     fetchAWINFeedIngestPreflight,
     fetchAWINFeedSnapshot,
-    fetchSupabaseRows,
     setLeida,
     setAWIN,
     setProducts,
     setQueue,
-    setClaude,
-    saveSupabaseRecord,
-    submitClaudePrompt,
     deletePractitioner,
     createPractitioner,
     updateAvatar,

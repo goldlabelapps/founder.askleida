@@ -1,5 +1,5 @@
 import type { Dispatch } from 'redux';
-import { setUbereduxKey } from '../../../../../NX/Uberedux';
+import { setUbereduxKey } from '../../../../NX/Uberedux';
 import { setAWIN } from './setAwin';
 
 type T_FetchAWINParams = {
