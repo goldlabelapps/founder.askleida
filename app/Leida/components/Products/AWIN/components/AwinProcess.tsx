@@ -16,7 +16,7 @@ import { usePaywall } from '../../../../../NX/Paywall';
 import { asText } from '../../../../lib/asText';
 import { inferAWINPrice } from '../../../../lib/inferAWINPrice';
 import type { AWINProcessProps, T_AWINProcessDecision } from '../../../../types.d';
-import { processAWIN } from '../actions/processAWIN';
+import { processAWIN } from '../actions/processAwin';
 
 export default function AWINProcess({ awin = null, onProcessed }: AWINProcessProps) {
 	const dispatch = useDispatch();

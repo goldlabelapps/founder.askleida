@@ -16,7 +16,7 @@ import { useDispatch } from '../../../../../NX/Uberedux';
 import { usePaywall } from '../../../../../NX/Paywall';
 import { MightyButton } from '../../../../index';
 import { asText } from '../../../../lib/asText';
-import { processAWIN } from '../actions/processAWIN';
+import { processAWIN } from '../actions/processAwin';
 import type { I_AWINDetail } from '../../../../types.d';
 
 export default function AWINDetail({ open, awin, onClose, onProcessed }: I_AWINDetail) {
