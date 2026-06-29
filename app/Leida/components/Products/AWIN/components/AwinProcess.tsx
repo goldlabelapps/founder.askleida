@@ -62,8 +62,8 @@ export default function AWINProcess({ awin = null, onProcessed }: AWINProcessPro
 		}
 
 		setSuccess(decision === 'queue'
-			? 'Added to processing queue and removed from the AWIN source list.'
-			: 'Deleted from AWIN source list.');
+			? 'Added to processing queue and marked as queued in the AWIN source list.'
+			: 'Marked as skipped in AWIN source list.');
 		await onProcessed?.({ decision, awin });
 	};
 
@@ -121,7 +121,7 @@ export default function AWINProcess({ awin = null, onProcessed }: AWINProcessPro
 								onClick={() => handleProcess('delete')}
 								disabled={!awin || Boolean(loadingDecision)}
 							>
-								{loadingDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : 'No, Delete'}
+								{loadingDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : 'No, Skip'}
 							</Button>
 						</Stack>
 					</Stack>

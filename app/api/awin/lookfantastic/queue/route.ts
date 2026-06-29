@@ -40,8 +40,9 @@ type T_PgError = {
 type T_ProcessResult = {
   existingPending: boolean;
   queueRow: Record<string, unknown> | null;
-  deletedRows: number;
-  deleteBy: string | null;
+  sourceRowsChanged: number;
+  sourceChangeBy: string | null;
+  sourceAction: 'updated';
 };
 
 const tenant = process.env.NEXT_PUBLIC_TENANT;
@@ -299,13 +300,14 @@ async function fetchMatchingSourceRows(
   };
 }
 
-async function deleteSourceProduct(
+async function updateSourceProductQueueStatus(
   sql: ReturnType<typeof createSqlClient>,
   safeSourceTable: string,
+  status: string,
   awinProduct: T_JsonObject,
 ) {
-  let deletedRows = 0;
-  let deleteBy: string | null = null;
+  let changedRows = 0;
+  let updateBy: string | null = null;
 
   const nested = (awinProduct.data as T_JsonObject | undefined) || {};
   const rowId = parseSourceId(awinProduct.id);
@@ -316,47 +318,67 @@ async function deleteSourceProduct(
 
   if (rowId) {
     const rows = await sql<Array<Record<string, unknown>>>`
-      delete from public.${sql(safeSourceTable)}
+      update public.${sql(safeSourceTable)}
+      set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
+        'queue_status', ${status},
+        'queue_status_updated_at', now()
+      )
       where products_awin_id = ${rowId}::uuid
       returning products_awin_id
     `;
-    deletedRows = rows.length;
-    deleteBy = 'id';
+    changedRows = rows.length;
+    updateBy = 'id';
   } else if (uniqueKey) {
     const rows = await sql<Array<Record<string, unknown>>>`
-      delete from public.${sql(safeSourceTable)}
+      update public.${sql(safeSourceTable)}
+      set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
+        'queue_status', ${status},
+        'queue_status_updated_at', now()
+      )
       where coalesce(data->>'unique_key', '') = ${uniqueKey}
       returning products_awin_id
     `;
-    deletedRows = rows.length;
-    deleteBy = 'unique_key';
+    changedRows = rows.length;
+    updateBy = 'unique_key';
   } else if (awProductId) {
     const rows = await sql<Array<Record<string, unknown>>>`
-      delete from public.${sql(safeSourceTable)}
+      update public.${sql(safeSourceTable)}
+      set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
+        'queue_status', ${status},
+        'queue_status_updated_at', now()
+      )
       where coalesce(data->>'aw_product_id', '') = ${awProductId}
       returning products_awin_id
     `;
-    deletedRows = rows.length;
-    deleteBy = 'aw_product_id';
+    changedRows = rows.length;
+    updateBy = 'aw_product_id';
   } else if (merchantProductId) {
     const rows = await sql<Array<Record<string, unknown>>>`
-      delete from public.${sql(safeSourceTable)}
+      update public.${sql(safeSourceTable)}
+      set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
+        'queue_status', ${status},
+        'queue_status_updated_at', now()
+      )
       where coalesce(data->>'merchant_product_id', '') = ${merchantProductId}
       returning products_awin_id
     `;
-    deletedRows = rows.length;
-    deleteBy = 'merchant_product_id';
+    changedRows = rows.length;
+    updateBy = 'merchant_product_id';
   } else if (slug) {
     const rows = await sql<Array<Record<string, unknown>>>`
-      delete from public.${sql(safeSourceTable)}
+      update public.${sql(safeSourceTable)}
+      set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
+        'queue_status', ${status},
+        'queue_status_updated_at', now()
+      )
       where coalesce(slug, '') = ${slug}
       returning products_awin_id
     `;
-    deletedRows = rows.length;
-    deleteBy = 'slug';
+    changedRows = rows.length;
+    updateBy = 'slug';
   }
 
-  return { deletedRows, deleteBy };
+  return { changedRows, updateBy };
 }
 
 async function processSingleAwinProduct({
@@ -444,16 +466,15 @@ async function processSingleAwinProduct({
     }
   }
 
-  const shouldDeleteSource = decision === 'delete' || decision === 'queue';
-  const { deletedRows, deleteBy } = shouldDeleteSource
-    ? await deleteSourceProduct(sql, safeSourceTable, awinProduct)
-    : { deletedRows: 0, deleteBy: null };
+  const sourceStatus = decision === 'queue' ? 'queued' : 'skipped';
+  const sourceResult = await updateSourceProductQueueStatus(sql, safeSourceTable, sourceStatus, awinProduct);
 
   return {
     existingPending,
     queueRow,
-    deletedRows,
-    deleteBy,
+    sourceRowsChanged: sourceResult.changedRows,
+    sourceChangeBy: sourceResult.updateBy,
+    sourceAction: 'updated',
   };
 }
 
@@ -504,17 +525,18 @@ export async function POST(req: Request) {
         tenant,
         severity: 'success',
         message: result.existingPending
-          ? 'Pending queue decision already exists for this product and the source row was removed'
+          ? 'Pending queue decision already exists for this product and the source row was marked as queued'
           : decision === 'delete'
-            ? 'Deleted matching source product rows'
-            : 'Queued product for processing and removed it from the source table',
+            ? 'Marked matching source product rows as skipped'
+            : 'Queued product for processing and marked source row as queued',
         data: {
           decision,
           queue: result.queueRow,
           existingPending: result.existingPending,
           sourceTable: safeSourceTable,
-          deletedRows: result.deletedRows,
-          deleteBy: result.deleteBy,
+          sourceRowsChanged: result.sourceRowsChanged,
+          sourceChangeBy: result.sourceChangeBy,
+          sourceAction: result.sourceAction,
         },
       });
 
@@ -535,7 +557,7 @@ export async function POST(req: Request) {
 
     let processedCount = 0;
     let existingPendingCount = 0;
-    let deletedRows = 0;
+    let sourceRowsChanged = 0;
 
     for (const row of rows) {
       const result = await processSingleAwinProduct({
@@ -548,7 +570,7 @@ export async function POST(req: Request) {
       });
 
       processedCount += 1;
-      deletedRows += result.deletedRows;
+      sourceRowsChanged += result.sourceRowsChanged;
       if (result.existingPending) {
         existingPendingCount += 1;
       }
@@ -558,15 +580,15 @@ export async function POST(req: Request) {
       tenant,
       severity: 'success',
       message: decision === 'queue'
-        ? `Queued ${processedCount} product${processedCount === 1 ? '' : 's'} and removed them from the source table`
-        : `Deleted ${processedCount} product${processedCount === 1 ? '' : 's'} from the source table`,
+        ? `Queued ${processedCount} product${processedCount === 1 ? '' : 's'} and marked them as queued in the source table`
+        : `Marked ${processedCount} product${processedCount === 1 ? '' : 's'} as skipped in the source table`,
       data: {
         decision,
         sourceTable: safeSourceTable,
         matchedCount: rows.length,
         processedCount,
         existingPendingCount,
-        deletedRows,
+        sourceRowsChanged,
         selection: {
           type: selectionType,
           idsCount: selectionIds.length,

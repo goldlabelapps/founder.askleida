@@ -8,6 +8,7 @@ type T_FetchAWINParams = {
     orderBy: string;
     orderDir: 'asc' | 'desc';
     q?: string;
+    includeQueued?: boolean;
 };
 
 type T_FetchAWINResult = {
@@ -21,7 +22,7 @@ type T_FetchAWINResult = {
 };
 
 export const fetchAWIN =
-    ({ page, limit, orderBy, orderDir, q }: T_FetchAWINParams): any =>
+    ({ page, limit, orderBy, orderDir, q, includeQueued = false }: T_FetchAWINParams): any =>
         async (dispatch: Dispatch): Promise<T_FetchAWINResult> => {
             try {
                 const offset = Math.max(0, (page - 1) * limit);
@@ -36,6 +37,7 @@ export const fetchAWIN =
                 if (trimmedQuery) {
                     params.set('q', trimmedQuery);
                 }
+                params.set('includeQueued', includeQueued ? '1' : '0');
 
                 const route = `/api/awin?${params.toString()}`;
                 const res = await fetch(route, {
@@ -68,6 +70,7 @@ export const fetchAWIN =
                     orderBy,
                     orderDir,
                     q: trimmedQuery,
+                    includeQueued,
                 }));
 
                 return {

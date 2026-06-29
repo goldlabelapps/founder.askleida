@@ -53,11 +53,20 @@ function parseOrderDir(value: string | null) {
   return (value || '').trim().toLowerCase() === 'asc' ? 'asc' : 'desc';
 }
 
+function parseBooleanParam(value: string | null, fallback: boolean) {
+  const input = (value || '').trim().toLowerCase();
+  if (!input) return fallback;
+  if (['1', 'true', 'yes', 'on'].includes(input)) return true;
+  if (['0', 'false', 'no', 'off'].includes(input)) return false;
+  return fallback;
+}
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const query = (url.searchParams.get('q') || '').trim();
   const category = (url.searchParams.get('category') || '').trim().toLowerCase();
   const brand = (url.searchParams.get('brand') || '').trim().toLowerCase();
+  const includeQueued = parseBooleanParam(url.searchParams.get('includeQueued'), false);
   const limit = parseIntParam(url.searchParams.get('limit'), 25, 1, 100);
   const offset = parseIntParam(url.searchParams.get('offset'), 0, 0, 20000);
   const orderBy = parseOrderBy(url.searchParams.get('orderBy'));
@@ -73,6 +82,7 @@ export async function GET(req: Request) {
     const descriptionExpr = sql`coalesce(data->>'description', '')`;
     const categoryExpr = sql`coalesce(data->>'category_name', data->>'category', '')`;
     const brandExpr = sql`coalesce(data->>'brand_name', '')`;
+    const queueStatusExpr = sql`lower(coalesce(data->>'queue_status', ''))`;
     const awProductIdExpr = sql`coalesce(data->>'aw_product_id', '')`;
     const merchantProductIdExpr = sql`coalesce(data->>'merchant_product_id', '')`;
     const eanExpr = sql`coalesce(data->>'ean', '')`;
@@ -104,7 +114,11 @@ export async function GET(req: Request) {
       ? sql`lower(${brandExpr}) = ${brand}`
       : sql`true`;
 
-    const whereClause = sql`${filter} and ${categoryFilter} and ${brandFilter}`;
+    const queueStatusFilter = includeQueued
+      ? sql`true`
+      : sql`${queueStatusExpr} not in ('queued', 'skipped')`;
+
+    const whereClause = sql`${filter} and ${categoryFilter} and ${brandFilter} and ${queueStatusFilter}`;
     const direction = orderDir === 'asc' ? sql`asc` : sql`desc`;
 
     const rowsBase = sql`
@@ -188,6 +202,7 @@ export async function GET(req: Request) {
         query,
         category,
         brand,
+        includeQueued,
         limit,
         offset,
         orderBy,

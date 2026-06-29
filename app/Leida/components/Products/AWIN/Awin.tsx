@@ -141,8 +141,8 @@ export default function AWIN() {
         dispatch(setFeedback({
             severity: 'success',
             title: decision === 'queue'
-                ? `Queued ${productName(processedAWIN)} and removed it from the AWIN source table.`
-                : `Deleted ${productName(processedAWIN)}.`,
+                ? `Queued ${productName(processedAWIN)} and marked it as queued in the AWIN source table.`
+                : `Marked ${productName(processedAWIN)} as skipped in the AWIN source table.`,
         }));
         setSelectionModel({
             type: 'include',
@@ -211,8 +211,8 @@ export default function AWIN() {
             }
 
             const actionLabel = decision === 'queue'
-                ? 'Queued and removed.'
-                : 'Deleted.';
+                ? 'Queued and marked as queued.'
+                : 'Marked as skipped.';
             dispatch(setFeedback({
                 severity: 'success',
                 title: `${processedCount} product${processedCount === 1 ? '' : 's'} ${actionLabel}.`,
@@ -394,7 +394,7 @@ export default function AWIN() {
                                     disabled={!selectedCount || Boolean(bulkDecision)}
                                     onClick={() => handleBulkProcess('delete')}
                                 >
-                                    {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Delete${selectedCount ? ` (${selectedCount})` : ''}`}
+                                    {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Skip${selectedCount ? ` (${selectedCount})` : ''}`}
                                 </MightyButton>
 
                             </Stack>

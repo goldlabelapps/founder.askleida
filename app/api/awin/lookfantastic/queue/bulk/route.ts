@@ -245,23 +245,28 @@ export async function POST(req: Request) {
     const sourceIds = sourceRows
       .map((row) => normalizeText(row.id))
       .filter((id): id is string => Boolean(id));
-    let deletedRows = 0;
+    let sourceRowsChanged = 0;
 
     if (sourceIds.length > 0) {
       const idMatchers = sourceIds.map((id) => sql`products_awin_id::text = ${id}`);
       const idFilter = idMatchers.slice(1).reduce((acc, clause) => sql`${acc} or ${clause}`, idMatchers[0]);
-      const deleted = await sql<Array<{ id: string }>>`
-        delete from public.${sql(safeSourceTable)}
+      const queueStatus = decision === 'queue' ? 'queued' : 'skipped';
+      const updated = await sql<Array<{ id: string }>>`
+        update public.${sql(safeSourceTable)}
+        set data = coalesce(data, '{}'::jsonb) || jsonb_build_object(
+          'queue_status', ${queueStatus},
+          'queue_status_updated_at', now()
+        )
         where ${idFilter}
         returning products_awin_id::text as id
       `;
-      deletedRows = deleted.length;
+      sourceRowsChanged = updated.length;
     }
 
     const limited = sourceRows.length >= Math.max(1, BULK_MAX);
     const message = decision === 'queue'
-      ? `Queued ${queuedRows} rows and removed ${deletedRows} from AWIN source${skippedRows ? ` (${skippedRows} already queued)` : ''}`
-      : `Deleted ${deletedRows} rows from AWIN source`;
+      ? `Queued ${queuedRows} rows and marked ${sourceRowsChanged} as queued in AWIN source${skippedRows ? ` (${skippedRows} already queued)` : ''}`
+      : `Marked ${sourceRowsChanged} rows as skipped in AWIN source`;
 
     const res = makeRes({
       tenant,
@@ -271,7 +276,7 @@ export async function POST(req: Request) {
         decision,
         matchedRows: sourceRows.length,
         queuedRows,
-        deletedRows,
+        sourceRowsChanged,
         skippedRows,
         limited,
       },

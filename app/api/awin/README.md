@@ -74,11 +74,12 @@ Purpose:
 - `offset` (optional): pagination offset, clamped `0..20000`, default `0`.
 - `orderBy` (optional): one of `created_at`, `id`, `product_name`, `category_name`, `search_price`. Default `created_at`.
 - `orderDir` (optional): `asc` or `desc`. Default `desc`.
+- `includeQueued` (optional): include rows where `data.queue_status = "queued"`. Defaults to `false`.
 
 - Response data shape:
 
 - `table`, `query`, `category`, `brand`
-- `limit`, `offset`, `orderBy`, `orderDir`
+- `includeQueued`, `limit`, `offset`, `orderBy`, `orderDir`
 - `count` (total rows matching filter)
 - `rows` (paged row set)
 
@@ -278,7 +279,14 @@ Purpose:
 
 - Supports two decisions:
   - `queue` (add to processing queue by creating a row in `public.product_queue`)
-  - `delete` (delete matching row(s) from `awin_lookfantastic` only; no queue row is created)
+  - `delete` (mark matching source row(s) as skipped in `products_awin`; no queue row is created)
+
+Queue behavior:
+
+- `queue` no longer deletes the AWIN source row.
+- Instead it updates `products_awin.data.queue_status = "queued"` (plus `queue_status_updated_at`).
+- `delete` also does not delete source rows; it updates `products_awin.data.queue_status = "skipped"`.
+- `GET /api/awin` excludes queued and skipped rows by default, so processed/ignored products are hidden from the main AWIN list while still retained for feed comparison/update workflows.
 
 Required body fields:
 

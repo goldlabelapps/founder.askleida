@@ -239,7 +239,7 @@ export default function AWINDetail({ open, awin, onClose, onProcessed }: I_AWIND
 						fullWidth
 						disabled={!awin || !practitionerId || deleting || queueing}
 						onClick={() => setConfirmDeleteOpen(true)}>
-						{deleting ? 'Deleting...' : 'Delete from AWIN'}
+						{deleting ? 'Skipping...' : 'Skip in AWIN'}
 					</MightyButton>
 					<MightyButton
 						startIcon={'queue'}
@@ -255,8 +255,8 @@ export default function AWINDetail({ open, awin, onClose, onProcessed }: I_AWIND
 			<ConfirmAction
 				open={confirmDeleteOpen}
 				icon="delete"
-				title="Delete this AWIN product?"
-				body="This will remove it from the AWIN source list."
+				title="Skip this AWIN product?"
+				body="This will mark it as skipped and hide it from the AWIN source list."
 				handleConfirm={handleDeleteConfirm}
 				handleClose={() => setConfirmDeleteOpen(false)}
 				zIndex={1500}

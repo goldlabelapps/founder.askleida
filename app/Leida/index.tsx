@@ -10,11 +10,11 @@ import {
 	DashSurface,
 } from './components/FounderDash';
 import DashAuth from './components/FounderDash/components/DashAuth';
-import AWIN from './components/AWIN/AWIN';
-import AWINDetail from './components/AWIN/components/AWINDetail';
-import AWINList from './components/AWIN/components/AWINList';
-import AWINProcess from './components/AWIN/components/AWINProcess';
-import Queue from './components/AWIN/components/Queue';
+import AWIN from './components/Products/AWIN/AWIN';
+import AWINDetail from './components/Products/AWIN/components/AWINDetail';
+import AWINList from './components/Products/AWIN/components/AWINList';
+import AWINProcess from './components/Products/AWIN/components/AWINProcess';
+import Queue from './components/Products/AWIN/components/Queue';
 import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
@@ -36,7 +36,7 @@ import { getLeidaContextPrompt, testProduct } from './components/Claude/prompts'
 // Hooks
 import { useLeida, useLeidaBus } from './hooks/useLeida';
 import { useFounderAccess } from './hooks/useFounderAccess';
-import { useAWIN } from './components/AWIN/hooks/useAWIN';
+import { useAWIN } from './components/Products/AWIN/hooks/useAWIN';
 import { useProducts } from './components/Products/hooks/useProducts';
 import { useQueue } from './components/Products/hooks/useQueue';
 import { useClaude } from './components/Claude/hooks/useClaude';
@@ -53,11 +53,11 @@ import { initPractitioners } from './components/Practitioners/actions/initPracti
 import { initSupabase } from './components/Supabase/actions/initSupabase';
 import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRows';
 import { saveSupabaseRecord } from './components/Supabase/actions/saveSupabaseRecord';
-import { initAWIN } from './components/AWIN/actions/initAWIN';
-import { setAWIN } from './components/AWIN/actions/setAWIN';
-import { fetchAWIN } from './components/AWIN/actions/fetchAWIN';
-import { processAWIN } from './components/AWIN/actions/processAWIN';
-import { processQueueItem } from './components/AWIN/actions/processQueueItem';
+import { initAWIN } from './components/Products/AWIN/actions/initAWIN';
+import { setAWIN } from './components/Products/AWIN/actions/setAWIN';
+import { fetchAWIN } from './components/Products/AWIN/actions/fetchAWIN';
+import { processAWIN } from './components/Products/AWIN/actions/processAWIN';
+import { processQueueItem } from './components/Products/AWIN/actions/processQueueItem';
 import { initProducts } from './components/Products/actions/initProducts';
 import { fetchProducts } from './components/Products/actions/fetchProducts';
 import { initQueue } from './components/Products/actions/initQueue';
