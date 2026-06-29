@@ -109,8 +109,8 @@ const PractitionerCard = ({
 								sx={{ alignSelf: 'flex-start', backgroundColor: 'common.white', mr: 1 }}
 							/>
 						</Box>
-						<Box sx={{mx: 1}}>
-							<Typography variant="body1">
+						<Box sx={{m: 0.5}}>
+							<Typography variant="h6">
 								{displayName}
 							</Typography>
 							

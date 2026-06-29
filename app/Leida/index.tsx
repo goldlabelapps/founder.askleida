@@ -38,7 +38,7 @@ import { useQueue } from './components/Products/hooks/useQueue';
 import { initLeida } from './actions/initLeida';
 import { fetchLeida } from './actions/fetchLeida';
 import { setLeida } from './actions/setLeida';
-import { deletePractitioner } from './actions/deletePractitioner';
+import { deletePractitioner } from './components/Practitioners/actions/deletePractitioner';
 import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
 import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
 import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
@@ -121,6 +121,7 @@ import { normalizeColumnsForPreset } from './lib/normalizeColumnsForPreset';
 const AWINSearch = AWIN;
 const Awin = AWIN;
 const AwinSearch = AWIN;
+const FounderDash = Dashboard;
 const Supabase = Dashboard;
 const SupabaseUsers = Dashboard;
 const SupabasePostgres = Dashboard;
@@ -143,6 +144,7 @@ export {
     AWINSearch,
     Awin,
     AwinSearch,
+    FounderDash,
     Supabase,
     SupabaseUsers,
     SupabasePostgres,
