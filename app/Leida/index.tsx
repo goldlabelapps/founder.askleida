@@ -133,6 +133,8 @@ import { getTableFormPreset } from './lib/getTableFormPreset';
 import { normalizeColumnsForPreset } from './lib/normalizeColumnsForPreset';
 
 const AWINSearch = AWIN;
+const Awin = AWIN;
+const AwinSearch = AWIN;
 
 export {
     // Components
@@ -149,6 +151,8 @@ export {
     AWINList,
     AWINProcess,
     AWINSearch,
+    Awin,
+    AwinSearch,
     Products,
     Queue,
     ListProducts,
