@@ -3,13 +3,9 @@ import * as React from 'react';
 import type { I_PageRouter } from './types';
 import { usePathname } from 'next/navigation';
 import {
-  Supabase,
-  SupabaseUsers,
-  SupabasePostgres,
   PractitionerUpdate, 
   Practitioners,
   FounderDash,
-  Claude,
   AWINSearch,
   AWIN,
   PractitionerNew,
@@ -33,12 +29,6 @@ export function PageRouter({ active }: I_PageRouter) {
   if (['practitioners', 'pracitioners', 'paractitioners'].includes(normalizedRoute)) return <Practitioners />;
 
   switch (normalizedRoute) {
-    case 'supabase':
-      return <Supabase />;
-    case 'supabase/postgres':
-      return <SupabasePostgres />;
-    case 'supabase/users':
-      return <SupabaseUsers />;
     case 'products/awin':
       return <AWIN />;
     case 'products/awin/search':
@@ -47,8 +37,6 @@ export function PageRouter({ active }: I_PageRouter) {
       return <AWIN />;
     case 'awin/search':
       return <AWINSearch />;
-    case 'claude':
-      return <Claude />;
     case 'queue':
     case 'products/queue':
       return <Queue />;

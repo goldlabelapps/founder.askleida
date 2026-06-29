@@ -329,11 +329,6 @@ export type T_ListProductsProps = {
     onProductSelect?: (product: T_Product) => void;
 };
 
-export type AffiliatePlayerProps = {
-    products?: T_Product[];
-    selectedProduct?: T_Product | null;
-};
-
 export type T_Record = Record<string, unknown>;
 
 export type T_PractitionerData = {
@@ -382,19 +377,6 @@ export type I_DashCard = {
 
 export interface I_UserSpot {
     onClick?: React.MouseEventHandler<HTMLButtonElement>;
-}
-
-export interface I_ClaudePopup {
-    open: boolean;
-    bodyText: string;
-    icon?: I_Icon['icon'];
-    title?: string;
-}
-
-export interface I_ClaudePromptAccordion {
-    title: string;
-    content: string;
-    defaultExpanded?: boolean;
 }
 
 export type T_FetchSupabaseRowsArgs = {
