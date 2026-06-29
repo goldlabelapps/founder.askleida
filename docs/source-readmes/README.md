@@ -1,8 +1,8 @@
-# Migrated README Archive
+# NX° Source Docs
 
-This directory contains README files moved from around the repository into a single documentation root.
+This directory contains source-first documentation for NX° and related modules, organized under the main docs tree.
 
-## Migration Map
+## Source Map
 
 | Original location | New location |
 |---|---|
@@ -20,5 +20,6 @@ This directory contains README files moved from around the repository into a sin
 
 ## Notes
 
-- This archive preserves source context and original wording.
-- Curated, up-to-date dashboard documentation lives in `docs/founder-dashboard/`.
+- These docs preserve source context and original wording for implementation-level detail.
+- Curated dashboard guides live in `docs/founder-dashboard/`.
+- This folder is an active NX° docs category, not an archive.
