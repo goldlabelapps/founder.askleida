@@ -14,7 +14,7 @@ import {
 import { useDispatch } from '../../../../NX/Uberedux';
 import { usePaywall } from '../../../../NX/Paywall';
 import { asText } from '../../../lib/asText';
-import { inferAWINPrice } from '../../../lib/inferAWINPrice';
+import { inferPrice } from '../../../lib/inferPrice';
 import type { AWINProcessProps, T_AWINProcessDecision } from '../../../types.d';
 import { processAWIN } from '../actions/processAwin';
 
@@ -24,7 +24,7 @@ export default function AWINProcess({ awin = null, onProcessed }: AWINProcessPro
 	const steps = ['Confirm product'];
 	const productName = awin ? asText(awin.product_name) || 'Untitled product' : '';
 	const category = awin ? asText(awin.category_name) : '';
-	const price = awin ? inferAWINPrice(awin) : '';
+	const price = awin ? inferPrice(awin) : '';
 	const currency = awin ? asText(awin.currency) || 'GBP' : 'GBP';
 	const [loadingDecision, setLoadingDecision] = React.useState<T_AWINProcessDecision | null>(null);
 	const [error, setError] = React.useState<string>('');
