@@ -70,7 +70,7 @@ import { parseArrayData } from './lib/parseArrayData';
 import { toAccessLevel } from './lib/toAccessLevel';
 import { asText } from './lib/asText';
 import { asId } from './lib/asId';
-import { inferAWINPrice } from './lib/inferAWINPrice';
+import { inferPrice } from './lib/inferPrice';
 import { productIdentity } from './lib/productIdentity';
 import { productName } from './lib/productName';
 import { productCategory } from './lib/productCategory';
@@ -209,7 +209,7 @@ export {
     toAccessLevel,
     asText,
     asId,
-    inferAWINPrice,
+    inferPrice,
     productIdentity,
     productName,
     productCategory,
