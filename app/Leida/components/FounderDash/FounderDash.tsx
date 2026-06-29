@@ -9,12 +9,9 @@ import {
 import { navigateTo } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
 import { 
-    fetchLeida,
     setLeida,
-    useLeida,
     initDash, 
     useDash,
-    useLeidaBus,
     SurfacePractitioners,
     MightyButton,
     PractitionerList,
@@ -24,21 +21,11 @@ export default function FounderDash() {
     
     const dispatch = useDispatch();
     const router = useRouter();
-    const leida = useLeida();
     const dash = useDash();
-    const { data: practitionersData, loading: practitionersLoading } = useLeidaBus('/api/practitioners');
-    const didInit = React.useRef(false);
-    const practitionersRouteEntry = leida?.bus?.['/api/practitioners'];
     
     React.useEffect(() => {
-        if (!didInit.current) {
-            if (!leida || !leida.dash) dispatch(initDash());
-            if (!practitionersRouteEntry) {
-                dispatch(fetchLeida('/api/practitioners'));
-            }
-            didInit.current = true;
-        }
-    }, [dispatch, leida, practitionersRouteEntry]);
+        dispatch(initDash());
+    }, [dispatch]);
 
     React.useEffect(() => {
         if (dash && dash.title) {
