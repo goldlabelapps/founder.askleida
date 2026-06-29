@@ -119,6 +119,10 @@ import { normalizeColumnsForPreset } from './lib/normalizeColumnsForPreset';
 const AWINSearch = AWIN;
 const Awin = AWIN;
 const AwinSearch = AWIN;
+const Supabase = FounderDash;
+const SupabaseUsers = FounderDash;
+const SupabasePostgres = FounderDash;
+const Claude = FounderDash;
 
 export {
     // Components
@@ -137,6 +141,10 @@ export {
     AWINSearch,
     Awin,
     AwinSearch,
+    Supabase,
+    SupabaseUsers,
+    SupabasePostgres,
+    Claude,
     Products,
     Queue,
     ListProducts,
