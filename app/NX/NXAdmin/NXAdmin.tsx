@@ -34,7 +34,6 @@ import {
 import {
   initLeida,
   useFounderAccess,
-  useLeida,
   getRandomLoadingMessage,
 } from '../../Leida';
 
@@ -48,10 +47,8 @@ export default function NXAdmin({
 
   const dispatch = useDispatch();
   const paywall = usePaywall();
-  const leida = useLeida();
   const isAuthed = useIsAuthed();
   const { isAllowed: hasFounderAccess, isCheckingAccess } = useFounderAccess();
-  const didInitLeida = React.useRef(false);
   const { authChecked } = paywall || {};
   const designSystem = useDesignSystem();
   const configThemes = config?.cartridges?.designSystem?.themes || {};
@@ -70,11 +67,8 @@ export default function NXAdmin({
   });
 
   React.useEffect(() => {
-    if (!didInitLeida.current) {
-      if (!leida || !leida.initted) dispatch(initLeida());
-      didInitLeida.current = true;
-    }
-  }, [dispatch, leida]);
+    dispatch(initLeida());
+  }, [dispatch]);
 
 
   React.useEffect(() => {

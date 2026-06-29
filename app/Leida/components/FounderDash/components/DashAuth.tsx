@@ -6,7 +6,6 @@ import {
 } from '../../../../NX/Paywall';
 import {
     fetchLeida,
-    useLeida,
     useLeidaBus,
 } from '../../../../Leida';
 import { useDispatch } from '../../../../NX/Uberedux';
@@ -15,16 +14,26 @@ import type { I_UserSpot } from '../../../types.d';
 export default function DashAuth({ onClick }: I_UserSpot) {
     const dispatch = useDispatch();
     const paywall = usePaywall();
-    const leida = useLeida();
     const uid = paywall ? paywall.uid : null;
     const user = paywall?.user || null;
     const { data } = useLeidaBus('practitioners');
-    const practitionersRouteEntry = leida?.bus?.['/api/practitioners'];
+    const [requestedUid, setRequestedUid] = React.useState<string | null>(null);
+    const hasPractitionerRows = Array.isArray(data) && data.length > 0;
 
     React.useEffect(() => {
-        if (!uid || practitionersRouteEntry) return;
+        if (!uid) {
+            setRequestedUid(null);
+            return;
+        }
+        if (hasPractitionerRows) {
+            setRequestedUid(uid);
+            return;
+        }
+        if (requestedUid === uid) return;
+
+        setRequestedUid(uid);
         dispatch(fetchLeida('practitioners'));
-    }, [dispatch, practitionersRouteEntry, uid]);
+    }, [dispatch, hasPractitionerRows, requestedUid, uid]);
 
     const practitionerRecord = React.useMemo(() => {
         if (!uid || !Array.isArray(data)) return null;

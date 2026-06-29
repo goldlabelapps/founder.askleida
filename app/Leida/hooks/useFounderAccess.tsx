@@ -4,33 +4,43 @@ import { useDispatch } from '../../NX/Uberedux';
 import { usePaywall } from '../../NX/Paywall';
 import { fetchLeida } from '../actions/fetchLeida';
 import { toAccessLevel } from '../lib/toAccessLevel';
-import { useLeida, useLeidaBus } from './useLeida';
+import { useLeidaBus } from './useLeida';
 
 const ALLOWED_ACCESS_LEVELS = new Set([3, 4]);
 
 export function useFounderAccess() {
     const dispatch = useDispatch();
     const paywall = usePaywall();
-    const leida = useLeida();
     const uid = typeof paywall?.uid === 'string' ? paywall.uid : null;
-    const { loading, data } = useLeidaBus('practitioners');
+    const { data } = useLeidaBus('practitioners');
     const [requestedUid, setRequestedUid] = React.useState<string | null>(null);
-    const practitionersRouteEntry = leida?.bus?.['/api/practitioners'];
+    const [isFetchingAccess, setIsFetchingAccess] = React.useState(false);
+    const inFlightUidRef = React.useRef<string | null>(null);
 
     React.useEffect(() => {
         if (!uid) {
             setRequestedUid(null);
+            setIsFetchingAccess(false);
+            inFlightUidRef.current = null;
             return;
         }
-        if (practitionersRouteEntry) {
-            setRequestedUid(uid);
-            return;
-        }
-        if (requestedUid === uid) return;
+        if (requestedUid === uid || inFlightUidRef.current === uid) return;
 
-        setRequestedUid(uid);
-        dispatch(fetchLeida('practitioners'));
-    }, [dispatch, practitionersRouteEntry, requestedUid, uid]);
+        inFlightUidRef.current = uid;
+        setIsFetchingAccess(true);
+
+        void (async () => {
+            try {
+                await dispatch(fetchLeida('practitioners'));
+            } finally {
+                setRequestedUid(uid);
+                setIsFetchingAccess(false);
+                if (inFlightUidRef.current === uid) {
+                    inFlightUidRef.current = null;
+                }
+            }
+        })();
+    }, [dispatch, requestedUid, uid]);
 
     const practitionerRecord = React.useMemo(() => {
         if (!uid || !Array.isArray(data)) return null;
@@ -46,7 +56,7 @@ export function useFounderAccess() {
     }, [practitionerRecord]);
 
     const isAllowed = accessLevel !== null && ALLOWED_ACCESS_LEVELS.has(accessLevel);
-    const isCheckingAccess = Boolean(uid) && (loading || requestedUid !== uid);
+    const isCheckingAccess = Boolean(uid) && (requestedUid !== uid || isFetchingAccess);
 
     return {
         accessLevel,

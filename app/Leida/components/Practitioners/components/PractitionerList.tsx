@@ -33,9 +33,13 @@ const PractitionerList = () => {
 
 	React.useEffect(() => {
 		if (didRequestRows.current) return;
+		if (rows.length > 0) {
+			didRequestRows.current = true;
+			return;
+		}
 		dispatch(fetchLeida(PRACTITIONERS_ROUTE));
 		didRequestRows.current = true;
-	}, [dispatch]);
+	}, [dispatch, rows.length]);
 
 	return (
 		<>
