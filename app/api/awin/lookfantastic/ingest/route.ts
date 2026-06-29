@@ -279,15 +279,46 @@ function matchesCategoryFilter(row: T_RawRow, categoryFilter: string | null) {
   return categoryName.includes(filter) || merchantCategory.includes(filter);
 }
 
+function makeSkippedIngestResponse(message: string, targetTable: string, missingEnv: string[] = []) {
+  const res = makeRes({
+    tenant,
+    severity: 'warning',
+    message,
+    data: {
+      snapshot: null,
+      table: targetTable,
+      csvRows: 0,
+      upserted: 0,
+      skipped: 0,
+      rowLimit: null,
+      configured: false,
+      missingEnv,
+    },
+  });
+
+  return NextResponse.json(res);
+}
+
 async function runIngest(req: Request) {
   const url = new URL(req.url);
-  const supabaseUrl = requireEnv('NEXT_PUBLIC_SUPABASE_URL');
-  const serviceRoleKey = requireEnv('SUPABASE_SERVICE_ROLE_KEY');
   const snapshotTable = assertSafeTableName(DEFAULT_SNAPSHOT_TABLE, 'AWIN_FEED_SYNC_TABLE');
   const targetTable = assertSafeTableName(DEFAULT_TARGET_TABLE, 'AWIN_PRODUCTS_TABLE');
   const envLimit = process.env.AWIN_SYNC_LIMIT?.trim() || null;
   const rowLimit = parseOptionalLimit(url.searchParams.get('limit'), parseOptionalLimit(envLimit, null));
   const categoryFilter = normalizeText(url.searchParams.get('category'));
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    return makeSkippedIngestResponse(
+      'AWIN ingest is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY after enabling feed snapshots.',
+      targetTable,
+      [
+        ...(!supabaseUrl ? ['NEXT_PUBLIC_SUPABASE_URL'] : []),
+        ...(!serviceRoleKey ? ['SUPABASE_SERVICE_ROLE_KEY'] : []),
+      ],
+    );
+  }
 
   const sql = createSqlClient();
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -302,7 +333,10 @@ async function runIngest(req: Request) {
 
     const snapshot = await getLatestSnapshot(sql, snapshotTable);
     if (!snapshot) {
-      throw new Error(`No saved snapshots found in ${snapshotTable} for source=${LOOKFANTASTIC_SOURCE}`);
+      return makeSkippedIngestResponse(
+        `No saved snapshots found in ${snapshotTable} for source=${LOOKFANTASTIC_SOURCE}. Run /api/awin/lookfantastic/sync first.`,
+        targetTable,
+      );
     }
 
     const { data: fileBlob, error: downloadError } = await supabase.storage

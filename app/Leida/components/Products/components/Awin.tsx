@@ -247,6 +247,14 @@ export default function AWIN() {
                 throw new Error(result?.error || 'Failed to run smoke test.');
             }
 
+            if (result.skippedIngest || result.configured === false) {
+                dispatch(setFeedback({
+                    severity: 'warning',
+                    title: result.message || 'AWIN ingest is not configured.',
+                }));
+                return;
+            }
+
             dispatch(setFeedback({
                 severity: 'success',
                 title: 'AWIN products updated successfully.',

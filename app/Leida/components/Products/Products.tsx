@@ -276,6 +276,15 @@ export default function Products() {
 				throw new Error(result?.error || 'Failed to load AWIN products.');
 			}
 
+			if (result.skippedIngest || result.configured === false) {
+				setUpdateRunResult({
+					severity: 'warning',
+					title: result.message || 'AWIN ingest is not configured.',
+					description: 'Run /api/awin/lookfantastic/sync after configuring the feed pipeline, then retry ingest.',
+				});
+				return;
+			}
+
 			const upsertedCount = typeof result.upserted === 'number' ? result.upserted : 0;
 			setHasAWINUpdate(upsertedCount > 0);
 
