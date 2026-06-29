@@ -3,4 +3,5 @@
 Project documentation is organized in [`/docs`](./docs/README.md).
 
 - Leida Founder Dashboard docs: [`docs/founder-dashboard`](./docs/founder-dashboard/overview.md)
-- Migrated README archive: [`docs/source-readmes`](./docs/source-readmes/README.md)
+
+- NX° Source docs: [`docs/source-readmes`](./docs/source-readmes/README.md)

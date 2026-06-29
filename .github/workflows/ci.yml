@@ -1,4 +1,4 @@
-name: CI
+name: CI Placeholder v0.1.0
 
 on:
   pull_request:
@@ -10,31 +10,40 @@ on:
       - staging
   workflow_dispatch:
 
+# Workflow semantic version (manual for now):
+# - bump PATCH for text/placeholder-only edits (v0.1.1)
+# - bump MINOR for non-breaking workflow behavior updates (v0.2.0)
+# - bump MAJOR for breaking CI flow changes (v1.0.0)
+env:
+  WORKFLOW_VERSION: 0.1.0
+
 jobs:
-  lint-and-build:
-    name: Lint and build
+  placeholder:
+    name: Placeholder only (no real CI)
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder
-      SUPABASE_SERVICE_ROLE_KEY: ci-placeholder
-      SUPABASE_DB_URL: postgres://postgres:postgres@localhost:5432/postgres
+    timeout-minutes: 5
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Placeholder
+        run: |
+          echo "CI workflow is currently a placeholder."
+          echo "Workflow version: ${WORKFLOW_VERSION}"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Lint
-        run: yarn lint
-
-      - name: Build
-        run: yarn build
+      # Real CI is intentionally disabled for now.
+      # Uncomment and restore when ready to re-enable pipeline execution.
+      # - name: Checkout
+      #   uses: actions/checkout@v4
+      #
+      # - name: Setup Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: 20
+      #     cache: yarn
+      #
+      # - name: Install dependencies
+      #   run: yarn install --frozen-lockfile
+      #
+      # - name: Lint
+      #   run: yarn lint
+      #
+      # - name: Build
+      #   run: yarn build

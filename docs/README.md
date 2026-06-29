@@ -25,6 +25,6 @@ NX is still part of this repo, but it is secondary to the founder dashboard in t
 | [Design System](./framework/design-system.md) | Theming and UI integration |
 | [NX Admin](./nx-admin/README.md) | Back-office cartridge documentation |
 
-## Source Readme Mirrors
+## NX° Source Docs
 
-The [source-readmes](./source-readmes/README.md) folder tracks mirrored docs generated from source locations for reference.
+The [source-readmes](./source-readmes/README.md) folder contains source-first NX° documentation brought into the main docs structure.
