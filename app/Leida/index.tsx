@@ -1,15 +1,17 @@
 // Components
 import { PageRouter } from './PageRouter';
-import { DashNav, navItems, LoggedInAs } from './components/DashNav';
 import {
-	FounderDash,
+    Dashboard,
+    DashNav,
+    navItems,
+    LoggedInAs,
+    DashAuth,
 	initDash,
 	useDash,
 	setDash,
 	DashCard,
 	DashSurface,
-} from './components/FounderDash';
-import DashAuth from './components/FounderDash/components/DashAuth';
+} from './components/Dashboard';
 import AWIN from './components/Products/components/Awin';
 import AWINDetail from './components/Products/components/AwinDetail';
 import AWINList from './components/Products/components/AwinList';
@@ -119,10 +121,10 @@ import { normalizeColumnsForPreset } from './lib/normalizeColumnsForPreset';
 const AWINSearch = AWIN;
 const Awin = AWIN;
 const AwinSearch = AWIN;
-const Supabase = FounderDash;
-const SupabaseUsers = FounderDash;
-const SupabasePostgres = FounderDash;
-const Claude = FounderDash;
+const Supabase = Dashboard;
+const SupabaseUsers = Dashboard;
+const SupabasePostgres = Dashboard;
+const Claude = Dashboard;
 
 export {
     // Components
@@ -130,7 +132,7 @@ export {
     DashNav,
     navItems,
     LoggedInAs,
-    FounderDash,
+    Dashboard,
     DashAuth,
     DashCard,
     DashSurface,

@@ -9,7 +9,8 @@ import {
     Typography, 
     InputAdornment,
     Avatar,
-    CardHeader
+    CardHeader,
+    Card,
 } from '@mui/material';
 import { Icon } from '../../DesignSystem';
 import { useTheme } from '@mui/material/styles';
@@ -40,17 +41,14 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
     return (
         <form onSubmit={handleSubmit}>
 
-            
-
             <Box sx={{ maxWidth: 150, mx: 'auto' }}>
-                    <img src="/nxadmin/svg/leidaLogo.svg" alt="Leida Logo" style={{ width: '100%' }} />
-                  </Box>
+                <img src="/nxadmin/svg/leidaLogo.svg" alt="Leida Logo" style={{ width: '100%' }} />
+            </Box>
             
             <Box sx={{}}>
                 <TextField
-                    autoFocus
                     label="Email"
-                    variant='standard'
+                    variant='outlined'
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
@@ -60,7 +58,7 @@ export default function SimpleSignIn({ config }: { config?: T_Config }) {
                 />
                 <TextField
                     label="Password"
-                    variant='standard'
+                    variant='outlined'
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}

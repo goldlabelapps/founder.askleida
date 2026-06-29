@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   PractitionerUpdate, 
   Practitioners,
-  FounderDash,
+  Dashboard,
   AWINSearch,
   AWIN,
   PractitionerNew,
@@ -18,7 +18,7 @@ import {
 export function PageRouter({ active }: I_PageRouter) {
   const pathname = usePathname();
   const normalizedRoute = (pathname || active || '').trim().replace(/^\/+|\/+$/g, '');
-  if (!normalizedRoute) return <FounderDash />;
+  if (!normalizedRoute) return <Dashboard />;
   if (normalizedRoute === 'practitioners/new') return <PractitionerNew />;
   const practitionerDetailMatch = normalizedRoute.match(/^(practitioners|pracitioners|paractitioners)\/([^/]+)$/);
   if (practitionerDetailMatch) {
@@ -47,6 +47,6 @@ export function PageRouter({ active }: I_PageRouter) {
     case 'products/list':
       return <ListProducts />;
     default:
-      return <FounderDash />;
+      return <Dashboard />;
   }
 }
