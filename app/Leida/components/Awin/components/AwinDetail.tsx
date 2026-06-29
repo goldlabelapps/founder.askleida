@@ -16,10 +16,10 @@ import { useDispatch } from '../../../../NX/Uberedux';
 import { usePaywall } from '../../../../NX/Paywall';
 import { MightyButton } from '../../../index';
 import { asText } from '../../../lib/asText';
-import { processAwin } from '../actions/processAwin';
-import type { I_AwinDetail } from '../../../types.d';
+import { processAWIN } from '../actions/processAWIN';
+import type { I_AWINDetail } from '../../../types.d';
 
-export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinDetail) {
+export default function AWINDetail({ open, awin, onClose, onProcessed }: I_AWINDetail) {
 	const dispatch = useDispatch();
 	const paywall = usePaywall();
 	const [showRawData, setShowRawData] = React.useState(false);
@@ -81,7 +81,7 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 		setQueueError(null);
 
 		const result = await dispatch(
-			processAwin({
+			processAWIN({
 				awin,
 				decision: 'queue',
 				practitionerId,
@@ -107,7 +107,7 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 
 		setDeleting(true);
 		const result = await dispatch(
-			processAwin({
+			processAWIN({
 				awin,
 				decision: 'delete',
 				practitionerId,
@@ -239,7 +239,7 @@ export default function AwinDetail({ open, awin, onClose, onProcessed }: I_AwinD
 						fullWidth
 						disabled={!awin || !practitionerId || deleting || queueing}
 						onClick={() => setConfirmDeleteOpen(true)}>
-						{deleting ? 'Deleting...' : 'Delete from Awin'}
+						{deleting ? 'Deleting...' : 'Delete from AWIN'}
 					</MightyButton>
 					<MightyButton
 						startIcon={'queue'}

@@ -16,8 +16,8 @@ import {
 	ConfirmAction,
 	deleteQueueSelection,
 	deleteProductQueueRecords,
-	fetchAwinFeedIngestPreflight,
-	fetchAwinFeedSnapshot,
+	fetchAWINFeedIngestPreflight,
+	fetchAWINFeedSnapshot,
 	MightyButton,
 	setLeida,
 } from '../../../Leida';
@@ -32,8 +32,8 @@ export default function Products() {
 	const dispatch = useDispatch();
 	const router = useRouter();
 	const [queueTotal, setQueueTotal] = React.useState(0);
-	const [awinTotal, setAwinTotal] = React.useState(0);
-	const [hasAwinUpdate, setHasAwinUpdate] = React.useState(false);
+	const [awinTotal, setAWINTotal] = React.useState(0);
+	const [hasAWINUpdate, setHasAWINUpdate] = React.useState(false);
 	const [updateCheckResult, setUpdateCheckResult] = React.useState<{
 		severity: 'success' | 'warning';
 		title: string;
@@ -48,8 +48,8 @@ export default function Products() {
 	const [deletingQueue, setDeletingQueue] = React.useState(false);
 	const [confirmDeleteProductQueueOpen, setConfirmDeleteProductQueueOpen] = React.useState(false);
 	const [deletingProductQueue, setDeletingProductQueue] = React.useState(false);
-	const [checkingAwinFeedSnapshot, setCheckingAwinFeedSnapshot] = React.useState(false);
-	const [loadingAwinProducts, setLoadingAwinProducts] = React.useState(false);
+	const [checkingAWINFeedSnapshot, setCheckingAWINFeedSnapshot] = React.useState(false);
+	const [loadingAWINProducts, setLoadingAWINProducts] = React.useState(false);
 
 	React.useEffect(() => {
 			dispatch(setLeida('header', {
@@ -91,7 +91,7 @@ export default function Products() {
 		}
 	}, []);
 
-	const refreshAwinTotal = React.useCallback(async () => {
+	const refreshAWINTotal = React.useCallback(async () => {
 		try {
 			const params = new URLSearchParams({
 				page: '1',
@@ -107,7 +107,7 @@ export default function Products() {
 
 			const json = await res.json().catch(() => null);
 			if (!res.ok) {
-				setAwinTotal(0);
+				setAWINTotal(0);
 				return;
 			}
 
@@ -117,15 +117,15 @@ export default function Products() {
 					? json.data.rows.length
 					: 0;
 
-			setAwinTotal(nextTotal);
+			setAWINTotal(nextTotal);
 		} catch {
-			setAwinTotal(0);
+			setAWINTotal(0);
 		}
 	}, []);
 
 	React.useEffect(() => {
 		refreshQueueTotal();
-		refreshAwinTotal();
+		refreshAWINTotal();
 
 		const onRefresh = () => {
 			refreshQueueTotal();
@@ -135,7 +135,7 @@ export default function Products() {
 		return () => {
 			window.removeEventListener(QUEUE_COUNT_REFRESH_EVENT, onRefresh);
 		};
-	}, [refreshAwinTotal, refreshQueueTotal]);
+	}, [refreshAWINTotal, refreshQueueTotal]);
 
 	const handleDeleteQueue = React.useCallback(async () => {
 		if (deletingQueue) {
@@ -190,7 +190,7 @@ export default function Products() {
 
 			dispatch(setFeedback({
 				severity: 'success',
-				title: `Deleted ${result.deletedRows} Awin record${result.deletedRows === 1 ? '' : 's'}.`,
+				title: `Deleted ${result.deletedRows} AWIN record${result.deletedRows === 1 ? '' : 's'}.`,
 			}));
 			notifyQueueCountRefresh();
 		} catch (e: unknown) {
@@ -201,23 +201,23 @@ export default function Products() {
 			}));
 		} finally {
 			setDeletingProductQueue(false);
-			refreshAwinTotal();
+			refreshAWINTotal();
 		}
-	}, [deletingProductQueue, dispatch, refreshAwinTotal]);
+	}, [deletingProductQueue, dispatch, refreshAWINTotal]);
 
-	const handleCheckAwinFeedSnapshot = React.useCallback(async () => {
-		if (checkingAwinFeedSnapshot) {
+	const handleCheckAWINFeedSnapshot = React.useCallback(async () => {
+		if (checkingAWINFeedSnapshot) {
 			return;
 		}
 
 		setUpdateCheckResult(null);
-		setCheckingAwinFeedSnapshot(true);
+		setCheckingAWINFeedSnapshot(true);
 
 		try {
-			const result = await dispatch(fetchAwinFeedSnapshot());
+			const result = await dispatch(fetchAWINFeedSnapshot());
 
 			if (!result?.ok) {
-				throw new Error(result?.error || 'Failed to check Awin feed snapshot.');
+				throw new Error(result?.error || 'Failed to check AWIN feed snapshot.');
 			}
 
 			const changed = result.changed;
@@ -253,35 +253,35 @@ export default function Products() {
 			const message = e instanceof Error ? e.message : String(e);
 			setUpdateCheckResult({
 				severity: 'warning',
-				title: message || 'Failed to check Awin feed snapshot.',
+				title: message || 'Failed to check AWIN feed snapshot.',
 			});
 		} finally {
-			setCheckingAwinFeedSnapshot(false);
+			setCheckingAWINFeedSnapshot(false);
 		}
-	}, [checkingAwinFeedSnapshot, dispatch]);
+	}, [checkingAWINFeedSnapshot, dispatch]);
 
-	const handleLoadAwinProducts = React.useCallback(async () => {
-		if (loadingAwinProducts) {
+	const handleLoadAWINProducts = React.useCallback(async () => {
+		if (loadingAWINProducts) {
 			return;
 		}
 
-		setHasAwinUpdate(false);
+		setHasAWINUpdate(false);
 		setUpdateRunResult(null);
-		setLoadingAwinProducts(true);
+		setLoadingAWINProducts(true);
 
 		try {
-			const result = await dispatch(fetchAwinFeedIngestPreflight());
+			const result = await dispatch(fetchAWINFeedIngestPreflight());
 
 			if (!result?.ok) {
-				throw new Error(result?.error || 'Failed to load Awin products.');
+				throw new Error(result?.error || 'Failed to load AWIN products.');
 			}
 
 			const upsertedCount = typeof result.upserted === 'number' ? result.upserted : 0;
-			setHasAwinUpdate(upsertedCount > 0);
+			setHasAWINUpdate(upsertedCount > 0);
 
 			setUpdateRunResult({
 				severity: 'success',
-				title: 'Awin products updated successfully.',
+				title: 'AWIN products updated successfully.',
 				description: [
 					result.message || null,
 					result.rowLimit !== null ? `Limit: ${result.rowLimit}` : null,
@@ -297,13 +297,13 @@ export default function Products() {
 			const message = e instanceof Error ? e.message : String(e);
 			setUpdateRunResult({
 				severity: 'warning',
-				title: message || 'Failed to update Awin products.',
+				title: message || 'Failed to update AWIN products.',
 			});
 		} finally {
-			setLoadingAwinProducts(false);
-			refreshAwinTotal();
+			setLoadingAWINProducts(false);
+			refreshAWINTotal();
 		}
-	}, [dispatch, loadingAwinProducts, refreshAwinTotal, router]);
+	}, [dispatch, loadingAWINProducts, refreshAWINTotal, router]);
 
 	return (
 		<Box sx={{  }}>
@@ -315,16 +315,16 @@ export default function Products() {
 						// borderColor: '#b2d612',
 					}}>
 						<Typography variant="body1" sx={{ mb: 2 }}>
-							This will check Awin for an updated feed snapshot and determine if a new ingest is required.
+							This will check AWIN for an updated feed snapshot and determine if a new ingest is required.
 						</Typography>
 						<MightyButton
 							alignLeft
 							variant="outlined"
 							startIcon="awin"
-							disabled={checkingAwinFeedSnapshot}
-							onClick={handleCheckAwinFeedSnapshot}
+							disabled={checkingAWINFeedSnapshot}
+							onClick={handleCheckAWINFeedSnapshot}
 						>
-							{checkingAwinFeedSnapshot ? 'Running Awin Cron...' : 'Run Awin Cron'}
+							{checkingAWINFeedSnapshot ? 'Running AWIN Cron...' : 'Run AWIN Cron'}
 						</MightyButton>
 					</Box>
 					
@@ -349,10 +349,10 @@ export default function Products() {
 							alignLeft
 							variant="outlined"
 							startIcon="warning"
-							disabled={loadingAwinProducts}
-							onClick={handleLoadAwinProducts}
+							disabled={loadingAWINProducts}
+							onClick={handleLoadAWINProducts}
 						>
-							{loadingAwinProducts ? 'Ingesting...' : 'Ingest Awin Feed'}
+							{loadingAWINProducts ? 'Ingesting...' : 'Ingest AWIN Feed'}
 						</MightyButton>
 						
 					</Box>
@@ -360,7 +360,7 @@ export default function Products() {
 					{awinTotal > 0 ? (
 						<Box sx={{}}>
 							<Typography variant="body1" sx={{ my: 2 }}>
-								This will permanently clear every record from the Awin table.
+								This will permanently clear every record from the AWIN table.
 							</Typography>
 							<MightyButton
 								alignLeft
@@ -369,7 +369,7 @@ export default function Products() {
 								disabled={deletingProductQueue}
 								onClick={() => setConfirmDeleteProductQueueOpen(true)}
 							>
-								{deletingProductQueue ? 'Dropping Awin Table...' : 'Drop Awin Table'}
+								{deletingProductQueue ? 'Dropping AWIN Table...' : 'Drop AWIN Table'}
 							</MightyButton>
 						</Box>
 					) : null}
@@ -404,14 +404,14 @@ export default function Products() {
 									{updateRunResult.description}
 								</Typography>
 							) : null}
-							{hasAwinUpdate ? (
+							{hasAWINUpdate ? (
 								<Box sx={{ mt: 1.5 }}>
 									<MightyButton
 										variant="outlined"
 										startIcon="awin"
 										onClick={() => dispatch(navigateTo(router, '/products/awin'))}
 									>
-										View Updated Awin Products
+										View Updated AWIN Products
 									</MightyButton>
 								</Box>
 							) : null}
@@ -435,8 +435,8 @@ export default function Products() {
 			<ConfirmAction
 				open={confirmDeleteProductQueueOpen}
 				icon="delete"
-				title="Clear all Awin products?"
-				body="This will permanently clear every record from the Awin table."
+				title="Clear all AWIN products?"
+				body="This will permanently clear every record from the AWIN table."
 				handleConfirm={handleDeleteProductQueue}
 				handleClose={() => setConfirmDeleteProductQueueOpen(false)}
 			/>

@@ -1,6 +1,6 @@
-import type { T_AwinProduct } from '../types.d';
+import type { T_AWINProduct } from '../types.d';
 
-export function inferAwinPrice(product: T_AwinProduct): string {
+export function inferAWINPrice(product: T_AWINProduct): string {
   const raw = product.search_price;
   if (typeof raw === 'number' && Number.isFinite(raw)) {
     return raw.toFixed(2);

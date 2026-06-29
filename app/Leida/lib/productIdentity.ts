@@ -1,8 +1,8 @@
-import type { T_AwinProduct } from '../types.d';
+import type { T_AWINProduct } from '../types.d';
 import { asId } from './asId';
 import { asText } from './asText';
 
-export function productIdentity(product: T_AwinProduct | null | undefined): string {
+export function productIdentity(product: T_AWINProduct | null | undefined): string {
   if (!product) {
     return '';
   }

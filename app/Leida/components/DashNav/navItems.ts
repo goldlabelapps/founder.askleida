@@ -20,7 +20,7 @@ export const navItems: DashNavItem[] = [
     activeRoutes: ['/products', '/products/awin', '/awin', '/products/queue', '/products/list'],
     children: [
       {
-        label: 'Awin',
+        label: 'AWIN',
         icon: 'awin',
         route: '/products/awin',
         activeRoutes: ['/products/awin', '/awin'],

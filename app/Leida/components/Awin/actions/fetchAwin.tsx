@@ -1,8 +1,8 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
-import { setAwin } from './setAwin';
+import { setAWIN } from './setAWIN';
 
-type T_FetchAwinParams = {
+type T_FetchAWINParams = {
     page: number;
     limit: number;
     orderBy: string;
@@ -10,7 +10,7 @@ type T_FetchAwinParams = {
     q?: string;
 };
 
-type T_FetchAwinResult = {
+type T_FetchAWINResult = {
     ok: true;
     route: string;
     rows: any[];
@@ -20,9 +20,9 @@ type T_FetchAwinResult = {
     error: string;
 };
 
-export const fetchAwin =
-    ({ page, limit, orderBy, orderDir, q }: T_FetchAwinParams): any =>
-        async (dispatch: Dispatch): Promise<T_FetchAwinResult> => {
+export const fetchAWIN =
+    ({ page, limit, orderBy, orderDir, q }: T_FetchAWINParams): any =>
+        async (dispatch: Dispatch): Promise<T_FetchAWINResult> => {
             try {
                 const offset = Math.max(0, (page - 1) * limit);
                 const params = new URLSearchParams({
@@ -56,12 +56,12 @@ export const fetchAwin =
                 const nextRows = Array.isArray(data?.rows) ? data.rows : [];
                 const count = typeof data?.count === 'number' ? data.count : nextRows.length;
 
-                await dispatch(setAwin('rows', nextRows));
-                await dispatch(setAwin('products', nextRows));
-                await dispatch(setAwin('count', count));
-                await dispatch(setAwin('scanned', nextRows.length));
-                await dispatch(setAwin('sourceRoute', route));
-                await dispatch(setAwin('query', {
+                await dispatch(setAWIN('rows', nextRows));
+                await dispatch(setAWIN('products', nextRows));
+                await dispatch(setAWIN('count', count));
+                await dispatch(setAWIN('scanned', nextRows.length));
+                await dispatch(setAWIN('sourceRoute', route));
+                await dispatch(setAWIN('query', {
                     page,
                     limit,
                     offset,

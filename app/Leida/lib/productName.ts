@@ -1,7 +1,7 @@
-import type { T_AwinProduct } from '../types.d';
+import type { T_AWINProduct } from '../types.d';
 import { asText } from './asText';
 
-export function productName(product: T_AwinProduct | null | undefined): string {
+export function productName(product: T_AWINProduct | null | undefined): string {
   if (!product) {
     return 'Untitled product';
   }

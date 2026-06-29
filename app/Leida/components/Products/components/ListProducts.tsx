@@ -327,7 +327,7 @@ const ListProducts = ({
 			) : showEmptyLibraryState ? (
 				<Box sx={{ py: 4 }}>
 					<Typography variant="body1" color="text.secondary">
-						No products yet. Add products from Awin into the Queue, then process them to build your products library.
+						No products yet. Add products from AWIN into the Queue, then process them to build your products library.
 					</Typography>
 
 					<Stack direction="row" spacing={1.5} sx={{ mt: 3 }}>
@@ -350,7 +350,7 @@ const ListProducts = ({
 								dispatch(navigateTo(router, '/products/awin'));
 							}}
 						>
-							Awin
+							AWIN
 						</MightyButton>
 					</Stack>
 				</Box>

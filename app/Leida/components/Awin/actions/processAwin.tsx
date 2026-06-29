@@ -1,16 +1,16 @@
 import type { Dispatch } from 'redux';
-import type { T_AwinProcessDecision, T_AwinProduct } from '../../../types.d';
+import type { T_AWINProcessDecision, T_AWINProduct } from '../../../types.d';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
 import { fetchLeida } from '../../../actions/fetchLeida';
 
-export const processAwin =
+export const processAWIN =
 	({
 		awin,
 		decision,
 		practitionerId,
 	}: {
-		awin: T_AwinProduct;
-		decision: T_AwinProcessDecision;
+		awin: T_AWINProduct;
+		decision: T_AWINProcessDecision;
 		practitionerId: string;
 	}): any =>
 		async (dispatch: Dispatch) => {

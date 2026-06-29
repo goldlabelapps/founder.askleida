@@ -1,7 +1,7 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
 
-export const setAwin =
+export const setAWIN =
     (key: string, value: any): any =>
         async (dispatch: Dispatch, getState: () => any) => {
             try {

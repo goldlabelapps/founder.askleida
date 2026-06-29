@@ -82,7 +82,7 @@ export default function FounderDash() {
                         startIcon="awin"
                         onClick={() => dispatch(navigateTo(router, '/products/awin'))}
                         >
-                        Awin
+                        AWIN
                     </MightyButton>
                 </Box>
             </Grid>

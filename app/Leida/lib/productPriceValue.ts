@@ -1,6 +1,6 @@
-import type { T_AwinProduct } from '../types.d';
+import type { T_AWINProduct } from '../types.d';
 
-export function productPriceValue(product: T_AwinProduct | null | undefined): number | null {
+export function productPriceValue(product: T_AWINProduct | null | undefined): number | null {
   if (!product) {
     return null;
   }

@@ -10,11 +10,11 @@ import {
 	DashSurface,
 } from './components/FounderDash';
 import DashAuth from './components/FounderDash/components/DashAuth';
-import Awin from './components/Awin/Awin';
-import AwinDetail from './components/Awin/components/AwinDetail';
-import AwinList from './components/Awin/components/AwinList';
-import AwinProcess from './components/Awin/components/AwinProcess';
-import Queue from './components/Awin/components/Queue';
+import AWIN from './components/AWIN/AWIN';
+import AWINDetail from './components/AWIN/components/AWINDetail';
+import AWINList from './components/AWIN/components/AWINList';
+import AWINProcess from './components/AWIN/components/AWINProcess';
+import Queue from './components/AWIN/components/Queue';
 import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
@@ -36,7 +36,7 @@ import { getLeidaContextPrompt, testProduct } from './components/Claude/prompts'
 // Hooks
 import { useLeida, useLeidaBus } from './hooks/useLeida';
 import { useFounderAccess } from './hooks/useFounderAccess';
-import { useAwin } from './components/Awin/hooks/useAwin';
+import { useAWIN } from './components/AWIN/hooks/useAWIN';
 import { useProducts } from './components/Products/hooks/useProducts';
 import { useQueue } from './components/Products/hooks/useQueue';
 import { useClaude } from './components/Claude/hooks/useClaude';
@@ -53,19 +53,19 @@ import { initPractitioners } from './components/Practitioners/actions/initPracti
 import { initSupabase } from './components/Supabase/actions/initSupabase';
 import { fetchSupabaseRows } from './components/Supabase/actions/fetchSupabaseRows';
 import { saveSupabaseRecord } from './components/Supabase/actions/saveSupabaseRecord';
-import { initAwin } from './components/Awin/actions/initAwin';
-import { setAwin } from './components/Awin/actions/setAwin';
-import { fetchAwin } from './components/Awin/actions/fetchAwin';
-import { processAwin } from './components/Awin/actions/processAwin';
-import { processQueueItem } from './components/Awin/actions/processQueueItem';
+import { initAWIN } from './components/AWIN/actions/initAWIN';
+import { setAWIN } from './components/AWIN/actions/setAWIN';
+import { fetchAWIN } from './components/AWIN/actions/fetchAWIN';
+import { processAWIN } from './components/AWIN/actions/processAWIN';
+import { processQueueItem } from './components/AWIN/actions/processQueueItem';
 import { initProducts } from './components/Products/actions/initProducts';
 import { fetchProducts } from './components/Products/actions/fetchProducts';
 import { initQueue } from './components/Products/actions/initQueue';
 import { fetchQueue } from './components/Products/actions/fetchQueue';
 import { deleteQueueSelection } from './components/Products/actions/deleteQueueSelection';
 import { deleteProductQueueRecords } from './components/Products/actions/deleteProductQueueRecords';
-import { fetchAwinFeedIngestPreflight } from './components/Products/actions/fetchAwinFeedIngestPreflight';
-import { fetchAwinFeedSnapshot } from './components/Products/actions/fetchAwinFeedSnapshot';
+import { fetchAWINFeedIngestPreflight } from './components/Products/actions/fetchAWINFeedIngestPreflight';
+import { fetchAWINFeedSnapshot } from './components/Products/actions/fetchAWINFeedSnapshot';
 import { setProducts } from './components/Products/actions/setProducts';
 import { setQueue } from './components/Products/actions/setQueue';
 import { initClaude } from './components/Claude/actions/initClaude';
@@ -86,7 +86,7 @@ import { parseArrayData } from './lib/parseArrayData';
 import { toAccessLevel } from './lib/toAccessLevel';
 import { asText } from './lib/asText';
 import { asId } from './lib/asId';
-import { inferAwinPrice } from './lib/inferAwinPrice';
+import { inferAWINPrice } from './lib/inferAWINPrice';
 import { productIdentity } from './lib/productIdentity';
 import { productName } from './lib/productName';
 import { productCategory } from './lib/productCategory';
@@ -132,7 +132,7 @@ import { parseSupabaseFieldValue } from './lib/parseSupabaseFieldValue';
 import { getTableFormPreset } from './lib/getTableFormPreset';
 import { normalizeColumnsForPreset } from './lib/normalizeColumnsForPreset';
 
-const AwinSearch = Awin;
+const AWINSearch = AWIN;
 
 export {
     // Components
@@ -144,11 +144,11 @@ export {
     DashAuth,
     DashCard,
     DashSurface,
-    Awin,
-    AwinDetail,
-    AwinList,
-    AwinProcess,
-    AwinSearch,
+    AWIN,
+    AWINDetail,
+    AWINList,
+    AWINProcess,
+    AWINSearch,
     Products,
     Queue,
     ListProducts,
@@ -178,7 +178,7 @@ export {
     useLeida,
     useLeidaBus,
     useFounderAccess,
-    useAwin,
+    useAWIN,
     useProducts,
     useQueue,
     useClaude,
@@ -188,23 +188,23 @@ export {
     initLeida,
     initDash,
     initSupabase,
-    initAwin,
+    initAWIN,
     initProducts,
     fetchProducts,
     initQueue,
     initClaude,
-    processAwin,
+    processAWIN,
     processQueueItem,
-    fetchAwin,
+    fetchAWIN,
     fetchLeida,
     fetchQueue,
     deleteQueueSelection,
     deleteProductQueueRecords,
-    fetchAwinFeedIngestPreflight,
-    fetchAwinFeedSnapshot,
+    fetchAWINFeedIngestPreflight,
+    fetchAWINFeedSnapshot,
     fetchSupabaseRows,
     setLeida,
-    setAwin,
+    setAWIN,
     setProducts,
     setQueue,
     setClaude,
@@ -230,7 +230,7 @@ export {
     toAccessLevel,
     asText,
     asId,
-    inferAwinPrice,
+    inferAWINPrice,
     productIdentity,
     productName,
     productCategory,

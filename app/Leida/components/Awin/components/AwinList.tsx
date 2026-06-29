@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import type { T_AwinListProps, T_AwinProduct } from '../../../types.d';
+import type { T_AWINListProps, T_AWINProduct } from '../../../types.d';
 import { Box, IconButton, LinearProgress, Stack, Typography } from '@mui/material';
 import {
     DataGrid,
@@ -12,7 +12,7 @@ import { formatUkPrice, MightyButton, setLeida, } from '../../../../Leida';
 import { Icon, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 
-export default function AwinList({
+export default function AWINList({
     rows,
     loading,
     smokeTestLoading = false,
@@ -28,14 +28,14 @@ export default function AwinList({
     onOpenProduct,
     onRunSmokeTest,
     
-}: T_AwinListProps) {
+}: T_AWINListProps) {
 
     const dispatch = useDispatch();
     const router = useRouter();
 
     React.useEffect(() => {
         dispatch(setLeida('header', {
-            title: 'Awin',
+            title: 'AWIN',
             icon: 'awin',
         }));
     }, [dispatch]);
@@ -54,7 +54,7 @@ export default function AwinList({
                         variant="text"
                         sx={{ justifyContent: 'flex-start', textTransform: 'none', px: 0 }}
                         onClick={() => {
-                            onOpenProduct(params.row.product as T_AwinProduct, String(params.row.id));
+                            onOpenProduct(params.row.product as T_AWINProduct, String(params.row.id));
                         }}
                     >
                         {params.value}
@@ -122,7 +122,7 @@ export default function AwinList({
             <Box sx={{ width: '100%', py: 6 }}>
                 <Stack spacing={2} alignItems="center" textAlign="center" sx={{ maxWidth: 560, mx: 'auto' }}>
                     <Typography variant="h6">
-                        Awin table empty. Run Smoke Test.
+                        AWIN table empty. Run Smoke Test.
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
                         This will ingest the latest AWIN feed into products_awin.
@@ -140,7 +140,7 @@ export default function AwinList({
                             dispatch(navigateTo(router, '/products'));
                         }}
                     >
-                        {smokeTestLoading ? 'Ingesting...' : 'Ingest Awin Feed'}
+                        {smokeTestLoading ? 'Ingesting...' : 'Ingest AWIN Feed'}
                     </MightyButton>
                 </Stack>
             </Box>
@@ -180,7 +180,7 @@ export default function AwinList({
                         return;
                     }
 
-                    onOpenProduct(params.row.product as T_AwinProduct, String(params.row.id));
+                    onOpenProduct(params.row.product as T_AWINProduct, String(params.row.id));
                 }}
                 sx={{
                     border: 0,

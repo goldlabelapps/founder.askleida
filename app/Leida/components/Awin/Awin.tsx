@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 
-import type { T_AwinProcessedPayload, T_AwinProduct } from '../../types.d';
+import type { T_AWINProcessedPayload, T_AWINProduct } from '../../types.d';
 import {
     Box,
     CircularProgress,
@@ -20,7 +20,7 @@ import { Editable } from '../../../NX/NXAdmin';
 import {
     asText,
     fetchLeida,
-    fetchAwinFeedIngestPreflight,
+    fetchAWINFeedIngestPreflight,
     MightyButton,
     orderByFromSortField,
     productCategory,
@@ -30,11 +30,11 @@ import {
     productPriceValue,
     setLeida,
     sortFieldFromQuery,
-    useAwin,
+    useAWIN,
     useDash,
-    AwinDetail,
-    AwinList,
-    fetchAwin,
+    AWINDetail,
+    AWINList,
+    fetchAWIN,
 } from '../../../Leida';
 
 const RESULTS_PER_PAGE_OPTIONS = [5, 10, 25, 50, 100];
@@ -45,16 +45,16 @@ function notifyQueueCountRefresh() {
     window.dispatchEvent(new Event(QUEUE_COUNT_REFRESH_EVENT));
 }
 
-export default function Awin() {
+export default function AWIN() {
     const dispatch = useDispatch();
     const router = useRouter();
     const dash = useDash();
-    const awin = useAwin();
+    const awin = useAWIN();
     const paywall = usePaywall();
-    const products = (Array.isArray(awin?.products) ? awin.products : []) as T_AwinProduct[];
+    const products = (Array.isArray(awin?.products) ? awin.products : []) as T_AWINProduct[];
     const total = typeof awin?.count === 'number' ? awin.count : 0;
     const practitionerId = asText(paywall?.uid) || asText(paywall?.user?.uid);
-    const [selectedAwin, setSelectedAwin] = React.useState<T_AwinProduct | null>(null);
+    const [selectedAWIN, setSelectedAWIN] = React.useState<T_AWINProduct | null>(null);
     const [page, setPage] = React.useState(typeof awin?.query?.page === 'number' ? awin.query.page : 1);
     const [searchTerm, setSearchTerm] = React.useState(typeof awin?.query?.q === 'string' ? awin.query.q : '');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState(typeof awin?.query?.q === 'string' ? awin.query.q : '');
@@ -88,7 +88,7 @@ export default function Awin() {
     const orderDir = activeSort.sort === 'asc' ? 'asc' : 'desc';
 
     const rows = React.useMemo(() => {
-        return products.map((product: T_AwinProduct, index: number) => ({
+        return products.map((product: T_AWINProduct, index: number) => ({
             id: productIdentity(product) || `awin-row-${index}`,
             product_name: productName(product),
             category_name: productCategory(product),
@@ -100,7 +100,7 @@ export default function Awin() {
 
     const displayedRows = isInitialLoad ? [] : rows;
     const displayedTotal = isInitialLoad ? 0 : total;
-    const showEmptyAwinState = !loading && displayedRows.length === 0;
+    const showEmptyAWINState = !loading && displayedRows.length === 0;
 
     const visibleRowIds = React.useMemo(() => {
         return new Set(rows.map((row) => String(row.id)));
@@ -118,7 +118,7 @@ export default function Awin() {
     const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
     const activeQuery = debouncedSearchTerm.trim();
     const isTableEmpty = !loading && !activeQuery && total === 0;
-    const showAwinControls = !loading && !isTableEmpty;
+    const showAWINControls = !loading && !isTableEmpty;
 
     const statusMessage = React.useMemo(() => {
         if (loading) {
@@ -137,12 +137,12 @@ export default function Awin() {
         return `${total} results${suffix}, page ${page} of ${totalPages}.`;
     }, [activeQuery, hasLoadedOnce, loading, page, total, totalPages]);
 
-    const handleProcessed = React.useCallback(async ({ decision, awin: processedAwin }: T_AwinProcessedPayload) => {
+    const handleProcessed = React.useCallback(async ({ decision, awin: processedAWIN }: T_AWINProcessedPayload) => {
         dispatch(setFeedback({
             severity: 'success',
             title: decision === 'queue'
-                ? `Queued ${productName(processedAwin)} and removed it from the AWIN source table.`
-                : `Deleted ${productName(processedAwin)}.`,
+                ? `Queued ${productName(processedAWIN)} and removed it from the AWIN source table.`
+                : `Deleted ${productName(processedAWIN)}.`,
         }));
         setSelectionModel({
             type: 'include',
@@ -241,7 +241,7 @@ export default function Awin() {
         setRunningSmokeTest(true);
 
         try {
-            const result = await dispatch(fetchAwinFeedIngestPreflight());
+            const result = await dispatch(fetchAWINFeedIngestPreflight());
 
             if (!result?.ok) {
                 throw new Error(result?.error || 'Failed to run smoke test.');
@@ -249,13 +249,13 @@ export default function Awin() {
 
             dispatch(setFeedback({
                 severity: 'success',
-                title: 'Awin products updated successfully.',
+                title: 'AWIN products updated successfully.',
             }));
 
             setRefreshNonce((value) => value + 1);
             dispatch(navigateTo(router, '/products/awin'));
         } catch (e: unknown) {
-            console.error('[Smoke Test] Awin page smoke test failed', e);
+            console.error('[Smoke Test] AWIN page smoke test failed', e);
             const message = e instanceof Error ? e.message : String(e);
             dispatch(setFeedback({
                 severity: 'warning',
@@ -289,7 +289,7 @@ export default function Awin() {
             setLoading(true);
 
             try {
-                const result = await dispatch(fetchAwin({
+                const result = await dispatch(fetchAWIN({
                     page,
                     limit: resultsPerPage,
                     orderBy,
@@ -332,7 +332,7 @@ export default function Awin() {
 
     React.useEffect(() => {
         dispatch(setLeida('header', {
-            title: total > 0 ? `Awin (Total ${total})` : 'Awin',
+            title: total > 0 ? `AWIN (Total ${total})` : 'AWIN',
             icon: 'awin',
         }));
     }, [dispatch, total]);
@@ -340,7 +340,7 @@ export default function Awin() {
     return (
         <Box sx={{ p: 2 }}>
             <Stack spacing={2}>
-                {showAwinControls ? (
+                {showAWINControls ? (
                     <>
                         <Box sx={{
                             width: { xs: '100%', md: 300 },
@@ -408,7 +408,7 @@ export default function Awin() {
                     </>
                 ) : null}
 
-                <AwinList
+                <AWINList
                     rows={displayedRows}
                     loading={loading}
                     smokeTestLoading={runningSmokeTest}
@@ -446,16 +446,16 @@ export default function Awin() {
                         });
                     }}
                     onOpenProduct={(product, rowId) => {
-                        setSelectedAwin(product);
+                        setSelectedAWIN(product);
                     }}
                     onRunSmokeTest={handleRunSmokeTest}
                 />
             </Stack>
 
-            <AwinDetail
-                open={Boolean(selectedAwin)}
-                awin={selectedAwin}
-                onClose={() => setSelectedAwin(null)}
+            <AWINDetail
+                open={Boolean(selectedAWIN)}
+                awin={selectedAWIN}
+                onClose={() => setSelectedAWIN(null)}
                 onProcessed={handleProcessed}
             />
         </Box>
