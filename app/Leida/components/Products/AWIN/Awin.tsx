@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 
-import type { T_AWINProcessedPayload, T_AWINProduct } from '../../types.d';
+import type { T_AWINProcessedPayload, T_AWINProduct } from '../../../types.d';
 import {
     Box,
     CircularProgress,
@@ -13,10 +13,10 @@ import {
     type GridRowSelectionModel,
     type GridSortModel,
 } from '@mui/x-data-grid';
-import { useDispatch } from '../../../NX/Uberedux';
-import { usePaywall } from '../../../NX/Paywall';
-import { navigateTo, setFeedback } from '../../../NX/DesignSystem';
-import { Editable } from '../../../NX/NXAdmin';
+import { useDispatch } from '../../../../NX/Uberedux';
+import { usePaywall } from '../../../../NX/Paywall';
+import { navigateTo, setFeedback } from '../../../../NX/DesignSystem';
+import { Editable } from '../../../../NX/NXAdmin';
 import {
     asText,
     fetchLeida,
@@ -35,7 +35,7 @@ import {
     AWINDetail,
     AWINList,
     fetchAWIN,
-} from '../../../Leida';
+} from '../../../index';
 
 const RESULTS_PER_PAGE_OPTIONS = [5, 10, 25, 50, 100];
 const SEARCH_DEBOUNCE_MS = 350;

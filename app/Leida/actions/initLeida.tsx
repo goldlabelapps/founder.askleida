@@ -2,7 +2,7 @@ import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../NX/Uberedux';
 import { setLeida } from '../../Leida';
 import { initSupabase } from '../components/Supabase/actions/initSupabase';
-import { initAWIN } from '../components/AWIN/actions/initAWIN';
+import { initAWIN } from '../components/Products/AWIN/actions/initAWIN';
 
 export const initLeida = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {

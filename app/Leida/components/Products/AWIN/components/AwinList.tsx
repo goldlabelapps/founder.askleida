@@ -1,16 +1,16 @@
 'use client';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import type { T_AWINListProps, T_AWINProduct } from '../../../types.d';
+import type { T_AWINListProps, T_AWINProduct } from '../../../../types.d';
 import { Box, IconButton, LinearProgress, Stack, Typography } from '@mui/material';
 import {
     DataGrid,
     type GridColDef,
     type GridRenderCellParams,
 } from '@mui/x-data-grid';
-import { formatUkPrice, MightyButton, setLeida, } from '../../../../Leida';
-import { Icon, navigateTo } from '../../../../NX/DesignSystem';
-import { useDispatch } from '../../../../NX/Uberedux';
+import { formatUkPrice, MightyButton, setLeida, } from '../../../../index';
+import { Icon, navigateTo } from '../../../../../NX/DesignSystem';
+import { useDispatch } from '../../../../../NX/Uberedux';
 
 export default function AWINList({
     rows,

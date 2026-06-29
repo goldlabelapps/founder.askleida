@@ -1,6 +1,7 @@
 import type { Dispatch } from 'redux';
-import { setUbereduxKey } from '../../../../NX/Uberedux';
-import { setLeida, fetchLeida } from '../../../../Leida';
+import { setUbereduxKey } from '../../../../../NX/Uberedux';
+import { setLeida } from '../../../../actions/setLeida';
+import { fetchLeida } from '../../../../actions/fetchLeida';
 
 const AWIN_ROUTE = '/api/awin?limit=25&orderBy=created_at&orderDir=desc';
 

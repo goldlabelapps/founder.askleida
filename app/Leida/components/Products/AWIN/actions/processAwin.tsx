@@ -1,7 +1,7 @@
 import type { Dispatch } from 'redux';
-import type { T_AWINProcessDecision, T_AWINProduct } from '../../../types.d';
-import { setUbereduxKey } from '../../../../NX/Uberedux';
-import { fetchLeida } from '../../../actions/fetchLeida';
+import type { T_AWINProcessDecision, T_AWINProduct } from '../../../../types.d';
+import { setUbereduxKey } from '../../../../../NX/Uberedux';
+import { fetchLeida } from '../../../../actions/fetchLeida';
 
 export const processAWIN =
 	({

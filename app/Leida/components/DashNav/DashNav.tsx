@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { useDispatch } from '../../../NX/Uberedux';
 import { MiniListItem } from '../../../NX/NXAdmin';
-import { initAWIN } from '../AWIN/actions/initAWIN';
+import { initAWIN } from '../Products/AWIN/actions/initAWIN';
 import { initQueue } from '../Products/actions/initQueue';
 import { LoggedInAs } from './components/index';
 import { navItems } from './navItems';
