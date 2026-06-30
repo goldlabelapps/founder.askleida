@@ -12,7 +12,7 @@ export default function Feedback() {
     if (feedback && !feedback.hidden) {
       const timer = setTimeout(() => {
         dispatch(setFeedback(null));
-      }, 3000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [feedback, dispatch]);
