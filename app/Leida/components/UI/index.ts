@@ -1,0 +1,1 @@
+export { default as MightyButton } from './MightyButton';

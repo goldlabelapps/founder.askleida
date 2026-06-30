@@ -53,7 +53,7 @@ export default function Products() {
 
 	React.useEffect(() => {
 			dispatch(setLeida('header', {
-				title: 'Products',
+				title: 'Manage Products',
 				icon: 'products',
 			}));
 	}, [dispatch]);

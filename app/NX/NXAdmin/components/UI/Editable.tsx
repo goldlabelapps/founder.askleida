@@ -39,6 +39,7 @@ export default function Editable({
 	onChange,
 	label,
 	placeholder,
+	helperText,
 	disabled = false,
 	required = false,
 	autoFocus = false,
@@ -215,6 +216,7 @@ export default function Editable({
 							) : undefined,
 						},
 					}}
+					helperText={helperText}
 					onChange={(event) => handleTextChange?.(event.target.value)}
 				>
 					{!required ? (
@@ -267,6 +269,7 @@ export default function Editable({
 						) : undefined,
 					},
 				}}
+				helperText={helperText}
 				onChange={(event) => handleTextChange?.(event.target.value)}
 			/>
 		</FormControl>

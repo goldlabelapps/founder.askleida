@@ -122,7 +122,7 @@ import FeatureIcon from '@mui/icons-material/RocketLaunchOutlined';
 import SitemapIcon from '@mui/icons-material/AccountTree';
 import GoodfitIcon from '@mui/icons-material/InterpreterMode';
 import SpeakwriteIcon from '@mui/icons-material/KeyboardVoice';
-import ProductsIcon from '@mui/icons-material/PriceChange';
+import ProductsIcon from '@mui/icons-material/MonetizationOnOutlined';
 import UbereduxIcon from '@mui/icons-material/StorageOutlined';
 import CartridgeIcon from '@mui/icons-material/AutoAwesomeMotion';
 import CoreIcon from '@mui/icons-material/BarcodeReader';

@@ -119,30 +119,24 @@ export default function AWINList({
 
     if (!loading && rows.length === 0) {
         return (
-            <Box sx={{ width: '100%', py: 6 }}>
-                <Stack spacing={2} alignItems="center" textAlign="center" sx={{ maxWidth: 560, mx: 'auto' }}>
+            <Box sx={{ width: '100%' }}>
                     <Typography variant="h6">
                         AWIN table empty. Run Smoke Test.
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
                         This will ingest the latest AWIN feed into products_awin.
                     </Typography>
+                    <Box sx={{ height: 24 }} />
                     <MightyButton
-                        startIcon="awin"
+                        alignLeft
                         variant="outlined"
-                        disabled={smokeTestLoading}
+                        startIcon="products"
                         onClick={() => {
-                            if (onRunSmokeTest) {
-                                onRunSmokeTest();
-                                return;
-                            }
-
                             dispatch(navigateTo(router, '/products'));
                         }}
                     >
-                        {smokeTestLoading ? 'Ingesting...' : 'Ingest AWIN Feed'}
+                        Manage Products
                     </MightyButton>
-                </Stack>
             </Box>
         );
     }

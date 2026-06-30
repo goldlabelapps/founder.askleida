@@ -21,7 +21,7 @@ import {
 	setLeida,
 	useLeidaBus,
 	deletePractitioner,
-	
+	MightyButton,
 } from '../../../../Leida';
 import { 
 	Editable, 
@@ -248,49 +248,22 @@ const PractitionerUpdate = () => {
 						{/* Header with delete button */}
 						<Stack
 							direction="row"
-							// justifyContent="space-between"
-							// alignItems="center"
 							sx={{ mb: 1 }}
 						>
-							<IconButton
-								color="primary"
+
+							<MightyButton
+								startIcon="left"
+								variant="outlined"
 								disabled={deleting}
 								onClick={handleBack}
 							>
-								<Icon icon="left" />
-							</IconButton>
+								All
+							</MightyButton>
 
 							<Box sx={{ flexGrow: 1 }} />
-							<IconButton 
-								color="primary"
-								disabled={deleting || savingDisplayName}
-								onClick={handleOpenAccessMenu}
-								title={accessLevelLabel}
-							>
-								<Icon icon="admin" />
-							</IconButton>
-							<Menu
-								anchorEl={accessMenuAnchorEl}
-								open={isAccessMenuOpen}
-								onClose={handleCloseAccessMenu}
-							>
-								{ACCESS_LEVEL_OPTIONS.map((option) => (
-									<MenuItem
-										key={option.index}
-										selected={String(option.index) === accessLevel}
-										onClick={() => handleSelectAccessLevel(option.index)}
-									>
-										{option.label}
-									</MenuItem>
-								))}
-							</Menu>
-							<IconButton 
-								color="primary"
-								disabled={deleting}
-								onClick={handleDelete}
-							>
-								<Icon icon="delete" />
-							</IconButton>
+
+							
+							
 						</Stack>
 					</>
 				)}
@@ -315,83 +288,122 @@ const PractitionerUpdate = () => {
 
 						{!loading && !error && (
 							<>
-							<Grid container spacing={2} alignItems="center">
-								
-								<Grid size={{
-									xs: 12,
-									sm: 4,
-								}} sx={{ alignSelf: 'flex-start', order: { xs: 1, sm: 2 } }}>
-									<Box sx={{ 
-										display: 'flex', 
-										justifyContent: 'center', 
-										alignItems: 'flex-start', 
-										height: '100%',
-										m:2
-									 }}>
-										<AvatarUpload
-											size={125}
-											practitionerId={uuid}
-											currentAvatar={currentAvatar}
-											displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
-											onSuccess={handleAvatarSuccess}
-										/>
-									</Box>
+								<Grid container spacing={1} alignItems="center">
+									
+									<Grid size={{
+										xs: 12,
+										sm: 4,
+									}} sx={{ alignSelf: 'flex-start', order: { xs: 1, sm: 2 } }}>
+										<Box sx={{ 
+											display: 'flex', 
+											justifyContent: 'center', 
+											alignItems: 'flex-start', 
+											height: '100%',
+											m:2
+										}}>
+											<AvatarUpload
+												size={125}
+												practitionerId={uuid}
+												currentAvatar={currentAvatar}
+												displayName={currentDisplayName || data?.[0]?.title || 'Practitioner'}
+												onSuccess={handleAvatarSuccess}
+											/>
+										</Box>
+
+												<MightyButton
+													kind="listItem"
+													color="warning"
+													disabled={deleting}
+													onClick={handleDelete}
+													icon="delete"
+												>
+													Delete
+												</MightyButton>
+
+												<MightyButton
+													kind="listItem"
+													color="primary"
+													disabled={deleting || savingDisplayName}
+													onClick={handleOpenAccessMenu}
+													title={accessLevelLabel}
+													icon="admin"
+												>
+													{accessLevelLabel}
+												</MightyButton>
+												<Menu
+													anchorEl={accessMenuAnchorEl}
+													open={isAccessMenuOpen}
+													onClose={handleCloseAccessMenu}
+												>
+													{ACCESS_LEVEL_OPTIONS.map((option) => (
+														<MenuItem
+															key={option.index}
+															selected={String(option.index) === accessLevel}
+															onClick={() => handleSelectAccessLevel(option.index)}
+														>
+															{option.label}
+														</MenuItem>
+													))}
+												</Menu>
+									</Grid>
+
+									<Grid size={{
+										xs: 12,
+										sm: 8,
+									}} sx={{ order: { xs: 2, sm: 1 } }}>
+										<Stack spacing={2} sx={{m:2}}>
+
+											<Editable
+												helperText="This is the name that will be displayed in the system."
+												placeholder="Name"
+												value={displayName}
+												variant="outlined"
+												onChange={setDisplayName}
+												startAdornment="user"
+											/>
+
+											<Editable
+												placeholder="Clinic"
+												value={clinic}
+												variant="outlined"
+												onChange={setClinic}
+												startAdornment="medical"
+											/>
+											
+											<Editable
+												placeholder="Website"
+												value={website}
+												variant="outlined"
+												onChange={setWebsite}
+												startAdornment="link"
+											/>
+
+											<Typography variant="body1">
+												Access: <strong>{accessLevelLabel}</strong><br />
+												Email: <strong>{email ? `${email}` : 'No email provided'}</strong><br />
+											</Typography>
+
+											
+										</Stack>
+									</Grid>
+									
 								</Grid>
-
-								<Grid size={{
-									xs: 12,
-									sm: 8,
-								}} sx={{ order: { xs: 2, sm: 1 } }}>
-									<Stack spacing={2} sx={{m:2}}>
-
-										<Editable
-											placeholder="Name"
-											value={displayName}
-											variant="outlined"
-											onChange={setDisplayName}
-											startAdornment="user"
-										/>
-
-										<Editable
-											placeholder="Clinic"
-											value={clinic}
-											variant="outlined"
-											onChange={setClinic}
-											startAdornment="medical"
-										/>
-										
-										<Editable
-											placeholder="Website"
-											value={website}
-											variant="outlined"
-											onChange={setWebsite}
-											startAdornment="link"
-										/>
-
-										<Typography variant="body1">
-											Access: <strong>{accessLevelLabel}</strong><br />
-											Email: <strong>{email ? `${email}` : 'No email provided'}</strong><br />
-										</Typography>
-
-										<Collapse
-											in={canSave || savingDisplayName}
-											orientation="vertical"
-											unmountOnExit>
-											<Button
-												fullWidth
-												variant="contained"
-												startIcon={<Icon icon="save" />}
-												color="primary"
-												onClick={handleSaveDisplayName}
-												disabled={savingDisplayName || !canSave}
-												sx={{ pointerEvents: 'auto' }}
-											>
-												{savingDisplayName ? 'Saving...' : 'Save'}
-											</Button>
-										</Collapse>
-									</Stack>
-								</Grid>
-							</Grid>
+								<Collapse
+									in={canSave || savingDisplayName}
+									orientation="vertical"
+									unmountOnExit>
+									<Button
+										fullWidth
+										variant="contained"
+										startIcon={<Icon icon="save" />}
+										color="primary"
+										onClick={handleSaveDisplayName}
+										disabled={savingDisplayName || !canSave}
+										sx={{ pointerEvents: 'auto' }}
+									>
+										{savingDisplayName ? 'Saving...' : 'Save'}
+									</Button>
+								</Collapse>
 							</>
 						)}
 					</>

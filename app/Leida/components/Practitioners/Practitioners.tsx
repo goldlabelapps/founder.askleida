@@ -42,25 +42,16 @@ const Practitioners = () => {
 
 	return <>
 			<Box sx={{ p: 2 }}>
-				<Paper variant="outlined" sx={{ p: 2 }}>
-					<Stack spacing={2}>
-						<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-							<Typography variant="h5">
-								Practitioners
-							</Typography>
-							<MightyButton
-								kind="icon"
-								// variant="contained"
-								color="primary"
-								onClick={handleNewPractitioner}
-								icon="add"
-							>
-								Add
-							</MightyButton>
-
-						</Box>
-					</Stack>
-				</Paper>
+				<MightyButton
+					kind="button"
+					variant="outlined"
+					color="primary"
+					onClick={handleNewPractitioner}
+					endIcon="add"
+				>
+					New Practitioner
+				</MightyButton>
+				<Box sx={{ height: 24 }} />
 				<PractitionerList />
 			</Box>		
 	</>;

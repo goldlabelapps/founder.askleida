@@ -10,6 +10,7 @@ export type EditableBaseProps = {
 	id?: string;
 	label?: string;
 	placeholder?: string;
+    helperText?: ReactNode;
 	disabled?: boolean;
 	required?: boolean;
 	autoFocus?: boolean;
