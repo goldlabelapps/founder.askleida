@@ -49,7 +49,7 @@ const Practitioners = () => {
 					onClick={handleNewPractitioner}
 					endIcon="add"
 				>
-					New Practitioner
+					New
 				</MightyButton>
 				<Box sx={{ height: 24 }} />
 				<PractitionerList />

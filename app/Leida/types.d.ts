@@ -358,6 +358,15 @@ export type T_UpdatePractitionerInput = {
     value: unknown;
 };
 
+export type T_UpdatePractitionerProfileInput = {
+    practitioner_id: string;
+    email?: string;
+    display_name?: string;
+    clinic?: string;
+    website?: string;
+    access_level: number;
+};
+
 export type T_CreatePractitionerArgs = {
     email: string;
     name?: string;

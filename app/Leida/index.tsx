@@ -25,7 +25,21 @@ import { MightyButton } from './components/UI';
 import ConfirmAction from '../NX/DesignSystem/components/ConfirmAction';
 import Editable from '../NX/NXAdmin/components/UI/Editable';
 import { LeidaFlash } from './components/LeidaFlash';
-import { PractitionerList, PractitionerCard, SurfacePractitioners, PractitionerNew, PractitionerUpdate, Practitioners, usePractitioners } from './components/Practitioners';
+import {
+    PractitionerList,
+    PractitionerCard,
+    SurfacePractitioners,
+    PractitionerNew,
+    PractitionerUpdate,
+    Practitioners,
+    usePractitioners,
+    deletePractitioner,
+    updateAvatar,
+    createPractitioner,
+    updatePractitioner,
+    updatePractitionerProfile,
+    initPractitioners,
+} from './components/Practitioners';
 
 // Hooks
 import { useLeida, useLeidaBus } from './hooks/useLeida';
@@ -38,11 +52,6 @@ import { useQueue } from './components/Products/hooks/useQueue';
 import { initLeida } from './actions/initLeida';
 import { fetchLeida } from './actions/fetchLeida';
 import { setLeida } from './actions/setLeida';
-import { deletePractitioner } from './components/Practitioners/actions/deletePractitioner';
-import { updateAvatar } from './components/Practitioners/actions/updateAvatar';
-import { createPractitioner } from './components/Practitioners/actions/createPractitioner';
-import { updatePractitioner } from './components/Practitioners/actions/updatePractitioner';
-import { initPractitioners } from './components/Practitioners/actions/initPractitioners';
 import { initAWIN } from './components/Products/actions/initAwin';
 import { setAWIN } from './components/Products/actions/setAwin';
 import { fetchAWIN } from './components/Products/actions/fetchAwin';
@@ -199,6 +208,7 @@ export {
     createPractitioner,
     updateAvatar,
     updatePractitioner,
+    updatePractitionerProfile,
     initPractitioners,
     setDash,
     // Lib

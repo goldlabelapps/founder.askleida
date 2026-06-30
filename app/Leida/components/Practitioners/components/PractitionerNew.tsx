@@ -42,6 +42,10 @@ const PractitionerNew = () => {
 			icon: 'practitioner-add',
 		}));
 	}, [dispatch]);
+
+	const handleBack = React.useCallback(() => {
+		router.back();
+	}, [router]);
 		
 	const handleCreatePractitioner = React.useCallback(async () => {
 		setCreateError(null);
@@ -106,55 +110,58 @@ const PractitionerNew = () => {
 			<Box sx={{ p: 1.5, width: '100%' }}>
 				<Box sx={{ mx: 0 }}>
 					
-					
-
-					<Typography variant="body1">
-						Send a Supabase invite to a new Practitioner.<br />They have to set a password to complete account setup before onboarding
+					<MightyButton
+						startIcon="left"
+						variant="outlined"
+						onClick={handleBack}
+					>
+						Back
+					</MightyButton>
+					<Box sx={{ height: 24 }} />
+					<Typography variant="body2">
+						Sends a Supabase invite to a new Practitioner.<br />
+						They set a password to complete account setup before onboarding
 					</Typography>
 					<Box sx={{ height: 24 }} />
-
-					
-
 					<Box sx={{ maxWidth: 400, width: '100%' }}>
-
 						{createError || createSuccess ? (
 							<Box sx={{ mb: 2 }}>
-								{createError && <Alert severity="error">{createError}</Alert>}
+								{createError && <Alert severity="warning">{createError}</Alert>}
 								{createSuccess && <Alert severity="success">{createSuccess}</Alert>}
 							</Box>
 						) : null}
+						<Box sx={{ maxWidth: 400, width: '100%' }}>
+							<Editable
+								key={`invite-email-${emailFocusKey}`}
+								startAdornment={"email"}
+								variant="standard"
+								value={inviteEmail}
+								onChange={setInviteEmail}
+								disabled={createLoading}
+								placeholder="name@example.com"
+							/>
+						</Box>
+						<Box sx={{ height: 24 }} />
 
 						<Editable
 							key={`invite-name-${nameFocusKey}`}
 							startAdornment={"practitioner"}
-							variant="filled"
+							variant="standard"
 							value={inviteName}
 							onChange={setInviteName}
 							disabled={createLoading}
 							placeholder="Name"
 						/>
 					</Box>
-					<Box sx={{ height: 24 }} />
-					<Box sx={{ maxWidth: 400, width: '100%' }}>
-						<Editable
-							key={`invite-email-${emailFocusKey}`}
-							startAdornment={"email"}
-							variant="filled"
-							value={inviteEmail}
-							onChange={setInviteEmail}
-							disabled={createLoading}
-							placeholder="name@example.com"
-						/>
-					</Box>
+					
 					<Box sx={{ height: 32 }} />
 					<MightyButton
-						
 						variant="outlined"
 						endIcon="send"
 						onClick={handleCreatePractitioner}
 						disabled={createLoading}
 					>
-						{createLoading ? 'Inviting...' : 'Invite Practitioner'}
+						{createLoading ? 'Inviting...' : 'Invite'}
 					</MightyButton>
 					
 				</Box>

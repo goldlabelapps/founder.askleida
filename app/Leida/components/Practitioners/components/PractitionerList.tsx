@@ -3,10 +3,41 @@ import * as React from 'react';
 import { Alert, Box, LinearProgress, Stack } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { fetchLeida, useLeidaBus } from '../../../../Leida';
+import { parsePractitionerData } from '../../../lib/parsePractitionerData';
 import type { T_PractitionerRecord } from '../../../types.d';
 import PractitionerCard from './PractitionerCard';
 
 const PRACTITIONERS_ROUTE = '/api/practitioners';
+
+function toTime(value: unknown): number {
+	if (typeof value !== 'string') return 0;
+	const time = Date.parse(value);
+	return Number.isNaN(time) ? 0 : time;
+}
+
+function getRecordUpdatedTime(record: T_PractitionerRecord | null): number {
+	if (!record) return 0;
+	const data = parsePractitionerData(record.data);
+	return (
+		toTime((record as Record<string, unknown>).updatedAt) ||
+		toTime(record.updated) ||
+		toTime((record as Record<string, unknown>).updated_at) ||
+		toTime((data as Record<string, unknown>).updatedAt) ||
+		toTime((data as Record<string, unknown>).updated_at)
+	);
+}
+
+function getRecordCreatedTime(record: T_PractitionerRecord | null): number {
+	if (!record) return 0;
+	const data = parsePractitionerData(record.data);
+	return (
+		toTime((record as Record<string, unknown>).createdAt) ||
+		toTime(record.created) ||
+		toTime((record as Record<string, unknown>).created_at) ||
+		toTime((data as Record<string, unknown>).createdAt) ||
+		toTime((data as Record<string, unknown>).created_at)
+	);
+}
 
 const PractitionerList = () => {
 	const dispatch = useDispatch();
@@ -16,17 +47,9 @@ const PractitionerList = () => {
 	const rows = (Array.isArray(practitionersBus?.data) ? practitionersBus.data : []) as T_PractitionerRecord[];
 	const sortedRows = React.useMemo(() => {
 		return [...rows]
-			.filter((row) => {
-				const accessLevel = row?.data && typeof row.data === 'object' 
-					? (row.data as Record<string, unknown>).access_level 
-					: null;
-				return accessLevel !== 4;
-			})
 			.sort((a, b) => {
-				const aTime = Date.parse(typeof a?.updated === 'string' ? a.updated : '');
-				const bTime = Date.parse(typeof b?.updated === 'string' ? b.updated : '');
-				const aValue = Number.isNaN(aTime) ? 0 : aTime;
-				const bValue = Number.isNaN(bTime) ? 0 : bTime;
+				const aValue = getRecordUpdatedTime(a) || getRecordCreatedTime(a);
+				const bValue = getRecordUpdatedTime(b) || getRecordCreatedTime(b);
 				return bValue - aValue;
 			});
 	}, [rows]);
