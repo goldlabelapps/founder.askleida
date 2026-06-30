@@ -170,7 +170,7 @@ export default function Nav({
           nested,
           badgeContent: item.route === '/products/queue'
             ? (typeof queueCount === 'number' && queueCount > 0 ? queueCount : undefined)
-            : item.route === '/products/list'
+            : item.route === '/products'
               ? productCount ?? undefined
               : undefined,
         }}

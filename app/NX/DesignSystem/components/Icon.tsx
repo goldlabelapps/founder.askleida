@@ -199,9 +199,9 @@ import FlagIcon from '@mui/icons-material/Flag';
 import RandomIcon from '@mui/icons-material/Shuffle';
 import PractitionerIcon from '@mui/icons-material/Face6';
 import PractitionerAddIcon from '@mui/icons-material/FaceRetouchingNatural';
-
 import StartIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import ManageIcon from '@mui/icons-material/BuildOutlined';
 
 export default function Icon({ icon, color }: I_Icon) {
   if (!color) color = 'inherit';
@@ -209,6 +209,9 @@ export default function Icon({ icon, color }: I_Icon) {
   switch (icon) {
     case 'stop':
       iconFragment = <StopIcon color={color} />;
+      break;
+    case 'manage':
+      iconFragment = <ManageIcon color={color} />;
       break;
     case 'pause':
       iconFragment = <PauseIcon color={color} />;

@@ -17,6 +17,7 @@ import AWINDetail from './components/Products/components/AwinDetail';
 import AWINList from './components/Products/components/AwinList';
 import AWINProcess from './components/Products/components/AwinProcess';
 import Queue from './components/Products/components/Queue';
+import { Selected } from './components/Products/components';
 import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
@@ -168,6 +169,7 @@ export {
     Claude,
     Products,
     Queue,
+    Selected,
     ListProducts,
     RenderProduct,
     FindProduct,

@@ -315,6 +315,24 @@ export type T_QueueListRow = {
     row: T_QueueRow;
 };
 
+export type T_SelectedImageData = {
+    thumbnailUrl: string | null;
+    mainImageUrl: string | null;
+    description: string | null;
+    descriptionPreview: string;
+    displayImageUrl: string | null;
+};
+
+export type T_SelectedProps = {
+    selectedRow: T_QueueListRow;
+    selectedImageData: T_SelectedImageData;
+    deletingQueueId: string | null;
+    confirmDeleteOpen: boolean;
+    onOpenDeleteConfirm: () => void;
+    onConfirmDelete: () => void;
+    onCloseDeleteConfirm: () => void;
+};
+
 export type T_ImageMeta = {
     status: 'idle' | 'loaded' | 'error';
     width: number;

@@ -36,7 +36,7 @@ export default function Feedback() {
         onClose={handleClose}
       >
         <Alert
-          variant="filled"
+          variant="outlined"
           severity={severity}
           sx={{ minWidth: 250 }}
           action={

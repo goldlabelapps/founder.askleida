@@ -197,7 +197,7 @@ export default function Products() {
 		} catch (e: unknown) {
 			const message = e instanceof Error ? e.message : String(e);
 			dispatch(setFeedback({
-				severity: 'warning',
+				severity: 'error',
 				title: message || 'Failed to delete product queue records.',
 			}));
 		} finally {
@@ -279,7 +279,7 @@ export default function Products() {
 
 			if (result.skippedIngest || result.configured === false) {
 				setUpdateRunResult({
-					severity: 'warning',
+					severity: 'info',
 					title: result.message || 'AWIN ingest is not configured.',
 					description: 'Run /api/awin/lookfantastic/sync after configuring the feed pipeline, then retry ingest.',
 				});
@@ -324,13 +324,21 @@ export default function Products() {
 				</Stack>
 				<Stack spacing={1.5} sx={{ width: '100%' }}>
 
-					<Box sx={{
-						// border: '1px solid ',
-						// borderColor: '#b2d612',
-					}}>
-						<Typography variant="body1" sx={{ mb: 2 }}>
-							This will check AWIN for an updated feed snapshot and determine if a new ingest is required.
-						</Typography>
+					<Box sx={{}}>
+
+						
+
+						
+
+						<MightyButton
+							variant="outlined"
+							startIcon="awin"
+							onClick={() => {
+								dispatch(navigateTo(router, '/products/awin'));
+							}}
+							>
+							View AWIN Products
+						</MightyButton>
 						<MightyButton
 							alignLeft
 							variant="outlined"
@@ -340,25 +348,23 @@ export default function Products() {
 						>
 							{checkingAWINFeedSnapshot ? 'Running AWIN Cron...' : 'Run AWIN Cron'}
 						</MightyButton>
+						<Box sx={{ height: 24 }} />
+						{updateCheckResult ? (
+							<Alert severity="info">
+								<Typography variant="body1">
+									{updateCheckResult.title}
+								</Typography>
+								{updateCheckResult.description ? (
+									<Typography variant="body2">
+										{updateCheckResult.description}
+									</Typography>
+								) : null}
+							</Alert>
+						) : null}
+
 					</Box>
 					
-					{updateCheckResult ? (
-						<Alert severity="warning">
-							<Typography variant="body1">
-								{updateCheckResult.title}
-							</Typography>
-							{updateCheckResult.description ? (
-								<Typography variant="body2">
-									{updateCheckResult.description}
-								</Typography>
-							) : null}
-						</Alert>
-					) : null}
-
 					<Box sx={{}}>
-						<Typography variant="body1" sx={{my: 2}}>
-							This will ingest the latest AWIN feed into products_awin.
-						</Typography>
 						<MightyButton
 							alignLeft
 							variant="outlined"
@@ -372,8 +378,8 @@ export default function Products() {
 
 					{awinTotal > 0 ? (
 						<Box sx={{}}>
-							<Typography variant="body1" sx={{ my: 2 }}>
-								This will permanently clear every record from the AWIN table.
+							<Typography variant="h6" sx={{ my: 2 }}>
+								Permanently clear AWIN table.
 							</Typography>
 							<MightyButton
 								alignLeft
@@ -389,8 +395,8 @@ export default function Products() {
 
 					{queueTotal > 0 ? (
 						<Box sx={{}}>
-							<Typography variant="body1" sx={{ my: 2 }}>
-								This will permanently clear every record from the Queue table.
+							<Typography variant="h6" sx={{ my: 2 }}>
+								Permanently clear Queue table.
 							</Typography>
 							<MightyButton
 								alignLeft

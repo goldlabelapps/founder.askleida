@@ -94,8 +94,8 @@ const ListProducts = ({
 
 	React.useEffect(() => {
 		dispatch(setLeida('header', {
-			title: 'List',
-			icon: 'list',
+			title: 'Products',
+			icon: 'products',
 		}));
 	}, [dispatch]);
 
@@ -327,20 +327,18 @@ const ListProducts = ({
 			) : showEmptyLibraryState ? (
 				<Box sx={{ py: 4 }}>
 					<Typography variant="body1" color="text.secondary">
-						No products yet. Add products from AWIN into the Queue, then process them to build your products library.
+						No products yet.
 					</Typography>
 
 					<Stack direction="row" spacing={1.5} sx={{ mt: 3 }}>
-						
-
 						<MightyButton
 							variant="outlined"
-							startIcon="awin"
+							startIcon="manage"
 							onClick={() => {
-								dispatch(navigateTo(router, '/products/awin'));
+								dispatch(navigateTo(router, '/products/manage'));
 							}}
 						>
-							AWIN
+							Manage
 						</MightyButton>
 
 						{queueTotal > 0 ? (
