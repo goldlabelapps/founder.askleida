@@ -6,8 +6,31 @@ import { setFeedback } from '../../../../NX/DesignSystem'
 import type { T_CreatePractitionerArgs, T_CreatePractitionerResult } from '../../../types.d';
 
 const PRACTITIONERS_ROUTE = '/api/practitioners';
+const SUPABASE_ROUTE = '/api/supabase';
 const ACCESS_LEVEL = 3;
 const DEFAULT_AVATAR_URL = 'https://app.askleida.com/askleida/png/default-logo.png';
+
+const slugify = (value: string) => value
+	.normalize('NFKD')
+	.replace(/[\u0300-\u036f]/g, '')
+	.toLowerCase()
+	.replace(/[^a-z0-9]+/g, '-')
+	.replace(/^-+|-+$/g, '');
+
+const hashString = (value: string) => {
+	let hash = 0;
+	for (let index = 0; index < value.length; index += 1) {
+		hash = (hash << 5) - hash + value.charCodeAt(index);
+		hash |= 0;
+	}
+	return Math.abs(hash).toString(36);
+};
+
+const buildPractitionerSlug = (name: string, email: string) => {
+	const baseSlug = slugify(name) || 'practitioner';
+	const uniqueSuffix = hashString(email).slice(0, 6) || '000000';
+	return `${baseSlug}-${uniqueSuffix}`;
+};
 
 export const createPractitioner = ({ email, name }: T_CreatePractitionerArgs): any =>
 	async (dispatch: Dispatch) => {
@@ -28,9 +51,10 @@ export const createPractitioner = ({ email, name }: T_CreatePractitionerArgs): a
 		const redirectTo = typeof window !== 'undefined'
 			? `${window.location.origin}/practitioners`
 			: '/practitioners';
+		const slug = buildPractitionerSlug(normalizedName, normalizedEmail);
 
 		try {
-			const response = await fetch(PRACTITIONERS_ROUTE, {
+			const response = await fetch(SUPABASE_ROUTE, {
 				method: 'POST',
 				headers: {
 					Accept: 'application/json',
@@ -38,12 +62,12 @@ export const createPractitioner = ({ email, name }: T_CreatePractitionerArgs): a
 				},
 				body: JSON.stringify({
 					resource: 'practitioner-onboard',
-					name: normalizedName,
 					email: normalizedEmail,
 					redirectTo,
 					user_metadata: {
 						name: normalizedName,
 						display_name: normalizedName,
+						slug,
 						invited_from: 'leida-practitioner-module',
 						access_level: ACCESS_LEVEL,
 						avatar: DEFAULT_AVATAR_URL,

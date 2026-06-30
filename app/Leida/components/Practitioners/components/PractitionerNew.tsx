@@ -4,8 +4,6 @@ import { useRouter } from 'next/navigation';
 import {
 	Alert,
 	Box,
-	Button,
-	Paper,
 	Typography,
 } from '@mui/material';
 import { Icon, navigateTo } from '../../../../NX/DesignSystem';
@@ -13,9 +11,11 @@ import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	createPractitioner,
 	setLeida,
+	MightyButton,
 } from '../../../../Leida';
 import { Editable } from '../../../../NX/NXAdmin';
 import { setFeedback } from '../../../../NX/DesignSystem';
+import { isValidEmail } from '../../../lib/isValidEmail';
 
 const PractitionerNew = () => {
 	const dispatch = useDispatch();
@@ -69,6 +69,16 @@ const PractitionerNew = () => {
 			return;
 		}
 
+		if (!isValidEmail(email)) {
+			dispatch(setFeedback({
+				title: 'Enter a valid email address',
+				severity: 'error',
+			}));
+			setCreateError('Enter a valid email address');
+			focusEmailField();
+			return;
+		}
+
 		setCreateLoading(true);
 		try {
 			await dispatch(createPractitioner({ email, name }));
@@ -99,7 +109,7 @@ const PractitionerNew = () => {
 					
 
 					<Typography variant="body1">
-						Sends a Supabase invite so they can set a password and finish account setup and onboarding
+						Send a Supabase invite to a new Practitioner.<br />They have to set a password to complete account setup before onboarding
 					</Typography>
 					<Box sx={{ height: 24 }} />
 
@@ -113,7 +123,7 @@ const PractitionerNew = () => {
 								{createSuccess && <Alert severity="success">{createSuccess}</Alert>}
 							</Box>
 						) : null}
-						
+
 						<Editable
 							key={`invite-name-${nameFocusKey}`}
 							startAdornment={"practitioner"}
@@ -121,11 +131,10 @@ const PractitionerNew = () => {
 							value={inviteName}
 							onChange={setInviteName}
 							disabled={createLoading}
-							autoFocus
 							placeholder="Name"
 						/>
 					</Box>
-					<Box sx={{ height: 12 }} />
+					<Box sx={{ height: 24 }} />
 					<Box sx={{ maxWidth: 400, width: '100%' }}>
 						<Editable
 							key={`invite-email-${emailFocusKey}`}
@@ -134,21 +143,19 @@ const PractitionerNew = () => {
 							value={inviteEmail}
 							onChange={setInviteEmail}
 							disabled={createLoading}
-							autoFocus
 							placeholder="name@example.com"
 						/>
 					</Box>
-					<Box sx={{ height: 12 }} />
-					<Button
-						sx={{mt: 2}}
-						variant="contained"
-						endIcon={<Icon icon="send" />}
+					<Box sx={{ height: 32 }} />
+					<MightyButton
+						
+						variant="outlined"
+						endIcon="send"
 						onClick={handleCreatePractitioner}
 						disabled={createLoading}
-						size="large"
 					>
 						{createLoading ? 'Inviting...' : 'Invite Practitioner'}
-					</Button>
+					</MightyButton>
 					
 				</Box>
 				

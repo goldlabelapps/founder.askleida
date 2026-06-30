@@ -46,16 +46,10 @@ export default function Dashboard() {
                 <Typography variant="overline">
                     Products
                 </Typography>
-                <Box sx={{ height: 12 }} />
-                <Typography variant="body1">
-                    Manage products. Maintain the AWIN data table, 
-                    add products to the Queue, process Queue item by item 
-                    using Claude
-                </Typography>
                 <Box sx={{ height: 24 }} />
+                
                 <MightyButton
                     alignLeft
-                    fullWidth
                     variant="outlined"
                     startIcon="products"
                     onClick={() => {
@@ -64,6 +58,15 @@ export default function Dashboard() {
                 >
                     Manage Products
                 </MightyButton>
+
+                <Box sx={{ height: 24 }} />
+                <Typography variant="body1">
+                    Manage products. Maintain the AWIN data table,
+                    add products to the Queue, process Queue item by item
+                    using Claude
+                </Typography>
+                
+
             </Grid>
             
             <Grid size={{
@@ -74,6 +77,21 @@ export default function Dashboard() {
                 <Typography variant="overline">
                     Practitioners
                 </Typography>
+                <Box sx={{ height: 24 }} />
+
+                
+                <MightyButton
+                    kind="button"
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => {
+                        dispatch(navigateTo(router, '/practitioners/new'));
+                    }}
+                    startIcon="practitioner-add"
+                >
+                    New Practitioner
+                </MightyButton>
+                
                 <Box sx={{ height: 12 }} />
                 <PractitionerList />
             </Grid>
