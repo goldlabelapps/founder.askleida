@@ -21,7 +21,7 @@ import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
-import MightyButton from './components/MightyButton/MightyButton';
+import { MightyButton } from './components/UI';
 import ConfirmAction from '../NX/DesignSystem/components/ConfirmAction';
 import Editable from '../NX/NXAdmin/components/UI/Editable';
 import { LeidaFlash } from './components/LeidaFlash';
