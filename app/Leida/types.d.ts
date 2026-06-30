@@ -298,6 +298,23 @@ export type T_QueueRow = {
     [key: string]: unknown;
 };
 
+export type T_QueueListRow = {
+    id: string;
+    position: number;
+    queueId: string;
+    title: string;
+    source: string | null;
+    source_table: string | null;
+    source_product_id: string | null;
+    decision: string | null;
+    status: string | null;
+    practitioner_id: string | null;
+    created: string | null;
+    updated: string | null;
+    data: Record<string, unknown>;
+    row: T_QueueRow;
+};
+
 export type T_ImageMeta = {
     status: 'idle' | 'loaded' | 'error';
     width: number;

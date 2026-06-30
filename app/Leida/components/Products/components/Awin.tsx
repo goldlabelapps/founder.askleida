@@ -19,6 +19,7 @@ import { navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { Editable } from '../../../../NX/NXAdmin';
 import {
     asText,
+    Back,
     fetchLeida,
     fetchAWINFeedIngestPreflight,
     MightyButton,
@@ -118,7 +119,7 @@ export default function AWIN() {
     const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
     const activeQuery = debouncedSearchTerm.trim();
     const isTableEmpty = !loading && !activeQuery && total === 0;
-    const showAWINControls = !loading && !isTableEmpty;
+    const showAWINControls = !isTableEmpty;
 
     const statusMessage = React.useMemo(() => {
         if (loading) {
@@ -350,6 +351,37 @@ export default function AWIN() {
             <Stack spacing={2}>
                 {showAWINControls ? (
                     <>
+                        <Stack
+                            direction={{ xs: 'column', md: 'row' }}
+                            spacing={1.5}
+                            alignItems={{ xs: 'stretch', md: 'center' }}
+                            justifyContent="space-between"
+                        >
+                            <Back />
+
+                            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: { md: 'auto' } }}>
+
+                                <MightyButton
+                                    variant="text"
+                                    startIcon="delete"
+                                    disabled={!selectedCount || Boolean(bulkDecision)}
+                                    onClick={() => handleBulkProcess('delete')}
+                                >
+                                    {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Skip${selectedCount ? ` (${selectedCount})` : ''}`}
+                                </MightyButton>
+                                <MightyButton
+                                    startIcon="queue"
+                                    variant="text"
+                                    disabled={!selectedCount || Boolean(bulkDecision)}
+                                    onClick={() => handleBulkProcess('queue')}
+                                >
+                                    {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add ${selectedCount ? ` (${selectedCount})` : ''}`}
+                                </MightyButton>
+
+                                
+                            </Stack>
+                        </Stack>
+
                         <Box sx={{
                             width: { xs: '100%', md: 300 },
                             maxWidth: '100%',
@@ -367,7 +399,7 @@ export default function AWIN() {
                                 endAdornment={(
                                     <MightyButton
                                         kind="icon"
-                                        icon="cancel"
+                                        icon="close"
                                         disabled={!searchTerm.trim() || Boolean(bulkDecision)}
                                         onClick={() => {
                                             setPage(1);
@@ -378,35 +410,6 @@ export default function AWIN() {
                                 )}
                             />
                         </Box>
-
-                        <Stack
-                            direction={{ xs: 'column', md: 'row' }}
-                            spacing={1.5}
-                            alignItems={{ xs: 'stretch', md: 'center' }}
-                            justifyContent="space-between"
-                        >
-                            <Stack direction="row" spacing={1.5} alignItems="center">
-
-                                <MightyButton
-                                    startIcon="queue"
-                                    variant="outlined"
-                                    disabled={!selectedCount || Boolean(bulkDecision)}
-                                    onClick={() => handleBulkProcess('queue')}
-                                >
-                                    {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add to Queue${selectedCount ? ` (${selectedCount})` : ''}`}
-                                </MightyButton>
-
-                                <MightyButton
-                                    variant="text"
-                                    startIcon="delete"
-                                    disabled={!selectedCount || Boolean(bulkDecision)}
-                                    onClick={() => handleBulkProcess('delete')}
-                                >
-                                    {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Skip${selectedCount ? ` (${selectedCount})` : ''}`}
-                                </MightyButton>
-
-                            </Stack>
-                        </Stack>
 
                         {activeQuery ? (
                             <Typography variant="body2" color="text.secondary">

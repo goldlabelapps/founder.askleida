@@ -1,4 +1,1 @@
-export { LeidaFlash } from './LeidaFlash';
-
-export { LeidaFlashAS, LogoAS } from './ActionScript';
-export { LeidaLogo } from './MovieClips';
+export { LeidaFlash, LeidaFlashAS, LogoAS, LeidaLogo } from '../UI/LeidaFlash';

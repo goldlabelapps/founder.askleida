@@ -19,12 +19,12 @@ export const navItems: DashNavItem[] = [
     route: '/products',
     activeRoutes: ['/products', '/products/awin', '/awin', '/products/queue', '/products/list'],
     children: [
-      {
-        label: 'AWIN',
-        icon: 'awin',
-        route: '/products/awin',
-        activeRoutes: ['/products/awin', '/awin'],
-      },
+      // {
+      //   label: 'AWIN',
+      //   icon: 'awin',
+      //   route: '/products/awin',
+      //   activeRoutes: ['/products/awin', '/awin'],
+      // },
       {
         label: 'Queue',
         icon: 'queue',

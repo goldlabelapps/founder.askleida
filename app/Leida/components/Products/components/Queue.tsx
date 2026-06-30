@@ -22,74 +22,22 @@ import {
 } from '@mui/x-data-grid';
 import { setFeedback } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { initQueue, MightyButton, processQueueItem, setLeida } from '../../../index';
-import type { T_QueueRow } from '../../../types.d';
+import {
+  getQueueRowTitle,
+  initQueue,
+  MightyButton,
+  notifyProductsCountRefresh,
+  notifyQueueCountRefresh,
+  processQueueItem,
+  queueAsObject,
+  queueAsText,
+  setLeida,
+} from '../../../index';
+import type { T_QueueListRow, T_QueueRow } from '../../../types.d';
 import { toDate } from '../../../lib/toDate';
 import { toLabel } from '../../../lib/toLabel';
 
 const RESULTS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
-const QUEUE_COUNT_REFRESH_EVENT = 'leida:queue-count-refresh';
-const PRODUCTS_COUNT_REFRESH_EVENT = 'leida:products-count-refresh';
-
-type T_QueueListRow = {
-  id: string;
-  position: number;
-  queueId: string;
-  title: string;
-  source: string | null;
-  source_table: string | null;
-  source_product_id: string | null;
-  decision: string | null;
-  status: string | null;
-  practitioner_id: string | null;
-  created: string | null;
-  updated: string | null;
-  data: Record<string, unknown>;
-  row: T_QueueRow;
-};
-
-function asText(value: unknown): string {
-  return typeof value === 'string' ? value.trim() : '';
-}
-
-function asObject(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {};
-}
-
-function getQueueRowTitle(row: T_QueueRow): string {
-  const data = asObject(row?.data);
-  const basic = asObject(data.product_basic);
-
-  const candidates: unknown[] = [
-    data.product_name,
-    basic.title,
-    basic.name,
-    data.title,
-    data.name,
-    row?.source_product_id,
-    data.merchant_product_id,
-    data.aw_product_id,
-  ];
-
-  for (const value of candidates) {
-    const text = asText(value);
-    if (text) {
-      return text;
-    }
-  }
-
-  return 'Queue item';
-}
-
-function notifyQueueCountRefresh() {
-  window.dispatchEvent(new Event(QUEUE_COUNT_REFRESH_EVENT));
-}
-
-function notifyProductsCountRefresh() {
-  window.dispatchEvent(new Event(PRODUCTS_COUNT_REFRESH_EVENT));
-}
 
 export default function Queue() {
   const dispatch = useDispatch();
@@ -207,21 +155,21 @@ export default function Queue() {
 
   const gridRows = React.useMemo<T_QueueListRow[]>(() => {
     const mapped = rows.map((row, index) => {
-      const queueId = asText(row.queue_id) || asText(row.id) || `queue-${index}`;
+      const queueId = queueAsText(row.queue_id) || queueAsText(row.id) || `queue-${index}`;
       return {
         id: queueId,
         position: ((page - 1) * resultsPerPage) + index + 1,
         queueId,
         title: getQueueRowTitle(row),
-        source: asText(row.source) || null,
-        source_table: asText(row.source_table) || null,
-        source_product_id: asText(row.source_product_id) || null,
-        decision: asText(row.decision) || null,
-        status: asText(row.status) || null,
-        practitioner_id: asText(row.practitioner_id) || null,
-        created: asText(row.created) || null,
-        updated: asText(row.updated) || null,
-        data: asObject(row.data),
+        source: queueAsText(row.source) || null,
+        source_table: queueAsText(row.source_table) || null,
+        source_product_id: queueAsText(row.source_product_id) || null,
+        decision: queueAsText(row.decision) || null,
+        status: queueAsText(row.status) || null,
+        practitioner_id: queueAsText(row.practitioner_id) || null,
+        created: queueAsText(row.created) || null,
+        updated: queueAsText(row.updated) || null,
+        data: queueAsObject(row.data),
         row,
       };
     });
@@ -402,12 +350,8 @@ export default function Queue() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <Stack spacing={2}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
-
-
-          <Box sx={{ flexGrow: 1 }} />
-        </Stack>
+      <Stack spacing={0}>
+        
 
         {!loading && !hasQueryError && listRows.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
@@ -431,14 +375,14 @@ export default function Queue() {
               </Avatar>
               <Stack spacing={1} sx={{ minWidth: 0, flex: 1 }}>
                 <Typography variant="overline">
-                  Next product
+                  Currently selected queue item
                 </Typography>
                 <Typography variant="subtitle1">
                   {selectedRow.title}
                 </Typography>
                 <Box>
                 <MightyButton
-                  variant="contained"
+                  variant="text"
                   endIcon="start"
                   disabled={processing}
                   onClick={openProcessDialog}

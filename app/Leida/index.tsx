@@ -21,10 +21,9 @@ import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
-import { MightyButton, Back } from './components/UI';
+import { MightyButton, Back, LeidaFlash } from './components/UI';
 import ConfirmAction from '../NX/DesignSystem/components/ConfirmAction';
 import Editable from '../NX/NXAdmin/components/UI/Editable';
-import { LeidaFlash } from './components/LeidaFlash';
 import {
     PractitionerList,
     PractitionerCard,
@@ -126,6 +125,13 @@ import { getSupabaseFieldValue } from './lib/getSupabaseFieldValue';
 import { parseSupabaseFieldValue } from './lib/parseSupabaseFieldValue';
 import { getTableFormPreset } from './lib/getTableFormPreset';
 import { normalizeColumnsForPreset } from './lib/normalizeColumnsForPreset';
+import {
+    getQueueRowTitle,
+    notifyProductsCountRefresh,
+    notifyQueueCountRefresh,
+    queueAsObject,
+    queueAsText,
+} from './lib/queue';
 
 const AWINSearch = AWIN;
 const Awin = AWIN;
@@ -271,6 +277,11 @@ export {
     parseSupabaseFieldValue,
     getTableFormPreset,
     normalizeColumnsForPreset,
+    queueAsText,
+    queueAsObject,
+    getQueueRowTitle,
+    notifyQueueCountRefresh,
+    notifyProductsCountRefresh,
 }
 
 export type * from './types';

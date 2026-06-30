@@ -1,16 +1,16 @@
 "use client";
 import React, { useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDispatch } from '../../../NX/Uberedux';
+import { useDispatch } from '../../../../NX/Uberedux';
 import {
     Flash,
     MovieClip,
-} from '../../../../app/NX/Flash';
+} from '../../../../NX/Flash';
 import {
     setLeida,
     useLeida,
     useDash,
-} from '../../../Leida';
+} from '../../../../Leida';
 
 import {
     LeidaFlashAS,
@@ -48,8 +48,6 @@ export const LeidaFlash: React.FC = () => {
             }
         };
     }, []);
-
-    
 
     return (
             <Flash id={'leida_flash'} width={"100%"} height={350}>

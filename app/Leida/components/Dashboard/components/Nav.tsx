@@ -177,7 +177,7 @@ export default function Nav({
       />
       )}
       {item.children?.map((child) => renderItem(child, true))}
-      {!nested ? <Divider /> : null}
+      {/* {!nested ? <Divider /> : null} */}
     </React.Fragment>
   ), [isRouteActive, navigateToRoute, open, productCount, queueCount]);
 

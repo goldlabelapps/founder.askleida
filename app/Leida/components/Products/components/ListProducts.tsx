@@ -331,6 +331,18 @@ const ListProducts = ({
 					</Typography>
 
 					<Stack direction="row" spacing={1.5} sx={{ mt: 3 }}>
+						
+
+						<MightyButton
+							variant="outlined"
+							startIcon="awin"
+							onClick={() => {
+								dispatch(navigateTo(router, '/products/awin'));
+							}}
+						>
+							AWIN
+						</MightyButton>
+
 						{queueTotal > 0 ? (
 							<MightyButton
 								variant="outlined"
@@ -342,16 +354,6 @@ const ListProducts = ({
 								Queue
 							</MightyButton>
 						) : null}
-
-						<MightyButton
-							variant="outlined"
-							startIcon="awin"
-							onClick={() => {
-								dispatch(navigateTo(router, '/products/awin'));
-							}}
-						>
-							AWIN
-						</MightyButton>
 					</Stack>
 				</Box>
 			) : (
