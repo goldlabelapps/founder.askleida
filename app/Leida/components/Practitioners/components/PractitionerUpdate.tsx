@@ -33,8 +33,14 @@ const ACCESS_LEVEL_OPTIONS = [
 	{ index: 4, label: 'Founder' },
 	{ index: 3, label: 'QA' },
 	{ index: 2, label: 'Practitioner' },
-	{ index: 1, label: 'Client' }
 ];
+
+const ACCESS_LEVEL_LABELS: Record<string, string> = {
+	'4': 'Founder',
+	'3': 'QA',
+	'2': 'Practitioner',
+	'1': 'Client',
+};
 
 const PractitionerUpdate = () => {
 
@@ -89,8 +95,7 @@ const PractitionerUpdate = () => {
 	const canSave = hasEmailChanges || hasDisplayNameChanges || hasClinicChanges || hasWebsiteChanges || hasAccessLevelChanges || avatarChanged;
 	const isAccessMenuOpen = Boolean(accessMenuAnchorEl);
 	const accessLevelLabel = React.useMemo(() => {
-		const match = ACCESS_LEVEL_OPTIONS.find((option) => String(option.index) === accessLevel);
-		return match?.label || 'Access Level';
+		return ACCESS_LEVEL_LABELS[accessLevel] || 'Access Level';
 	}, [accessLevel]);
 
 	React.useEffect(() => {
@@ -113,16 +118,16 @@ const PractitionerUpdate = () => {
 		setAccessLevel(currentAccessLevel);
 	}, [currentAccessLevel]);
 
+	const router = useRouter();
+	const [deleting, setDeleting] = React.useState(false);
+
 	const handleDelete = () => {
 		setConfirmOpen(true);
 	};
 
-	const handleBack = () => {
-		dispatch(navigateTo(router, '/practitioners'));
-	};
-
-	const router = useRouter();
-	const [deleting, setDeleting] = React.useState(false);
+	const handleBack = React.useCallback(() => {
+		router.back();
+	}, [router]);
 
 	const handleConfirmDelete = async () => {
 		try {
@@ -225,20 +230,15 @@ const PractitionerUpdate = () => {
 							direction="row"
 							sx={{ mb: 1 }}
 						>
-
 							<MightyButton
 								startIcon="left"
-								variant="outlined"
+								variant="text"
 								disabled={deleting}
 								onClick={handleBack}
 							>
-								All
+								Back
 							</MightyButton>
-
 							<Box sx={{ flexGrow: 1 }} />
-
-							
-							
 						</Stack>
 					</>
 				)}
@@ -297,7 +297,6 @@ const PractitionerUpdate = () => {
 
 												<MightyButton
 													kind="listItem"
-													color="primary"
 													disabled={deleting || savingDisplayName}
 													onClick={handleOpenAccessMenu}
 													title={accessLevelLabel}
@@ -326,40 +325,31 @@ const PractitionerUpdate = () => {
 										xs: 12,
 										sm: 8,
 									}} sx={{ order: { xs: 2, sm: 1 } }}>
-										<Stack spacing={2} sx={{m:2}}>
-
+											<Box sx={{ height: 24 }} />
 											<Editable
-												helperText="This is the name that will be displayed in the system."
+												helperText={email}
 												placeholder="Name"
 												value={displayName}
-												variant="outlined"
+												variant="standard"
 												onChange={setDisplayName}
 												startAdornment="user"
 											/>
-
+											<Box sx={{ height: 12 }} />
 											<Editable
 												placeholder="Clinic"
 												value={clinic}
-												variant="outlined"
+												variant="standard"
 												onChange={setClinic}
 												startAdornment="medical"
 											/>
-											
+											<Box sx={{ height: 24 }} />
 											<Editable
-												placeholder="Website"
+												placeholder="Link"
 												value={website}
-												variant="outlined"
+												variant="standard"
 												onChange={setWebsite}
 												startAdornment="link"
-											/>
-
-											<Typography variant="body1">
-												Access: <strong>{accessLevelLabel}</strong><br />
-												Email: <strong>{email ? `${email}` : 'No email provided'}</strong><br />
-											</Typography>
-
-											
-										</Stack>
+											/>	
 									</Grid>
 									
 								</Grid>
@@ -367,6 +357,7 @@ const PractitionerUpdate = () => {
 									in={canSave || savingDisplayName}
 									orientation="vertical"
 									unmountOnExit>
+									<Box sx={{ height: 24 }} />
 									<Button
 										fullWidth
 										variant="contained"
@@ -376,7 +367,7 @@ const PractitionerUpdate = () => {
 										disabled={savingDisplayName || !canSave}
 										sx={{ pointerEvents: 'auto' }}
 									>
-										{savingDisplayName ? 'Saving...' : 'Save'}
+										{savingDisplayName ? 'Updating...' : 'Update'}
 									</Button>
 								</Collapse>
 							</>
@@ -390,7 +381,7 @@ const PractitionerUpdate = () => {
 				open={confirmOpen}
 				icon="delete"
 				title={`Delete ${displayName}?`}
-				// body={`This action cannot be undone.`}
+				body={`This action cannot be undone.`}
 				handleConfirm={handleConfirmDelete}
 				handleClose={handleCloseConfirm}
 			/>		

@@ -49,6 +49,7 @@ export default function Dashboard() {
                 <Box sx={{ height: 24 }} />
                 
                 <MightyButton
+                    fullWidth
                     alignLeft
                     variant="outlined"
                     startIcon="products"
@@ -81,6 +82,8 @@ export default function Dashboard() {
 
                 
                 <MightyButton
+                    fullWidth
+                    alignLeft
                     kind="button"
                     variant="outlined"
                     color="primary"
