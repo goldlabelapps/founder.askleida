@@ -22,6 +22,7 @@ import {
 	useLeidaBus,
 	deletePractitioner,
 	updatePractitionerProfile,
+	Back,
 	MightyButton,
 } from '../../../../Leida';
 import { 
@@ -125,10 +126,6 @@ const PractitionerUpdate = () => {
 		setConfirmOpen(true);
 	};
 
-	const handleBack = React.useCallback(() => {
-		router.back();
-	}, [router]);
-
 	const handleConfirmDelete = async () => {
 		try {
 			setConfirmOpen(false);
@@ -230,14 +227,7 @@ const PractitionerUpdate = () => {
 							direction="row"
 							sx={{ mb: 1 }}
 						>
-							<MightyButton
-								startIcon="left"
-								variant="text"
-								disabled={deleting}
-								onClick={handleBack}
-							>
-								Back
-							</MightyButton>
+							<Back disabled={deleting} />
 							<Box sx={{ flexGrow: 1 }} />
 						</Stack>
 					</>

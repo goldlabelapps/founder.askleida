@@ -41,17 +41,23 @@ const Practitioners = () => {
 	}
 
 	return <>
-			<Box sx={{ p: 2 }}>
-				<MightyButton
-					kind="button"
-					variant="outlined"
-					color="primary"
-					onClick={handleNewPractitioner}
-					endIcon="add"
-				>
-					New
-				</MightyButton>
-				<Box sx={{ height: 24 }} />
+			<Box >
+				<Box sx={{ display: 'flex' }}>
+					<Box sx={{flexGrow:1}}/>
+					<Box>
+						<MightyButton
+							kind="button"
+							variant="outlined"
+							color="primary"
+							onClick={handleNewPractitioner}
+							endIcon="add"
+						>
+							New
+						</MightyButton>
+					</Box>
+					<Box sx={{ height: 12 }} />
+				</Box>
+				<Box sx={{ height: 12 }} />
 				<PractitionerList />
 			</Box>		
 	</>;

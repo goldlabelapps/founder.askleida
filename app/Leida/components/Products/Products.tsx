@@ -13,6 +13,7 @@ import {
 import { navigateTo, setFeedback } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
 import {
+	Back,
 	ConfirmAction,
 	deleteQueueSelection,
 	deleteProductQueueRecords,
@@ -317,6 +318,10 @@ export default function Products() {
 	return (
 		<Box sx={{  }}>
 			<Stack spacing={2} alignItems="stretch">
+				<Stack direction="row" sx={{ mb: 1 }}>
+					<Back />
+					<Box sx={{ flexGrow: 1 }} />
+				</Stack>
 				<Stack spacing={1.5} sx={{ width: '100%' }}>
 
 					<Box sx={{
@@ -361,9 +366,8 @@ export default function Products() {
 							disabled={loadingAWINProducts}
 							onClick={handleLoadAWINProducts}
 						>
-							{loadingAWINProducts ? 'Ingesting...' : 'Ingest AWIN Feed'}
+							{loadingAWINProducts ? 'Ingesting...' : 'Ingest AWIN Feed [Smoke Test]'}
 						</MightyButton>
-						
 					</Box>
 
 					{awinTotal > 0 ? (
