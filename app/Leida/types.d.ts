@@ -360,6 +360,7 @@ export type T_UpdatePractitionerInput = {
 
 export type T_CreatePractitionerArgs = {
     email: string;
+    name?: string;
 };
 
 export type T_CreatePractitionerResult = {

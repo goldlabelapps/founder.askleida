@@ -12,7 +12,6 @@ import {
     setLeida,
     initDash, 
     useDash,
-    SurfacePractitioners,
     MightyButton,
     PractitionerList,
 } from '../../../Leida';
@@ -38,18 +37,6 @@ export default function Dashboard() {
 
     return (
         <Grid container spacing={2} sx={{ mt: 1 }}>
-            
-
-            <Grid size={{
-                xs: 12,
-                sm: 6,
-                lg: 4,
-            }}>
-                <Typography variant="overline">
-                    Practitioners
-                </Typography>
-                <PractitionerList />
-            </Grid>
 
             <Grid size={{
                 xs: 12,
@@ -59,22 +46,37 @@ export default function Dashboard() {
                 <Typography variant="overline">
                     Products
                 </Typography>
-                <Box>
-
-                    <MightyButton
-                        kind="button"
-                        fullWidth
-                        alignLeft
-                        variant="outlined"
-                        startIcon="awin"
-                        onClick={() => dispatch(navigateTo(router, '/products/awin'))}
-                        >
-                        AWIN
-                    </MightyButton>
-                </Box>
+                <Box sx={{ height: 12 }} />
+                <Typography variant="body1">
+                    Manage products. Maintain the AWIN data table, 
+                    add products to the Queue, process Queue item by item 
+                    using Claude
+                </Typography>
+                <Box sx={{ height: 24 }} />
+                <MightyButton
+                    alignLeft
+                    fullWidth
+                    variant="outlined"
+                    startIcon="products"
+                    onClick={() => {
+                        dispatch(navigateTo(router, '/products'));
+                    }}
+                >
+                    Manage Products
+                </MightyButton>
             </Grid>
             
-
+            <Grid size={{
+                xs: 12,
+                sm: 6,
+                lg: 4,
+            }}>
+                <Typography variant="overline">
+                    Practitioners
+                </Typography>
+                <Box sx={{ height: 12 }} />
+                <PractitionerList />
+            </Grid>
             
         </Grid>
     );

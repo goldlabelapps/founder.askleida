@@ -9,7 +9,7 @@ const PRACTITIONERS_ROUTE = '/api/practitioners';
 const ACCESS_LEVEL = 3;
 const DEFAULT_AVATAR_URL = 'https://app.askleida.com/askleida/png/default-logo.png';
 
-export const createPractitioner = ({ email }: T_CreatePractitionerArgs): any =>
+export const createPractitioner = ({ email, name }: T_CreatePractitionerArgs): any =>
 	async (dispatch: Dispatch) => {
 		const normalizedEmail = email.trim().toLowerCase();
 		if (!normalizedEmail) {
@@ -17,6 +17,17 @@ export const createPractitioner = ({ email }: T_CreatePractitionerArgs): any =>
 			dispatch(setUbereduxKey({ key: 'error', value: msg }));
 			throw new Error(msg);
 		}
+
+		const normalizedName = typeof name === 'string' ? name.trim() : '';
+		if (!normalizedName) {
+			const msg = 'A practitioner must have a name';
+			dispatch(setUbereduxKey({ key: 'error', value: msg }));
+			throw new Error(msg);
+		}
+
+		const redirectTo = typeof window !== 'undefined'
+			? `${window.location.origin}/practitioners`
+			: '/practitioners';
 
 		try {
 			const response = await fetch(PRACTITIONERS_ROUTE, {
@@ -26,8 +37,13 @@ export const createPractitioner = ({ email }: T_CreatePractitionerArgs): any =>
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
+					resource: 'practitioner-onboard',
+					name: normalizedName,
 					email: normalizedEmail,
-					data: {
+					redirectTo,
+					user_metadata: {
+						name: normalizedName,
+						display_name: normalizedName,
 						invited_from: 'leida-practitioner-module',
 						access_level: ACCESS_LEVEL,
 						avatar: DEFAULT_AVATAR_URL,
@@ -50,11 +66,11 @@ export const createPractitioner = ({ email }: T_CreatePractitionerArgs): any =>
 
 			const practitioner = payload?.practitioner;
 			const user = payload?.user;
-			const practitionerId = practitioner?.practitioner_id || null;
+			const resolvedPractitionerId = practitioner?.practitioner_id || user?.id || null;
 
-			if (practitionerId) {
+			if (resolvedPractitionerId) {
 				await dispatch(updatePractitioner({
-					practitioner_id: practitionerId,
+					practitioner_id: resolvedPractitionerId,
 					key: 'avatar',
 					value: DEFAULT_AVATAR_URL,
 				}));
@@ -69,13 +85,17 @@ export const createPractitioner = ({ email }: T_CreatePractitionerArgs): any =>
 
 			return {
 				email: normalizedEmail,
-				practitionerId,
+				practitionerId: resolvedPractitionerId,
 				practitioner,
 				user,
 			} as T_CreatePractitionerResult;
 			
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : String(e);
+			dispatch(setFeedback({
+				title: msg || 'Failed to create practitioner',
+				severity: 'error',
+			}));
 			dispatch(setUbereduxKey({ key: 'error', value: msg }));
 			throw e;
 		}
