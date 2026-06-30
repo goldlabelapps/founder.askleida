@@ -5,7 +5,10 @@ export { default as SurfacePractitioners } from './components/SurfacePractitione
 export { default as PractitionerNew } from './components/PractitionerNew';
 export { default as PractitionerUpdate } from './components/PractitionerUpdate';
 export { createPractitioner } from './actions/createPractitioner';
+export { deletePractitioner } from './actions/deletePractitioner';
+export { initPractitioners } from './actions/initPractitioners';
 export { updateAvatar } from './actions/updateAvatar';
 export { updatePractitioner } from './actions/updatePractitioner';
+export { updatePractitionerProfile } from './actions/updatePractitionerProfile';
 export { usePractitioners } from './hooks/usePractitioners';
 export type { T_PractitionerRecord } from '../../types.d';

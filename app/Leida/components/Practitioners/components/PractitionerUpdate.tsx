@@ -21,6 +21,7 @@ import {
 	setLeida,
 	useLeidaBus,
 	deletePractitioner,
+	updatePractitionerProfile,
 	MightyButton,
 } from '../../../../Leida';
 import { 
@@ -173,40 +174,14 @@ const PractitionerUpdate = () => {
 		}
 
 		try {
-			const trimmedDisplayName = displayName.trim();
-			const trimmedEmail = email.trim();
-			const trimmedClinic = clinic.trim();
-			const trimmedWebsite = website.trim();
-			const res = await fetch('/api/practitioners', {
-				method: 'PATCH',
-				headers: {
-					Accept: 'application/json',
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					practitioner_id: uuid,
-					title: trimmedEmail || trimmedDisplayName || null,
-					data: {
-						email: trimmedEmail || null,
-						display_name: trimmedDisplayName || null,
-						name: trimmedDisplayName || null,
-						clinic: trimmedClinic || null,
-						website: trimmedWebsite || null,
-						access_level: Number(accessLevel),
-					},
-				}),
-			});
-
-			let json: any = null;
-			try {
-				json = await res.json();
-			} catch {
-				json = null;
-			}
-
-			if (!res.ok) {
-				throw new Error(json?.message || `Failed to update display name (${res.status})`);
-			}
+			await dispatch(updatePractitionerProfile({
+				practitioner_id: uuid,
+				email,
+				display_name: displayName,
+				clinic,
+				website,
+				access_level: Number(accessLevel),
+			}) as any);
 
 			setAvatarChanged(false);
 			dispatch(navigateTo(router, `/practitioners`));

@@ -16,12 +16,6 @@ const PractitionerList = () => {
 	const rows = (Array.isArray(practitionersBus?.data) ? practitionersBus.data : []) as T_PractitionerRecord[];
 	const sortedRows = React.useMemo(() => {
 		return [...rows]
-			.filter((row) => {
-				const accessLevel = row?.data && typeof row.data === 'object' 
-					? (row.data as Record<string, unknown>).access_level 
-					: null;
-				return accessLevel !== 4;
-			})
 			.sort((a, b) => {
 				const aTime = Date.parse(typeof a?.updated === 'string' ? a.updated : '');
 				const bTime = Date.parse(typeof b?.updated === 'string' ? b.updated : '');
