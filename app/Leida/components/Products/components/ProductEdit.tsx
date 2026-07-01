@@ -279,7 +279,7 @@ export default function ProductEdit() {
 
           {Object.keys(baseData).length > 0 && (
             <Box sx={{ p: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+              <Typography variant="overline" sx={{ mb: 1, fontWeight: 600 }}>
                 Current Product
               </Typography>
               <Typography

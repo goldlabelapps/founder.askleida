@@ -132,7 +132,7 @@ export default function Dashboard() {
                 </Badge>
                 <Box sx={{ height: 24 }} />
                 <MightyButton
-                    variant="contained"
+                    variant="outlined"
                     startIcon="awin"
                     onClick={() => {
                     dispatch(navigateTo(router, '/products/awin'));
