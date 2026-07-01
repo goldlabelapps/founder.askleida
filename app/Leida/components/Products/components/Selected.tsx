@@ -99,13 +99,7 @@ export default function Selected({
               gap: 1,
             }}
           >
-            
-            <MightyButton
-              kind="icon"
-              icon="delete"
-              disabled={isDeleting || isProcessing}
-              onClick={onOpenDeleteConfirm}
-            />
+            <Box sx={{ flexGrow: 1 }} />
 
             <MightyButton
               kind="icon"
@@ -114,6 +108,15 @@ export default function Selected({
             >
               Raw Object
             </MightyButton>
+            
+            <MightyButton
+              kind="icon"
+              icon="delete"
+              disabled={isDeleting || isProcessing}
+              onClick={onOpenDeleteConfirm}
+            />
+
+            
 
            
           </Box>
