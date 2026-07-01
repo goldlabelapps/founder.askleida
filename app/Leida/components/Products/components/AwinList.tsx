@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import type { T_AWINListProps, T_AWINProduct } from '../../../types.d';
-import { Box, IconButton, LinearProgress, Stack, Typography } from '@mui/material';
+import { Backdrop, Box, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
 import {
     DataGrid,
     type GridColDef,
@@ -128,8 +128,13 @@ export default function AWINList({
 
     if (loading && rows.length === 0) {
         return (
-            <Box sx={{ width: '100%', py: 2 }}>
-                <LinearProgress />
+            <Box sx={{ width: '100%', minHeight: 200, position: 'relative' }}>
+                <Backdrop
+                    open
+                    sx={{ position: 'absolute', zIndex: (theme) => theme.zIndex.mobileStepper }}
+                >
+                    <CircularProgress />
+                </Backdrop>
             </Box>
         );
     }

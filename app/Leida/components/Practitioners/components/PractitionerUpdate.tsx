@@ -2,11 +2,12 @@
 import * as React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
+	Backdrop,
 	Paper, 
 	Grid,
 	Stack,
 	Collapse,
-	LinearProgress,
+	CircularProgress,
 	Typography,
 	Button,
 	IconButton,
@@ -216,8 +217,21 @@ const PractitionerUpdate = () => {
 	return (
 		<Box
 			id={`practitioner-update-${uuid}`}
-			sx={{ pb: 'calc(104px + env(safe-area-inset-bottom))' }}
+			sx={{ pb: 'calc(104px + env(safe-area-inset-bottom))', position: 'relative' }}
 		>
+			<Backdrop
+				open={Boolean(deleting || loading)}
+				sx={{ position: 'absolute', zIndex: (theme) => theme.zIndex.modal + 1 }}
+			>
+				<Stack spacing={1} sx={{ alignItems: 'center' }}>
+					<CircularProgress />
+					{deleting ? (
+						<Typography variant="body2" color="text.secondary">
+							Deleting Practitioner and related account data...
+						</Typography>
+					) : null}
+				</Stack>
+			</Backdrop>
 			<>
 				{!loading && !deleting && (
 					<>
@@ -232,20 +246,8 @@ const PractitionerUpdate = () => {
 					</>
 				)}
 				
-				{deleting ? (
-					<Stack spacing={1} sx={{ pt: 0.5 }}>
-						<LinearProgress />
-						<Typography variant="body2" color="text.secondary">
-							Deleting Practitioner and related account data...
-						</Typography>
-					</Stack>
-				) : (
+				{deleting ? null : (
 					<>
-						{loading && (
-							<Box sx={{height: 12}}>
-								{loading && <LinearProgress />}
-							</Box>
-						)}
 						{error && <Typography variant="body2" color="error">
 							Error: {error}
 						</Typography>}

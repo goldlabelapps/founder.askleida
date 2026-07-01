@@ -657,7 +657,7 @@ export default function Queue() {
         ) : null}
 
         {!loading && !hasQueryError && queueRows.length === 0 ? (
-          <>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <Typography variant="body2" color="text.secondary">
               Nothing in the queue. Add products from Awin.
             </Typography>
@@ -672,7 +672,7 @@ export default function Queue() {
               >
                 Add
               </MightyButton>
-          </>
+          </Box>
         ) : null}
 
         {!loading && !hasQueryError && selectedRow ? (

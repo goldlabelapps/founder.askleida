@@ -26,7 +26,7 @@ function getRecordUpdatedTime(record: T_PractitionerRecord | null): number {
 		toTime((data as Record<string, unknown>).updated_at)
 	);
 }
-
+	import { Alert, Backdrop, CircularProgress, Stack } from '@mui/material';
 function getRecordCreatedTime(record: T_PractitionerRecord | null): number {
 	if (!record) return 0;
 	const data = parsePractitionerData(record.data);
@@ -71,9 +71,12 @@ const PractitionerList = () => {
 				{practitionersBus?.error && <Alert severity="error">{practitionersBus.error}</Alert>}
 				{!practitionersBus?.loading && sortedRows.length === 0 && (
 					<Alert severity="info">No practitioners found.</Alert>
-				)}
-				{sortedRows.map((row, index) => {
-					const key = typeof row?.practitioner_id === 'string' && row.practitioner_id
+					<Backdrop
+						open={Boolean(practitionersBus?.loading)}
+						sx={{ position: 'absolute', zIndex: (theme) => theme.zIndex.mobileStepper }}
+					>
+						<CircularProgress />
+					</Backdrop>
 						? row.practitioner_id
 						: `practitioner-${index}`;
 					return <PractitionerCard key={key} practitioner={row} />;

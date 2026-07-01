@@ -2,8 +2,9 @@
 import * as React from 'react';
 import {useRouter} from 'next/navigation';
 import {
+	Backdrop,
 	Box,
-	LinearProgress,
+	CircularProgress,
 	Stack,
 	Typography,
 } from '@mui/material';
@@ -357,7 +358,14 @@ const ListProducts = ({
 	return (
 		<Stack spacing={2}>
 			{isResolvingInitialProducts ? (
-				<LinearProgress />
+				<Box sx={{ minHeight: 120, position: 'relative' }}>
+					<Backdrop
+						open
+						sx={{ position: 'absolute', zIndex: (theme) => theme.zIndex.mobileStepper }}
+					>
+						<CircularProgress />
+					</Backdrop>
+				</Box>
 			) : showEmptyLibraryState ? (
 				<Box sx={{ py: 4 }}>
 					<Typography variant="body1" color="text.secondary">
