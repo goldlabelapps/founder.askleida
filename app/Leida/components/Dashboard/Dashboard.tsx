@@ -86,13 +86,18 @@ export default function Dashboard() {
             <Grid size={{
                 xs: 12,
                 sm: 6,
-                lg: 4,
             }}>
                 <Typography variant="overline">
                     Products
                 </Typography>
-                <Box sx={{ height: 24 }} />
                 
+                <Box sx={{ height: 24 }} />
+                <Typography variant="body1">
+                    Manage products. Maintain the AWIN data table,
+                    add products to the Queue, process Queue item by item
+                    using Claude
+                </Typography>
+                <Box sx={{ height: 24 }} />
                 <MightyButton
                     alignLeft
                     variant="outlined"
@@ -105,12 +110,7 @@ export default function Dashboard() {
                 </MightyButton>
 
                 <Box sx={{ height: 24 }} />
-                <Typography variant="body1">
-                    Manage products. Maintain the AWIN data table,
-                    add products to the Queue, process Queue item by item
-                    using Claude
-                </Typography>
-                <Box sx={{ height: 24 }} />
+                
                 <Badge
                     color="primary"
                     badgeContent={queueTotal}
@@ -145,7 +145,6 @@ export default function Dashboard() {
             <Grid size={{
                 xs: 12,
                 sm: 6,
-                lg: 4,
             }}>
                 <Typography variant="overline">
                     Practitioners
