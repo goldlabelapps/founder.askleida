@@ -61,7 +61,7 @@ const ListProducts = ({
 	const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState('');
 	const [resultsPerPage, setResultsPerPage] = React.useState(100);
 	const [sortModel, setSortModel] = React.useState<GridSortModel>([
-		{ field: 'title', sort: 'asc' },
+		{ field: 'updated', sort: 'desc' },
 	]);
 	const [loading, setLoading] = React.useState(false);
 	const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false);
@@ -74,7 +74,7 @@ const ListProducts = ({
 		dispatch(initProducts());
 	}, [dispatch]);
 
-	const activeSort = sortModel[0] || { field: 'title', sort: 'asc' as const };
+	const activeSort = sortModel[0] || { field: 'updated', sort: 'desc' as const };
 	const sortBy = (() => {
 		switch (activeSort.field) {
 			case 'created':

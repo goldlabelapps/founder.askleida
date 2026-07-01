@@ -14,11 +14,13 @@ import { navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
   deleteQueueSelection,
+  formatUkPrice,
   getQueueRowTitle,
   initQueue,
   MightyButton,
   notifyProductsCountRefresh,
   notifyQueueCountRefresh,
+  processQueueItem,
   queueAsText,
   Selected,
   setLeida,
@@ -66,6 +68,7 @@ export default function Queue() {
   const [rightPage, setRightPage] = React.useState(1);
   const previousRightPageRef = React.useRef(rightPage);
   const [deletingQueueId, setDeletingQueueId] = React.useState<string | null>(null);
+  const [processingQueueId, setProcessingQueueId] = React.useState<string | null>(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -218,9 +221,75 @@ export default function Queue() {
       nestedData?.image,
     );
 
+    const displayPrice = pickFirstText(
+      rowRecord?.display_price,
+      rowData?.display_price,
+      nestedData?.display_price,
+    );
+
+    const searchPrice = pickFirstText(
+      rowRecord?.search_price,
+      rowData?.search_price,
+      nestedData?.search_price,
+    );
+
+    const currency = pickFirstText(
+      rowRecord?.currency,
+      rowData?.currency,
+      nestedData?.currency,
+    );
+
+    const numericFromSearchPrice = searchPrice ? Number(searchPrice) : NaN;
+    const numericFromDisplayPrice = displayPrice
+      ? Number(String(displayPrice).replace(/[^\d.-]/g, ''))
+      : NaN;
+    const formattedUkPrice = Number.isFinite(numericFromSearchPrice)
+      ? formatUkPrice(numericFromSearchPrice)
+      : Number.isFinite(numericFromDisplayPrice)
+        ? formatUkPrice(numericFromDisplayPrice)
+        : null;
+
+    const priceLabel = formattedUkPrice || displayPrice || (searchPrice ? `${currency || ''}${searchPrice}` : null);
+
+    const awDeepLink = pickFirstText(
+      rowRecord?.aw_deep_link,
+      rowData?.aw_deep_link,
+      nestedData?.aw_deep_link,
+    );
+
+    const awProductId = pickFirstText(
+      rowRecord?.aw_product_id,
+      rowData?.aw_product_id,
+      nestedData?.aw_product_id,
+    );
+
+    const slug = pickFirstText(
+      rowRecord?.slug,
+      rowData?.slug,
+      nestedData?.slug,
+    );
+
+    const merchantName = pickFirstText(
+      rowRecord?.merchant_name,
+      rowData?.merchant_name,
+      nestedData?.merchant_name,
+    );
+
+    const merchantDeepLink = pickFirstText(
+      rowRecord?.merchant_deep_link,
+      rowData?.merchant_deep_link,
+      nestedData?.merchant_deep_link,
+    );
+
     return {
       thumbnailUrl,
       mainImageUrl,
+      priceLabel,
+      awDeepLink,
+      awProductId,
+      slug,
+      merchantName,
+      merchantDeepLink,
       description: pickFirstText(
         rowRecord?.description,
         rowData?.description,
@@ -235,6 +304,54 @@ export default function Queue() {
         TWEET_MAX_LENGTH,
       ),
       displayImageUrl: thumbnailUrl || mainImageUrl,
+    };
+  }, [selectedRow]);
+
+  const productDataDraft = React.useMemo<Record<string, unknown>>(() => {
+    const rowRecord = asRecord(selectedRow?.row);
+    const rowData = asRecord(rowRecord?.data);
+    const nestedData = asRecord(rowData?.data);
+
+    const thumbnail = pickFirstText(
+      rowRecord?.aw_image_url,
+      rowData?.aw_image_url,
+      nestedData?.aw_image_url,
+      rowRecord?.thumbnail,
+      rowData?.thumbnail,
+      nestedData?.thumbnail,
+    );
+
+    const image = pickFirstText(
+      rowRecord?.merchant_image_url,
+      rowData?.merchant_image_url,
+      nestedData?.merchant_image_url,
+      rowRecord?.image_url,
+      rowData?.image_url,
+      nestedData?.image_url,
+      rowRecord?.image,
+      rowData?.image,
+      nestedData?.image,
+      thumbnail,
+    );
+
+    const productName = pickFirstText(
+      rowRecord?.product_name,
+      rowData?.product_name,
+      nestedData?.product_name,
+      selectedRow?.title,
+    );
+
+    return {
+      slug: pickFirstText(rowRecord?.slug, rowData?.slug, nestedData?.slug),
+      title: productName,
+      description: pickFirstText(rowRecord?.description, rowData?.description, nestedData?.description),
+      id_awin: pickFirstText(rowRecord?.aw_product_id, rowData?.aw_product_id, nestedData?.aw_product_id),
+      url_awin: pickFirstText(rowRecord?.aw_deep_link, rowData?.aw_deep_link, nestedData?.aw_deep_link),
+      thumbnail,
+      image,
+      merchant: pickFirstText(rowRecord?.merchant_name, rowData?.merchant_name, nestedData?.merchant_name),
+      id_merchant: pickFirstText(rowRecord?.merchant_product_id, rowData?.merchant_product_id, nestedData?.merchant_product_id),
+      url_merchant: pickFirstText(rowRecord?.merchant_deep_link, rowData?.merchant_deep_link, nestedData?.merchant_deep_link),
     };
   }, [selectedRow]);
 
@@ -335,6 +452,55 @@ export default function Queue() {
     void handleDeleteSelected();
   }, [handleDeleteSelected]);
 
+  const handleSaveAndProcessSelected = React.useCallback(async () => {
+    if (!selectedRow || deletingQueueId || processingQueueId) {
+      return;
+    }
+
+    const practitionerId = queueAsText(selectedRow.practitioner_id);
+    const hasDraft = productDataDraft && Object.keys(productDataDraft).length > 0;
+
+    if (!practitionerId || !hasDraft) {
+      dispatch(setFeedback({
+        severity: 'warning',
+        title: 'Unable to process this queue item due to missing practitioner or product draft data.',
+      }));
+      return;
+    }
+
+    setProcessingQueueId(selectedRow.id);
+
+    try {
+      const result = await dispatch(processQueueItem({
+        queueId: selectedRow.id,
+        practitionerId,
+        productDataDraft,
+      }));
+
+      if (!result?.ok) {
+        throw new Error(result?.error || 'Failed to process selected queue item.');
+      }
+
+      dispatch(setFeedback({
+        severity: 'success',
+        title: `Saved and processed queue item ${selectedRow.position}.`,
+      }));
+
+      setRefreshNonce((value) => value + 1);
+      notifyQueueCountRefresh();
+      notifyProductsCountRefresh();
+      dispatch(navigateTo(router, '/products'));
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      dispatch(setFeedback({
+        severity: 'warning',
+        title: message || 'Failed to process selected queue item.',
+      }));
+    } finally {
+      setProcessingQueueId(null);
+    }
+  }, [deletingQueueId, dispatch, processingQueueId, productDataDraft, router, selectedRow]);
+
   return (
     <Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -380,9 +546,12 @@ export default function Queue() {
                 <Selected
                   selectedRow={selectedRow}
                   selectedImageData={selectedImageData}
+                  productDataDraft={productDataDraft}
                   deletingQueueId={deletingQueueId}
+                  processingQueueId={processingQueueId}
                   confirmDeleteOpen={confirmDeleteOpen}
                   onOpenDeleteConfirm={handleOpenDeleteConfirm}
+                  onSaveAndProcess={handleSaveAndProcessSelected}
                   onConfirmDelete={handleConfirmDelete}
                   onCloseDeleteConfirm={handleCloseDeleteConfirm}
                 />

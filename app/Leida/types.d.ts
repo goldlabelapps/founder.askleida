@@ -318,6 +318,12 @@ export type T_QueueListRow = {
 export type T_SelectedImageData = {
     thumbnailUrl: string | null;
     mainImageUrl: string | null;
+    priceLabel: string | null;
+    awDeepLink: string | null;
+    awProductId: string | null;
+    slug: string | null;
+    merchantName: string | null;
+    merchantDeepLink: string | null;
     description: string | null;
     descriptionPreview: string;
     displayImageUrl: string | null;
@@ -326,9 +332,12 @@ export type T_SelectedImageData = {
 export type T_SelectedProps = {
     selectedRow: T_QueueListRow;
     selectedImageData: T_SelectedImageData;
+    productDataDraft: Record<string, unknown>;
     deletingQueueId: string | null;
+    processingQueueId: string | null;
     confirmDeleteOpen: boolean;
     onOpenDeleteConfirm: () => void;
+    onSaveAndProcess: () => void;
     onConfirmDelete: () => void;
     onCloseDeleteConfirm: () => void;
 };
