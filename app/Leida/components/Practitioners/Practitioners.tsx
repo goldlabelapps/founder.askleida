@@ -8,13 +8,12 @@ import {
 	Fab,
 } from '@mui/material';
 import { useDispatch } from '../../../NX/Uberedux';
-import { Icon, navigateTo } from '../../../NX/DesignSystem';
+import { Icon, MightyButton, navigateTo } from '../../../NX/DesignSystem';
 import {
 	setLeida,
 	initPractitioners,
 	usePractitioners,
 	PractitionerList,
-	MightyButton,
 } from '../../../Leida';
 
 const Practitioners = () => {

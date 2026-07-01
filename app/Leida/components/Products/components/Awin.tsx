@@ -14,14 +14,13 @@ import {
 } from '@mui/x-data-grid';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { usePaywall } from '../../../../NX/Paywall';
-import { navigateTo, setFeedback } from '../../../../NX/DesignSystem';
+import { MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { Editable } from '../../../../NX/NXAdmin';
 import {
     asText,
     Back,
     fetchLeida,
     fetchAWINFeedIngestPreflight,
-    MightyButton,
     orderByFromSortField,
     productCategory,
     productDeepLink,

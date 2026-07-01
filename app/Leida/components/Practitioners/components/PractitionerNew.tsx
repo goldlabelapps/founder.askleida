@@ -6,15 +6,13 @@ import {
 	Box,
 	Typography,
 } from '@mui/material';
-import { Icon, navigateTo } from '../../../../NX/DesignSystem';
+import { Icon, MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	createPractitioner,
 	setLeida,
-	MightyButton,
 } from '../../../../Leida';
 import { Editable } from '../../../../NX/NXAdmin';
-import { setFeedback } from '../../../../NX/DesignSystem';
 import { isValidEmail } from '../../../lib/isValidEmail';
 
 const PractitionerNew = () => {

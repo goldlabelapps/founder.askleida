@@ -9,7 +9,7 @@ import {
   Collapse,
   Typography,
 } from '@mui/material';
-import { ConfirmAction, MightyButton } from '../../../index';
+import { ConfirmAction, MightyButton } from '../../../../NX/DesignSystem';
 import type { T_SelectedProps } from '../../../types.d';
 
 const THUMBNAIL_SIZE = { xs: 96, sm: 120, md: 144 };

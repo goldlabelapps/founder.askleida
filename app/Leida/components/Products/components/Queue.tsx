@@ -10,14 +10,13 @@ import {
   Pagination,
   Typography,
 } from '@mui/material';
-import { navigateTo, setFeedback } from '../../../../NX/DesignSystem';
+import { MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
   deleteQueueSelection,
   formatUkPrice,
   getQueueRowTitle,
   initQueue,
-  MightyButton,
   notifyProductsCountRefresh,
   notifyQueueCountRefresh,
   processQueueItem,

@@ -15,7 +15,7 @@ import {
 	MenuItem,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { Icon, ConfirmAction, navigateTo } from '../../../../NX/DesignSystem';
+import { Icon, ConfirmAction, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
 import { 
 	fetchLeida,
 	setLeida,
@@ -23,7 +23,6 @@ import {
 	deletePractitioner,
 	updatePractitionerProfile,
 	Back,
-	MightyButton,
 } from '../../../../Leida';
 import { 
 	Editable, 

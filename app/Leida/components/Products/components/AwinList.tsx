@@ -8,9 +8,9 @@ import {
     type GridColDef,
     type GridRenderCellParams,
 } from '@mui/x-data-grid';
-import { formatUkPrice, getAffiliateImageUrl, MightyButton, setLeida, Thumbnail } from '../../../index';
+import { formatUkPrice, getAffiliateImageUrl, setLeida, Thumbnail } from '../../../index';
 import { LEIDA_DATA_GRID_SX } from '../../UI';
-import { Icon, navigateTo } from '../../../../NX/DesignSystem';
+import { Icon, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 
 export default function AWINList({

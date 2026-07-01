@@ -10,7 +10,7 @@ import {
 	Stack,
 	Typography,
 } from '@mui/material';
-import { navigateTo, setFeedback } from '../../../NX/DesignSystem';
+import { MightyButton, navigateTo, setFeedback } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
 import {
 	Back,
@@ -20,7 +20,6 @@ import {
 	deleteProductsRecords,
 	fetchAWINFeedIngestPreflight,
 	fetchAWINFeedSnapshot,
-	MightyButton,
 	setLeida,
 } from '../../../Leida';
 

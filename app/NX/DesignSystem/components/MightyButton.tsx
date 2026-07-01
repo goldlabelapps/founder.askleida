@@ -14,8 +14,8 @@ import type {
 	IconButtonProps,
 	ListItemButtonProps,
 } from '@mui/material';
-import {Icon} from '../../../NX/DesignSystem';
-import type { MightyButtonProps } from '../../types.d';
+import Icon from './Icon';
+import type { MightyButtonProps } from '../../../Leida/types.d';
 
 const renderIcon = (icon: MightyButtonProps['icon']) => {
 	if (!icon) return null;

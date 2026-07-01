@@ -22,7 +22,7 @@ import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
-import { MightyButton, Back, LeidaFlash, Thumbnail, LEIDA_DATA_GRID_SX } from './components/UI';
+import { Back, LeidaFlash, Thumbnail, LEIDA_DATA_GRID_SX } from './components/UI';
 import ConfirmAction from '../NX/DesignSystem/components/ConfirmAction';
 import Editable from '../NX/NXAdmin/components/UI/Editable';
 import {
@@ -175,7 +175,6 @@ export {
     RenderProduct,
     FindProduct,
     Back,
-    MightyButton,
     Thumbnail,
     LEIDA_DATA_GRID_SX,
     ConfirmAction,

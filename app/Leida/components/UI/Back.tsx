@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import MightyButton from './MightyButton';
+import { MightyButton } from '../../../NX/DesignSystem';
 import type { MightyButtonProps } from '../../types.d';
 
 type BackProps = Omit<MightyButtonProps, 'children' | 'startIcon'> & {

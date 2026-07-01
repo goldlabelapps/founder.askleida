@@ -16,7 +16,7 @@ import {
 	type GridRenderCellParams,
 	type GridSortModel,
 } from '@mui/x-data-grid';
-import { setFeedback, navigateTo } from '../../../../NX/DesignSystem';
+import { MightyButton, setFeedback, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	formatUkPrice,
@@ -28,7 +28,6 @@ import {
 	Editable,
 	fetchProducts,
 	initProducts,
-	MightyButton,
 	Thumbnail,
 	setLeida
 } from '../../../../Leida';

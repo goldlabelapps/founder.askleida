@@ -7,13 +7,12 @@ import {
     Grid,
     Typography,
 } from '@mui/material';
-import { navigateTo } from '../../../NX/DesignSystem';
+import { MightyButton, navigateTo } from '../../../NX/DesignSystem';
 import { useDispatch } from '../../../NX/Uberedux';
 import { 
     setLeida,
     initDash, 
     useDash,
-    MightyButton,
     PractitionerList,
 } from '../../../Leida';
 

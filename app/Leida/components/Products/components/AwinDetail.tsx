@@ -9,10 +9,10 @@ import {
 	Typography,
 	CircularProgress,
 } from '@mui/material';
-import { ConfirmAction, Icon } from '../../../../NX/DesignSystem';
+import { ConfirmAction, Icon, MightyButton } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { usePaywall } from '../../../../NX/Paywall';
-import { MightyButton, Thumbnail } from '../../../index';
+import { Thumbnail } from '../../../index';
 import { asText } from '../../../lib/asText';
 import { processAWIN } from '../actions/processAwin';
 import type { I_AWINDetail } from '../../../types.d';

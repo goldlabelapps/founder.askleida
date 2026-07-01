@@ -17,6 +17,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Icon from './components/Icon';
 import Loader from "./components/Loader";
+import MightyButton from './components/MightyButton';
 import Nav from './components/Nav';
 import { CleverText } from './components/CleverText';
 import Related from './components/Related';
@@ -49,6 +50,7 @@ export {
     Hero,
     Icon,
     Loader,
+    MightyButton,
     Nav,
     Related,
     TreeNav,
