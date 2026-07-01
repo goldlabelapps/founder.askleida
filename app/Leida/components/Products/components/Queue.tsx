@@ -29,6 +29,7 @@ import type { T_QueueListRow, T_QueueRow } from '../../../types.d';
 const RESULTS_PER_PAGE = 100;
 const RIGHT_LIST_PAGE_SIZE = 10;
 const TWEET_MAX_LENGTH = 280;
+const AUTO_PROGRESS_SECONDS = 1;
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== 'object') {
@@ -82,6 +83,9 @@ export default function Queue() {
   const [deletingQueueId, setDeletingQueueId] = React.useState<string | null>(null);
   const [processingQueueId, setProcessingQueueId] = React.useState<string | null>(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
+  const [autoProgress, setAutoProgress] = React.useState(false);
+  const [countdown, setCountdown] = React.useState(AUTO_PROGRESS_SECONDS);
+  const autoProgressRef = React.useRef(false);
 
   React.useEffect(() => {
     dispatch(initQueue());
@@ -451,6 +455,29 @@ export default function Queue() {
 
   const remainingCount = Math.max(0, queueRows.length - 1);
 
+  // Keep ref in sync; reset countdown when auto-progress is turned off
+  React.useEffect(() => {
+    autoProgressRef.current = autoProgress;
+    if (!autoProgress) {
+      setCountdown(AUTO_PROGRESS_SECONDS);
+    }
+  }, [autoProgress]);
+
+  // Stop auto-progress when queue truly empties while playing
+  React.useEffect(() => {
+    if (autoProgress && queueRows.length === 0 && !loading) {
+      setAutoProgress(false);
+      dispatch(setFeedback({ severity: 'success', title: 'Queue complete.' }));
+    }
+  }, [autoProgress, queueRows.length, loading, dispatch]);
+
+  // Countdown tick — only when playing, not saving, and queue has items
+  React.useEffect(() => {
+    if (!autoProgress || !!processingQueueId || !selectedRow || countdown <= 0) return;
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [autoProgress, processingQueueId, selectedRow, countdown]);
+
   const handleDeleteSelected = React.useCallback(async () => {
     if (!selectedRow || deletingQueueId) {
       return;
@@ -502,6 +529,76 @@ export default function Queue() {
     void handleDeleteSelected();
   }, [handleDeleteSelected]);
 
+  const handleAutoSave = React.useCallback(async () => {
+    if (!selectedRow) {
+      // selectedRow can be transiently null while the list re-fetches after a save.
+      // Only stop if the queue is genuinely empty; otherwise reset the countdown and retry.
+      if (queueRows.length === 0) {
+        setAutoProgress(false);
+      } else {
+        setCountdown(AUTO_PROGRESS_SECONDS);
+      }
+      return;
+    }
+
+    const practitionerId = queueAsText(selectedRow.practitioner_id);
+    const hasDraft = productDataDraft && Object.keys(productDataDraft).length > 0;
+
+    if (!practitionerId || !hasDraft) {
+      // Can't process this item — skip to the next one
+      const currentIndex = queueRows.findIndex((r) => r.id === selectedRow.id);
+      const nextRow = queueRows[currentIndex + 1] ?? null;
+      if (nextRow) {
+        setSelectedQueueId(nextRow.id);
+        setCountdown(AUTO_PROGRESS_SECONDS);
+      } else {
+        setAutoProgress(false);
+      }
+      return;
+    }
+
+    setProcessingQueueId(selectedRow.id);
+
+    try {
+      const result = await dispatch(processQueueItem({
+        queueId: selectedRow.id,
+        practitionerId,
+        productDataDraft,
+      }));
+
+      if (!result?.ok) {
+        throw new Error(result?.error || 'Failed to process queue item.');
+      }
+
+      dispatch(setFeedback({
+        severity: 'success',
+        title: `${productDataDraft.title ?? selectedRow.title ?? 'Product'} saved`,
+      }));
+
+      setRefreshNonce((v) => v + 1);
+      notifyQueueCountRefresh();
+      notifyProductsCountRefresh();
+    } catch (e: unknown) {
+      // On error, log feedback and continue to the next item
+      const message = e instanceof Error ? e.message : String(e);
+      dispatch(setFeedback({
+        severity: 'warning',
+        title: message || 'Auto-save failed — continuing to next item.',
+      }));
+    } finally {
+      if (autoProgressRef.current) {
+        setCountdown(AUTO_PROGRESS_SECONDS);
+      }
+      setProcessingQueueId(null);
+    }
+  }, [dispatch, productDataDraft, queueRows, selectedRow]);
+
+  // Trigger auto-save when countdown reaches zero
+  React.useEffect(() => {
+    if (!autoProgress || countdown !== 0 || !!processingQueueId) return;
+    void handleAutoSave();
+  }, [autoProgress, countdown, processingQueueId, handleAutoSave]);
+
   const handleSaveAndProcessSelected = React.useCallback(async () => {
     if (!selectedRow || deletingQueueId || processingQueueId) {
       return;
@@ -533,12 +630,13 @@ export default function Queue() {
 
       dispatch(setFeedback({
         severity: 'success',
-        title: `Saved queue item ${selectedRow.position}. Opening editor...`,
+        title: `${selectedRow.title} saved. Opening for enhancement...`,
       }));
 
       setRefreshNonce((value) => value + 1);
       notifyQueueCountRefresh();
       notifyProductsCountRefresh();
+
       const queryParams = new URLSearchParams();
       if (typeof result.productId === 'string' && result.productId.trim()) {
         queryParams.set('productId', result.productId.trim());
@@ -571,9 +669,22 @@ export default function Queue() {
         ) : null}
 
         {!loading && !hasQueryError && queueRows.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            No queue items found.
-          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <Typography variant="body2" color="text.secondary">
+              Nothing in the queue. Add products from Awin.
+            </Typography>
+            <Box sx={{ height: 24 }} />
+            <MightyButton
+                variant="outlined"
+                startIcon="awin"
+                fullWidth={false}
+                onClick={() => {
+                  dispatch(navigateTo(router, '/products/awin'));
+                }}
+              >
+                Add
+              </MightyButton>
+          </Box>
         ) : null}
 
         {!loading && !hasQueryError && selectedRow ? (
@@ -584,19 +695,62 @@ export default function Queue() {
               width: '100%',
             }}
           >
-            <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+            <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1}}>
               <Box sx={{flexGrow: 1}} />
-              <Box>
-                <MightyButton
-                  variant="contained"
-                  startIcon="awin"
-                  onClick={() => {
-                    dispatch(navigateTo(router, '/products/awin'));
-                  }}
-                >
-                  Add
-                </MightyButton>
-              </Box>
+              
+              
+
+              <MightyButton
+                variant="outlined"
+                startIcon="awin"
+                fullWidth={false}
+                onClick={() => {
+                  dispatch(navigateTo(router, '/products/awin'));
+                }}
+              >
+                Add
+              </MightyButton>
+
+             
+
+              <MightyButton
+                variant={'outlined'}
+                startIcon={autoProgress ? 'pause' : 'reset'}
+                fullWidth={false}
+                onClick={() => {
+                  if (autoProgress) {
+                    setAutoProgress(false);
+                  } else {
+                    setAutoProgress(true);
+                    setCountdown(0);
+                  }
+                }}
+                disabled={queueRows.length === 0}
+              >
+                {autoProgress ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                    <CircularProgress
+                      size={16}
+                      thickness={5}
+                      color="inherit"
+                    />
+                    <span>Pause</span>
+                  </Box>
+                ) : 'Auto'}
+              </MightyButton>
+
+              <MightyButton
+                startIcon="start"
+                variant="contained"
+                fullWidth={false}
+                onClick={() => {
+                  void handleSaveAndProcessSelected();
+                }}
+                disabled={queueRows.length === 0 || !!deletingQueueId || !!processingQueueId || autoProgress}
+              >
+                Next
+              </MightyButton>
+              
             </Box>
 
             <Box sx={{ height: 16 }} />

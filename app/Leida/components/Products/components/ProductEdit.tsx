@@ -2,33 +2,19 @@
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   CircularProgress,
   Stack,
   TextField,
   Typography,
 } from '@mui/material';
-import { MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
+import { Icon, MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { Back, setLeida } from '../../../index';
+import { Back, setLeida, asRecord, asText } from '../../../index';
 import { slugify } from '../../../lib/slugify';
-
-function asRecord(value: unknown): Record<string, unknown> | null {
-  if (!value || typeof value !== 'object') {
-    return null;
-  }
-  return value as Record<string, unknown>;
-}
-
-function asText(value: unknown): string {
-  if (typeof value === 'string') {
-    return value.trim();
-  }
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return String(value);
-  }
-  return '';
-}
 
 export default function ProductEdit() {
   const dispatch = useDispatch();
@@ -47,8 +33,16 @@ export default function ProductEdit() {
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [body, setBody] = React.useState('');
+  const [initialTitle, setInitialTitle] = React.useState('');
+  const [initialDescription, setInitialDescription] = React.useState('');
+  const [initialBody, setInitialBody] = React.useState('');
   const [baseData, setBaseData] = React.useState<Record<string, unknown>>({});
   const derivedSlug = React.useMemo(() => slugify(title), [title]);
+
+  const isDirty = React.useMemo(
+    () => title !== initialTitle || description !== initialDescription || body !== initialBody,
+    [title, initialTitle, description, initialDescription, body, initialBody],
+  );
 
   React.useEffect(() => {
     dispatch(setLeida('header', {
@@ -124,9 +118,16 @@ export default function ProductEdit() {
         setFallbackMatchId(secondaryId || primaryId);
         const existingTitle = asText(dataRecord.title || record.title);
         const existingSlug = asText(record.slug || dataRecord.slug || slugQuery);
-        setTitle(existingTitle || existingSlug);
-        setDescription(asText(dataRecord.description));
-        setBody(asText(dataRecord.body));
+        const loadedTitle = existingTitle || existingSlug;
+        const loadedDescription = asText(dataRecord.description);
+        const loadedBody = asText(dataRecord.body);
+        
+        setTitle(loadedTitle);
+        setDescription(loadedDescription);
+        setBody(loadedBody);
+        setInitialTitle(loadedTitle);
+        setInitialDescription(loadedDescription);
+        setInitialBody(loadedBody);
         setBaseData(dataRecord);
       } catch (e: unknown) {
         if (cancelled) {
@@ -228,9 +229,7 @@ export default function ProductEdit() {
 
   return (
     <Stack spacing={2}>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Back kind="icon" />
-      </Box>
+     
 
       {loading ? (
         <Box sx={{ py: 4, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -245,44 +244,64 @@ export default function ProductEdit() {
             </Typography>
           ) : null}
 
-          <TextField
-            label="Title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            helperText={derivedSlug ? `Slug: ${derivedSlug}` : 'Slug will be generated from title'}
-            fullWidth
-          />
+          <Accordion variant='outlined'>
+            <AccordionSummary expandIcon={<Icon icon="expand" />}>
+              <Typography variant="body2">Content</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <TextField
+                label="Title"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                helperText={derivedSlug ? `Slug: ${derivedSlug}` : 'Slug will be generated from title'}
+                fullWidth
+              />
 
-          <TextField
-            label="Description"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            multiline
-            minRows={3}
-            fullWidth
-          />
+              <TextField
+                label="Description"
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                multiline
+                minRows={3}
+                fullWidth
+              />
 
-          <TextField
-            label="Body"
-            value={body}
-            onChange={(event) => setBody(event.target.value)}
-            multiline
-            minRows={8}
-            fullWidth
-          />
+              <TextField
+                label="Body"
+                value={body}
+                onChange={(event) => setBody(event.target.value)}
+                multiline
+                minRows={8}
+                fullWidth
+              />
+            </AccordionDetails>
+          </Accordion>
+
+          {Object.keys(baseData).length > 0 && (
+            <Box sx={{ p: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+                Current Product
+              </Typography>
+              <Typography
+                variant="body2"
+                component="pre"
+                sx={{
+                  fontSize: '0.75rem',
+                  overflow: 'auto',
+                  color: 'text.secondary',
+                }}
+              >
+                {JSON.stringify(baseData, null, 2)}
+              </Typography>
+            </Box>
+          )}
 
           <Box sx={{ display: 'flex', gap: 1.5 }}>
-            <MightyButton
-              variant="outlined"
-              onClick={() => dispatch(navigateTo(router, '/products'))}
-              disabled={saving}
-            >
-              Cancel
-            </MightyButton>
+              <Back kind="icon" />
             <MightyButton
               variant="contained"
               onClick={() => { void handleSave(); }}
-              disabled={saving || loading}
+              disabled={saving || loading || !isDirty}
             >
               {saving ? 'Saving...' : 'Save'}
             </MightyButton>

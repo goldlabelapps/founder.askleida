@@ -82,6 +82,7 @@ import { toDate } from './lib/toDate';
 import { parseArrayData } from './lib/parseArrayData';
 import { toAccessLevel } from './lib/toAccessLevel';
 import { asText } from './lib/asText';
+import { asRecord } from './lib/asRecord';
 import { asId } from './lib/asId';
 import { inferPrice } from './lib/inferPrice';
 import { productIdentity } from './lib/productIdentity';
@@ -238,6 +239,7 @@ export {
     parseArrayData,
     toAccessLevel,
     asText,
+    asRecord,
     asId,
     inferPrice,
     productIdentity,

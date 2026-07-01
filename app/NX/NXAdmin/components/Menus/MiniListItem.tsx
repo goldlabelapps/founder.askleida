@@ -72,6 +72,7 @@ export default function MiniListItem({
                           {typeof badgeContent === 'number' ? (
                                 <Badge
                                     color="default"
+                                    max={9999999}
                                     badgeContent={badgeContent}
                                 />
                           ) : null}

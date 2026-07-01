@@ -1,6 +1,7 @@
 "use client";
 import * as React from 'react';
-import { Alert, Box, LinearProgress, Stack } from '@mui/material';
+import { Alert, Stack } from '@mui/material';
+import { BlockingOverlay } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { fetchLeida, useLeidaBus } from '../../../../Leida';
 import { parsePractitionerData } from '../../../lib/parsePractitionerData';
@@ -78,9 +79,7 @@ const PractitionerList = () => {
 						: `practitioner-${index}`;
 					return <PractitionerCard key={key} practitioner={row} />;
 				})}
-				<Box sx={{ height: 12 }}>
-					{practitionersBus?.loading && <LinearProgress />}
-				</Box>
+				<BlockingOverlay open={Boolean(practitionersBus?.loading)} label="Loading practitioners..." />
 			</Stack>
 		</>
 	);

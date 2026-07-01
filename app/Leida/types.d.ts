@@ -174,6 +174,7 @@ export type T_AWINListProps = {
     rows: T_AWINListRow[];
     loading: boolean;
     smokeTestLoading?: boolean;
+    activeQuery?: string;
     total: number;
     page: number;
     resultsPerPage: number;

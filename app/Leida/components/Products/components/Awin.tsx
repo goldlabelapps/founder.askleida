@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { usePaywall } from '../../../../NX/Paywall';
-import { MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
+import { BlockingOverlay, MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { Editable } from '../../../../NX/NXAdmin';
 import {
     asText,
@@ -431,6 +431,7 @@ export default function AWIN() {
                     rows={displayedRows}
                     loading={loading}
                     smokeTestLoading={runningSmokeTest}
+                    activeQuery={activeQuery}
                     total={displayedTotal}
                     page={page}
                     resultsPerPage={resultsPerPage}
@@ -477,6 +478,8 @@ export default function AWIN() {
                 onClose={() => setSelectedAWIN(null)}
                 onProcessed={handleProcessed}
             />
+
+            <BlockingOverlay open={bulkDecision === 'queue'} label="Adding products to queue..." />
         </Box>
     );
 }

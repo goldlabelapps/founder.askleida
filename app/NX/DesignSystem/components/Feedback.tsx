@@ -36,7 +36,7 @@ export default function Feedback() {
         onClose={handleClose}
       >
         <Alert
-          variant="outlined"
+          variant="standard"
           severity={severity}
           sx={{ minWidth: 250 }}
           action={
@@ -46,7 +46,7 @@ export default function Feedback() {
               size="small"
               onClick={handleClose}
             >
-              <Icon icon="close" />
+              <Icon icon="tick" />
             </IconButton>
           }
         >

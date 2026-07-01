@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import type { T_AWINListProps, T_AWINProduct } from '../../../types.d';
-import { Box, IconButton, LinearProgress, Stack, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import {
     DataGrid,
     type GridColDef,
@@ -10,13 +10,14 @@ import {
 } from '@mui/x-data-grid';
 import { formatUkPrice, getAffiliateImageUrl, setLeida, Thumbnail } from '../../../index';
 import { LEIDA_DATA_GRID_SX } from '../../UI';
-import { Icon, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
+import { BlockingOverlay, Icon, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 
 export default function AWINList({
     rows,
     loading,
     smokeTestLoading = false,
+    activeQuery = '',
     total,
     page,
     resultsPerPage,
@@ -127,13 +128,28 @@ export default function AWINList({
 
     if (loading && rows.length === 0) {
         return (
-            <Box sx={{ width: '100%', py: 2 }}>
-                <LinearProgress />
-            </Box>
+            <BlockingOverlay open label="Loading AWIN products..." />
         );
     }
 
     if (!loading && rows.length === 0) {
+        const trimmedQuery = activeQuery.trim();
+        const showTableEmptyState = total === 0 && !trimmedQuery;
+
+        if (!showTableEmptyState) {
+            if (trimmedQuery) {
+                return null;
+            }
+
+            return (
+                <Box sx={{ width: '100%' }}>
+                    <Typography variant="body1" color="text.secondary">
+                        No products found.
+                    </Typography>
+                </Box>
+            );
+        }
+
         return (
             <Box sx={{ width: '100%' }}>
                     <Typography variant="h6">

@@ -6,7 +6,6 @@ import {
 	Grid,
 	Stack,
 	Collapse,
-	LinearProgress,
 	Typography,
 	Button,
 	IconButton,
@@ -15,7 +14,7 @@ import {
 	MenuItem,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { Icon, ConfirmAction, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
+import { BlockingOverlay, Icon, ConfirmAction, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
 import { 
 	fetchLeida,
 	setLeida,
@@ -216,8 +215,12 @@ const PractitionerUpdate = () => {
 	return (
 		<Box
 			id={`practitioner-update-${uuid}`}
-			sx={{ pb: 'calc(104px + env(safe-area-inset-bottom))' }}
+			sx={{ pb: 'calc(104px + env(safe-area-inset-bottom))', position: 'relative' }}
 		>
+			<BlockingOverlay
+				open={Boolean(deleting || loading)}
+				label={deleting ? 'Deleting practitioner...' : 'Loading practitioner...'}
+			/>
 			<>
 				{!loading && !deleting && (
 					<>
@@ -232,20 +235,8 @@ const PractitionerUpdate = () => {
 					</>
 				)}
 				
-				{deleting ? (
-					<Stack spacing={1} sx={{ pt: 0.5 }}>
-						<LinearProgress />
-						<Typography variant="body2" color="text.secondary">
-							Deleting Practitioner and related account data...
-						</Typography>
-					</Stack>
-				) : (
+				{deleting ? null : (
 					<>
-						{loading && (
-							<Box sx={{height: 12}}>
-								{loading && <LinearProgress />}
-							</Box>
-						)}
 						{error && <Typography variant="body2" color="error">
 							Error: {error}
 						</Typography>}
