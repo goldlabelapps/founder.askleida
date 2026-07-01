@@ -94,8 +94,8 @@ export default function Queue() {
         const params = new URLSearchParams({
           page: '1',
           pageSize: String(RESULTS_PER_PAGE),
-          sortBy: 'created',
-          sortOrder: 'asc',
+          sortBy: 'updated',
+          sortOrder: 'desc',
         });
 
         if (statusFilter) {
@@ -341,6 +341,20 @@ export default function Queue() {
       selectedRow?.title,
     );
 
+    const rawPrice = pickFirstText(
+      rowRecord?.search_price,
+      rowData?.search_price,
+      nestedData?.search_price,
+      rowRecord?.price,
+      rowData?.price,
+      nestedData?.price,
+      rowRecord?.display_price,
+      rowData?.display_price,
+      nestedData?.display_price,
+    );
+    const parsedPrice = rawPrice ? Number(String(rawPrice).replace(/[^\d.-]/g, '')) : NaN;
+    const price = Number.isFinite(parsedPrice) ? parsedPrice : null;
+
     return {
       slug: pickFirstText(rowRecord?.slug, rowData?.slug, nestedData?.slug),
       title: productName,
@@ -349,6 +363,7 @@ export default function Queue() {
       url_awin: pickFirstText(rowRecord?.aw_deep_link, rowData?.aw_deep_link, nestedData?.aw_deep_link),
       thumbnail,
       image,
+      ...(price !== null ? { price, search_price: price } : {}),
       merchant: pickFirstText(rowRecord?.merchant_name, rowData?.merchant_name, nestedData?.merchant_name),
       id_merchant: pickFirstText(rowRecord?.merchant_product_id, rowData?.merchant_product_id, nestedData?.merchant_product_id),
       url_merchant: pickFirstText(rowRecord?.merchant_deep_link, rowData?.merchant_deep_link, nestedData?.merchant_deep_link),

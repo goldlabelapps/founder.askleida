@@ -6,7 +6,6 @@ import type { T_AWINProcessedPayload, T_AWINProduct } from '../../../types.d';
 import {
     Box,
     CircularProgress,
-    Stack,
     Typography,
 } from '@mui/material';
 import {
@@ -119,7 +118,8 @@ export default function AWIN() {
     const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
     const activeQuery = debouncedSearchTerm.trim();
     const isTableEmpty = !loading && !activeQuery && total === 0;
-    const showAWINControls = !isTableEmpty;
+    const hideControlsForInitialLoad = loading && isInitialLoad;
+    const showAWINControls = !isTableEmpty && !hideControlsForInitialLoad;
 
     const statusMessage = React.useMemo(() => {
         if (loading) {
@@ -142,7 +142,7 @@ export default function AWIN() {
         dispatch(setFeedback({
             severity: 'success',
             title: decision === 'queue'
-                ? `Queued ${productName(processedAWIN)} and marked it as queued in the AWIN source table.`
+                ? `${productName(processedAWIN)} was added to the queue.`
                 : `Marked ${productName(processedAWIN)} as skipped in the AWIN source table.`,
         }));
         setSelectionModel({
@@ -348,30 +348,68 @@ export default function AWIN() {
 
     return (
         <Box sx={{ p: 2 }}>
-            <Stack spacing={2}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {showAWINControls ? (
                     <>
-                        <Stack
-                            direction={{ xs: 'column', md: 'row' }}
-                            spacing={1.5}
-                            alignItems={{ xs: 'stretch', md: 'center' }}
-                            justifyContent="space-between"
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                flexWrap: 'wrap',
+                                gap: 1.5,
+                                alignItems: 'center',
+                            }}
                         >
-                            <Back />
+                            <Back kind="icon" />
 
-                            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: { md: 'auto' } }}>
+                            <Box sx={{
+                                width: { xs: '100%', md: 320 },
+                                maxWidth: '100%',
+                            }}>
+                                <Editable
+                                    variant="standard"
+                                    value={searchTerm}
+                                    onChange={(value: string) => {
+                                        setPage(1);
+                                        setSearchTerm(value);
+                                    }}
+                                    disabled={Boolean(bulkDecision)}
+                                    startAdornment={'search'}
+                                    endAdornment={(
+                                        <MightyButton
+                                            kind="icon"
+                                            icon="close"
+                                            disabled={!searchTerm.trim() || Boolean(bulkDecision)}
+                                            onClick={() => {
+                                                setPage(1);
+                                                setSearchTerm('');
+                                                setDebouncedSearchTerm('');
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </Box>
+
+                            <Box sx={{ flexGrow: 1 }} />
+
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    gap: 1.5,
+                                    alignItems: 'center',
+                                }}
+                            >
 
                                 <MightyButton
-                                    variant="text"
-                                    startIcon="delete"
+                                    kind="icon"
+                                    icon={bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : 'delete'}
                                     disabled={!selectedCount || Boolean(bulkDecision)}
                                     onClick={() => handleBulkProcess('delete')}
-                                >
-                                    {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Skip${selectedCount ? ` (${selectedCount})` : ''}`}
-                                </MightyButton>
+                                />
                                 <MightyButton
                                     startIcon="queue"
-                                    variant="text"
+                                    variant="contained"
                                     disabled={!selectedCount || Boolean(bulkDecision)}
                                     onClick={() => handleBulkProcess('queue')}
                                 >
@@ -379,36 +417,7 @@ export default function AWIN() {
                                 </MightyButton>
 
                                 
-                            </Stack>
-                        </Stack>
-
-                        <Box sx={{
-                            width: { xs: '100%', md: 300 },
-                            maxWidth: '100%',
-                            ml: { md: 'auto' },
-                        }}>
-                            <Editable
-                                variant="standard"
-                                value={searchTerm}
-                                onChange={(value: string) => {
-                                    setPage(1);
-                                    setSearchTerm(value);
-                                }}
-                                disabled={Boolean(bulkDecision)}
-                                startAdornment={'search'}
-                                endAdornment={(
-                                    <MightyButton
-                                        kind="icon"
-                                        icon="close"
-                                        disabled={!searchTerm.trim() || Boolean(bulkDecision)}
-                                        onClick={() => {
-                                            setPage(1);
-                                            setSearchTerm('');
-                                            setDebouncedSearchTerm('');
-                                        }}
-                                    />
-                                )}
-                            />
+                            </Box>
                         </Box>
 
                         {activeQuery ? (
@@ -461,7 +470,7 @@ export default function AWIN() {
                     }}
                     onRunSmokeTest={handleRunSmokeTest}
                 />
-            </Stack>
+            </Box>
 
             <AWINDetail
                 open={Boolean(selectedAWIN)}

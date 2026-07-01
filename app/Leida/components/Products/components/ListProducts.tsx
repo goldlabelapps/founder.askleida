@@ -3,7 +3,9 @@ import * as React from 'react';
 import {useRouter} from 'next/navigation';
 import {
 	Box,
-	Button,
+	Dialog,
+	DialogContent,
+	DialogTitle,
 	LinearProgress,
 	Stack,
 	Typography,
@@ -18,6 +20,7 @@ import { setFeedback, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	formatUkPrice,
+	getProductImageUrl,
 	getProductCategoryLabel,
 	getProductName,
 	getProductPrice,
@@ -26,8 +29,10 @@ import {
 	fetchProducts,
 	initProducts,
 	MightyButton,
+	Thumbnail,
 	setLeida
 } from '../../../../Leida';
+import { LEIDA_DATA_GRID_SX } from '../../UI';
 import type { T_ListProductsProps, T_Product } from '../../../types.d';
 
 
@@ -37,8 +42,10 @@ const PRODUCTS_COUNT_REFRESH_EVENT = 'leida:products-count-refresh';
 
 type T_ProductListRow = {
 	id: string;
+	thumbnailUrl: string | null;
 	title: string;
 	category: string | null;
+	status: string | null;
 	price: number | null;
 	updated: string | number | null;
 	product: T_Product;
@@ -68,7 +75,25 @@ const ListProducts = ({
 	const [error, setError] = React.useState<string | null>(null);
 	const [queueTotal, setQueueTotal] = React.useState(0);
 	const [refreshNonce, setRefreshNonce] = React.useState(0);
+	const [previewProduct, setPreviewProduct] = React.useState<T_Product | null>(null);
 	const lastSearchFeedbackKeyRef = React.useRef('');
+
+	const openProductPreview = React.useCallback((product: T_Product) => {
+		onProductSelect?.(product);
+		setPreviewProduct(product);
+	}, [onProductSelect]);
+
+	const previewText = React.useMemo(() => {
+		if (!previewProduct) {
+			return '';
+		}
+
+		try {
+			return JSON.stringify(previewProduct, null, 2);
+		} catch {
+			return '{\n  "error": "Unable to stringify product"\n}';
+		}
+	}, [previewProduct]);
 
 	React.useEffect(() => {
 		dispatch(initProducts());
@@ -81,8 +106,10 @@ const ListProducts = ({
 				return 'created';
 			case 'updated':
 				return 'updated';
+			case 'title':
+				return 'slug';
 			default:
-				return 'title';
+				return 'slug';
 		}
 	})();
 	const sortOrder = activeSort.sort === 'desc' ? 'desc' : 'asc';
@@ -199,6 +226,15 @@ const ListProducts = ({
 
 	const rows = React.useMemo<T_ProductListRow[]>(() => {
 		return products.map((product, index) => {
+			const data = product?.data && typeof product.data === 'object' && !Array.isArray(product.data)
+				? (product.data as Record<string, unknown>)
+				: null;
+			const status = typeof product?.status === 'string' && product.status.trim()
+				? product.status.trim()
+				: typeof data?.status === 'string' && data.status.trim()
+					? data.status.trim()
+					: null;
+
 			const productId = typeof product?.product_id === 'string' && product.product_id
 				? product.product_id
 				: (typeof product?.product_id === 'number' && Number.isFinite(product.product_id)
@@ -214,8 +250,10 @@ const ListProducts = ({
 
 			return {
 				id,
+				thumbnailUrl: getProductImageUrl(product),
 				title: getProductName(product),
 				category: getProductCategoryLabel(product),
+				status,
 				price: Number.isFinite(numericPrice) ? numericPrice : null,
 				updated: getProductUpdatedAt(product),
 				product,
@@ -278,21 +316,32 @@ const ListProducts = ({
 	const columns = React.useMemo<GridColDef[]>(() => {
 		return [
 			{
+				field: 'thumbnailUrl',
+				headerName: '',
+				width: 72,
+				sortable: false,
+				filterable: false,
+				disableColumnMenu: true,
+				renderCell: (params: GridRenderCellParams) => (
+					<Thumbnail
+						src={typeof params.value === 'string' ? params.value : null}
+						alt="Product thumbnail"
+						size={40}
+					/>
+				),
+			},
+			{
 				field: 'title',
 				headerName: '',
 				flex: 1.6,
 				minWidth: 280,
 				sortable: true,
 				renderCell: (params: GridRenderCellParams) => (
-					<Button
-						variant="text"
-						sx={{ justifyContent: 'flex-start', textTransform: 'none', px: 0 }}
-						onClick={() => {
-							onProductSelect?.(params.row.product as T_Product);
-						}}
-					>
-						{params.value}
-					</Button>
+					<Box sx={{ width: '100%', cursor: 'pointer' }}>
+						<Typography variant="h6" sx={{ mt: 1, lineHeight: 1.2, cursor: 'pointer' }}>
+							{params.value}
+						</Typography>
+					</Box>
 				),
 			},
 			{
@@ -303,6 +352,17 @@ const ListProducts = ({
 				sortable: false,
 			},
 			{
+				field: 'status',
+				headerName: 'Status',
+				width: 140,
+				sortable: false,
+				renderCell: (params: GridRenderCellParams) => (
+					<Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+						{typeof params.value === 'string' && params.value.trim() ? params.value : 'n/a'}
+					</Typography>
+				),
+			},
+			{
 				field: 'price',
 				headerName: 'Price',
 				width: 140,
@@ -311,14 +371,8 @@ const ListProducts = ({
 				headerAlign: 'right',
 				renderCell: (params: GridRenderCellParams) => formatUkPrice(typeof params.value === 'number' ? params.value : null),
 			},
-			{
-				field: 'updated',
-				headerName: 'Updated',
-				width: 180,
-				sortable: true,
-			},
 		];
-	}, [onProductSelect]);
+	}, [openProductPreview]);
 
 	return (
 		<Stack spacing={2}>
@@ -355,32 +409,43 @@ const ListProducts = ({
 					</Stack>
 				</Box>
 			) : (
-				<Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
-					<Box sx={{ width: { xs: '100%', md: 380 }, maxWidth: '100%', ml: { md: 'auto' } }}>
-						<Editable
-							variant="standard"
-							placeholder="Search products"
-							value={searchTerm}
-							onChange={(value: string) => {
-								setPage(1);
-								setSearchTerm(value);
+					<Box sx={{display: 'flex'}}>
+						<Box>
+							<Editable
+								variant="standard"
+								value={searchTerm}
+								onChange={(value: string) => {
+									setPage(1);
+									setSearchTerm(value);
+								}}
+								startAdornment={'search'}
+								endAdornment={(
+									<MightyButton
+										kind="icon"
+										icon="close"
+										disabled={!searchTerm.trim()}
+										onClick={() => {
+											setPage(1);
+											setSearchTerm('');
+											setDebouncedSearchTerm('');
+										}}
+									/>
+								)}
+							/>
+						</Box>
+					<Box sx={{ flexGrow: 1 }} />
+					<Box>
+						<MightyButton
+							variant="outlined"
+							startIcon="awin"
+							onClick={() => {
+							dispatch(navigateTo(router, '/products/awin'));
 							}}
-							startAdornment={'search'}
-							endAdornment={(
-								<MightyButton
-									kind="icon"
-									icon="cancel"
-									disabled={!searchTerm.trim()}
-									onClick={() => {
-										setPage(1);
-										setSearchTerm('');
-										setDebouncedSearchTerm('');
-									}}
-								/>
-							)}
-						/>
+						>
+							Add more
+						</MightyButton>
 					</Box>
-				</Stack>
+					</Box>
 			)}
 
 			{loading || rows.length > 0 ? (
@@ -392,8 +457,6 @@ const ListProducts = ({
 							columns: {
 								columnVisibilityModel: {
 									category: false,
-									price: false,
-									updated: false,
 								},
 							},
 						}}
@@ -421,17 +484,34 @@ const ListProducts = ({
 							setSortModel(normalized);
 						}}
 						onCellClick={(params) => {
-							onProductSelect?.(params.row.product as T_Product);
+							openProductPreview(params.row.product as T_Product);
 						}}
-						sx={{
-							border: 0,
-							'& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
-								outline: 'none',
-							},
-						}}
+						sx={LEIDA_DATA_GRID_SX}
 					/>
 				</Box>
 			) : null}
+
+			<Dialog
+				open={Boolean(previewProduct)}
+				onClose={() => setPreviewProduct(null)}
+				fullWidth
+				maxWidth="md"
+			>
+				<DialogTitle>Product JSON</DialogTitle>
+				<DialogContent>
+					<Box
+						component="pre"
+						sx={{
+							m: 0,
+							whiteSpace: 'pre-wrap',
+							wordBreak: 'break-word',
+							fontSize: '0.8rem',
+						}}
+					>
+						{previewText}
+					</Box>
+				</DialogContent>
+			</Dialog>
 		</Stack>
 	);
 };

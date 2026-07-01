@@ -2,19 +2,17 @@
 import * as React from 'react';
 import {
 	Box,
-	CardMedia,
 	Dialog,
 	DialogActions,
 	DialogContent,
 	DialogTitle,
-	IconButton,
-	Stack,
 	Typography,
+	CircularProgress,
 } from '@mui/material';
 import { ConfirmAction, Icon } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { usePaywall } from '../../../../NX/Paywall';
-import { MightyButton } from '../../../index';
+import { MightyButton, Thumbnail } from '../../../index';
 import { asText } from '../../../lib/asText';
 import { processAWIN } from '../actions/processAwin';
 import type { I_AWINDetail } from '../../../types.d';
@@ -133,13 +131,7 @@ export default function AWINDetail({ open, awin, onClose, onProcessed }: I_AWIND
 		>
 			<DialogTitle sx={{ display: 'flex' }}>
 				<Box sx={{ flexGrow: 1 }} />
-				<MightyButton
-					kind="icon"
-					icon="awin"
-					onClick={() => {
-						window.open(awinLink, '_blank', 'noopener,noreferrer');
-					}}
-				/>
+				
 				<MightyButton
 					kind="icon"
 					icon="api"
@@ -196,24 +188,19 @@ export default function AWINDetail({ open, awin, onClose, onProcessed }: I_AWIND
 							overflow: 'hidden',
 						}}
 					>
-						{thumbnailUrl ? (
-							<CardMedia
-								component="img"
-								image={thumbnailUrl}
-								alt={title}
-								sx={{
-									width: '100%',
-									height: 260,
-									objectFit: 'contain',
-									p: 1,
-								}}
-							/>
-						) : (
-							<Typography variant="body2" color="text.secondary">No thumbnail</Typography>
-						)}
+						<Thumbnail
+							src={thumbnailUrl || null}
+							alt={title}
+							size={260}
+							sx={{
+								width: '100%',
+								height: 260,
+								objectFit: 'contain',
+							}}
+						/>
 					</Box>
 
-					<Stack spacing={1.5}>
+					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
 						<Typography variant="h6">
 							{title}
 						</Typography>
@@ -221,41 +208,42 @@ export default function AWINDetail({ open, awin, onClose, onProcessed }: I_AWIND
 						<Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
 							{description}
 						</Typography>
-					</Stack>
+					</Box>
 				</Box>
 
 				{queueError ? <Typography variant="body2" color="error">{queueError}</Typography> : null}
 			</DialogContent>
 			<DialogActions sx={{ px: 3, pb: 2.5, pt: 2 }}>
-				<Stack
-					direction={{ xs: 'column', md: 'row' }}
-					spacing={1}
-					sx={{ width: '100%' }}
+				<Box
+					sx={{
+						display: 'flex',
+						flexDirection: { xs: 'column', md: 'row' },
+						gap: 1,
+						width: '100%',
+					}}
 				>
 					<MightyButton
-						startIcon={'delete'}
-						variant="outlined"
+						kind="icon"
+						icon={deleting ? <CircularProgress size={18} color="inherit" /> : 'delete'}
 						color="error"
-						fullWidth
 						disabled={!awin || !practitionerId || deleting || queueing}
 						onClick={() => setConfirmDeleteOpen(true)}>
-						{deleting ? 'Skipping...' : 'Skip in AWIN'}
 					</MightyButton>
 					<MightyButton
 						startIcon={'queue'}
-						variant="contained"
+						variant="outlined"
 						fullWidth
 						disabled={!awin || !practitionerId || queueing || deleting}
 						onClick={() => { void handleQueueConfirm(); }}>
 						{queueing ? 'Adding...' : 'Add to Queue'}
 					</MightyButton>
-				</Stack>
+				</Box>
 			</DialogActions>
 
 			<ConfirmAction
 				open={confirmDeleteOpen}
 				icon="delete"
-				title="Skip this AWIN product?"
+				title="Bin it?"
 				body="This will mark it as skipped and hide it from the AWIN source list."
 				handleConfirm={handleDeleteConfirm}
 				handleClose={() => setConfirmDeleteOpen(false)}

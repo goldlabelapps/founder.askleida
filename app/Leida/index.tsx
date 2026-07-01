@@ -22,7 +22,7 @@ import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
-import { MightyButton, Back, LeidaFlash } from './components/UI';
+import { MightyButton, Back, LeidaFlash, Thumbnail, LEIDA_DATA_GRID_SX } from './components/UI';
 import ConfirmAction from '../NX/DesignSystem/components/ConfirmAction';
 import Editable from '../NX/NXAdmin/components/UI/Editable';
 import {
@@ -63,6 +63,7 @@ import { initQueue } from './components/Products/actions/initQueue';
 import { fetchQueue } from './components/Products/actions/fetchQueue';
 import { deleteQueueSelection } from './components/Products/actions/deleteQueueSelection';
 import { deleteProductQueueRecords } from './components/Products/actions/deleteProductQueueRecords';
+import { deleteProductsRecords } from './components/Products/actions/deleteProductsRecords';
 import { fetchAWINFeedIngestPreflight } from './components/Products/actions/fetchAwinFeedIngestPreflight';
 import { fetchAWINFeedSnapshot } from './components/Products/actions/fetchAwinFeedSnapshot';
 import { setProducts } from './components/Products/actions/setProducts';
@@ -175,6 +176,8 @@ export {
     FindProduct,
     Back,
     MightyButton,
+    Thumbnail,
+    LEIDA_DATA_GRID_SX,
     ConfirmAction,
     Editable,
     LeidaFlash,
@@ -207,6 +210,7 @@ export {
     fetchQueue,
     deleteQueueSelection,
     deleteProductQueueRecords,
+    deleteProductsRecords,
     fetchAWINFeedIngestPreflight,
     fetchAWINFeedSnapshot,
     setLeida,

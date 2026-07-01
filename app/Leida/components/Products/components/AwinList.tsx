@@ -8,7 +8,8 @@ import {
     type GridColDef,
     type GridRenderCellParams,
 } from '@mui/x-data-grid';
-import { formatUkPrice, MightyButton, setLeida, } from '../../../index';
+import { formatUkPrice, getAffiliateImageUrl, MightyButton, setLeida, Thumbnail } from '../../../index';
+import { LEIDA_DATA_GRID_SX } from '../../UI';
 import { Icon, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 
@@ -42,6 +43,21 @@ export default function AWINList({
     
     const columns = React.useMemo<GridColDef[]>(() => {
         return [
+            {
+                field: 'thumbnail',
+                headerName: '',
+                width: 72,
+                sortable: false,
+                filterable: false,
+                disableColumnMenu: true,
+                renderCell: (params: GridRenderCellParams) => (
+                    <Thumbnail
+                        src={getAffiliateImageUrl(params.row.product as T_AWINProduct)}
+                        alt="Affiliate thumbnail"
+                        size={40}
+                    />
+                ),
+            },
             {
                 field: 'product_name',
                 headerName: ' ',
@@ -176,16 +192,7 @@ export default function AWINList({
 
                     onOpenProduct(params.row.product as T_AWINProduct, String(params.row.id));
                 }}
-                sx={{
-                    border: 0,
-                    '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
-                        outline: 'none',
-                    },
-                    '& .MuiDataGrid-menuIconButton': {
-                        color: 'primary.main',
-                        opacity: 1,
-                    },
-                }}
+                sx={LEIDA_DATA_GRID_SX}
             />
         </Box>
     ) : null;

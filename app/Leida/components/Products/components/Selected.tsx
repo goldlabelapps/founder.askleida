@@ -89,10 +89,10 @@ export default function Selected({
               <Box sx={{ mt: 1.5 }}>
                 <MightyButton
                   variant="text"
-                  icon="info"
+                  icon="api"
                   onClick={() => setShowMoreInfo((value) => !value)}
                 >
-                  More Info
+                  Raw Object
                 </MightyButton>
 
                 <Collapse in={showMoreInfo}>

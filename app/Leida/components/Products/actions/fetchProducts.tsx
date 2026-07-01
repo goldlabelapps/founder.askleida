@@ -24,10 +24,11 @@ export const fetchProducts =
 	({ page, pageSize, sortBy, sortOrder, q }: T_FetchProductsParams): any =>
 		async (dispatch: Dispatch): Promise<T_FetchProductsResult> => {
 			try {
+				const normalizedSortBy = sortBy === 'title' ? 'slug' : sortBy;
 				const params = new URLSearchParams({
 					page: String(page),
 					pageSize: String(pageSize),
-					sortBy,
+					sortBy: normalizedSortBy,
 					sortOrder,
 				});
 
@@ -60,7 +61,7 @@ export const fetchProducts =
 				await dispatch(setProducts('query', {
 					page,
 					pageSize,
-					sortBy,
+					sortBy: normalizedSortBy,
 					sortOrder,
 					q: trimmedQuery,
 				}));

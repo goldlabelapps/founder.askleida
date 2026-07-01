@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import MightyButton from './MightyButton';
 import type { MightyButtonProps } from '../../types.d';
 
-type BackProps = Omit<Extract<MightyButtonProps, { kind?: 'button' }>, 'children' | 'startIcon'> & {
+type BackProps = Omit<MightyButtonProps, 'children' | 'startIcon'> & {
 	label?: React.ReactNode;
 };
 
@@ -16,6 +16,7 @@ const Back = ({
 	...props
 }: BackProps) => {
 	const router = useRouter();
+	const isIconKind = props.kind === 'icon';
 
 	const handleClick: NonNullable<BackProps['onClick']> = (event) => {
 		if (onClick) {
@@ -29,11 +30,12 @@ const Back = ({
 	return (
 		<MightyButton
 			{...props}
-			startIcon="left"
-			variant={variant}
+			{...(isIconKind
+				? { icon: props.icon || 'left' }
+				: { startIcon: 'left', variant })}
 			onClick={handleClick}
 		>
-			{label}
+			{isIconKind ? null : label}
 		</MightyButton>
 	);
 };

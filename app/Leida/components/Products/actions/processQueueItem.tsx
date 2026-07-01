@@ -32,7 +32,10 @@ export const processQueueItem =
             values: {
               practitioner_id: practitionerId,
               ...(slug ? { slug } : {}),
-              data: productDataDraft,
+              data: {
+                ...productDataDraft,
+                status: 'draft',
+              },
               updated: new Date().toISOString(),
             },
           }),

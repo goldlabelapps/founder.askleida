@@ -17,6 +17,7 @@ import {
 	ConfirmAction,
 	deleteQueueSelection,
 	deleteProductQueueRecords,
+	deleteProductsRecords,
 	fetchAWINFeedIngestPreflight,
 	fetchAWINFeedSnapshot,
 	MightyButton,
@@ -24,15 +25,21 @@ import {
 } from '../../../Leida';
 
 const QUEUE_COUNT_REFRESH_EVENT = 'leida:queue-count-refresh';
+const PRODUCTS_COUNT_REFRESH_EVENT = 'leida:products-count-refresh';
 
 function notifyQueueCountRefresh() {
 	window.dispatchEvent(new Event(QUEUE_COUNT_REFRESH_EVENT));
+}
+
+function notifyProductsCountRefresh() {
+	window.dispatchEvent(new Event(PRODUCTS_COUNT_REFRESH_EVENT));
 }
 
 export default function Products() {
 	const dispatch = useDispatch();
 	const router = useRouter();
 	const [queueTotal, setQueueTotal] = React.useState(0);
+	const [productsTotal, setProductsTotal] = React.useState(0);
 	const [awinTotal, setAWINTotal] = React.useState(0);
 	const [hasAWINUpdate, setHasAWINUpdate] = React.useState(false);
 	const [updateCheckResult, setUpdateCheckResult] = React.useState<{
@@ -49,6 +56,8 @@ export default function Products() {
 	const [deletingQueue, setDeletingQueue] = React.useState(false);
 	const [confirmDeleteProductQueueOpen, setConfirmDeleteProductQueueOpen] = React.useState(false);
 	const [deletingProductQueue, setDeletingProductQueue] = React.useState(false);
+	const [confirmDeleteProductsOpen, setConfirmDeleteProductsOpen] = React.useState(false);
+	const [deletingProducts, setDeletingProducts] = React.useState(false);
 	const [checkingAWINFeedSnapshot, setCheckingAWINFeedSnapshot] = React.useState(false);
 	const [loadingAWINProducts, setLoadingAWINProducts] = React.useState(false);
 
@@ -124,19 +133,56 @@ export default function Products() {
 		}
 	}, []);
 
+	const refreshProductsTotal = React.useCallback(async () => {
+		try {
+			const params = new URLSearchParams({
+				page: '1',
+				pageSize: '1',
+			});
+
+			const res = await fetch(`/api/products?${params.toString()}`, {
+				method: 'GET',
+				headers: { Accept: 'application/json' },
+			});
+
+			const json = await res.json().catch(() => null);
+			if (!res.ok) {
+				setProductsTotal(0);
+				return;
+			}
+
+			const nextTotal = typeof json?.data?.total === 'number'
+				? json.data.total
+				: Array.isArray(json?.data?.rows)
+					? json.data.rows.length
+					: 0;
+
+			setProductsTotal(nextTotal);
+		} catch {
+			setProductsTotal(0);
+		}
+	}, []);
+
 	React.useEffect(() => {
 		refreshQueueTotal();
 		refreshAWINTotal();
+		refreshProductsTotal();
 
 		const onRefresh = () => {
 			refreshQueueTotal();
 		};
 
+		const onProductsRefresh = () => {
+			refreshProductsTotal();
+		};
+
 		window.addEventListener(QUEUE_COUNT_REFRESH_EVENT, onRefresh);
+		window.addEventListener(PRODUCTS_COUNT_REFRESH_EVENT, onProductsRefresh);
 		return () => {
 			window.removeEventListener(QUEUE_COUNT_REFRESH_EVENT, onRefresh);
+			window.removeEventListener(PRODUCTS_COUNT_REFRESH_EVENT, onProductsRefresh);
 		};
-	}, [refreshAWINTotal, refreshQueueTotal]);
+	}, [refreshAWINTotal, refreshProductsTotal, refreshQueueTotal]);
 
 	const handleDeleteQueue = React.useCallback(async () => {
 		if (deletingQueue) {
@@ -205,6 +251,38 @@ export default function Products() {
 			refreshAWINTotal();
 		}
 	}, [deletingProductQueue, dispatch, refreshAWINTotal]);
+
+	const handleDeleteProducts = React.useCallback(async () => {
+		if (deletingProducts) {
+			return;
+		}
+
+		setConfirmDeleteProductsOpen(false);
+		setDeletingProducts(true);
+
+		try {
+			const result = await dispatch(deleteProductsRecords());
+
+			if (!result?.ok) {
+				throw new Error(result?.error || 'Failed to delete product records.');
+			}
+
+			dispatch(setFeedback({
+				severity: 'success',
+				title: `Deleted ${result.deletedRows} product record${result.deletedRows === 1 ? '' : 's'}.`,
+			}));
+			notifyProductsCountRefresh();
+		} catch (e: unknown) {
+			const message = e instanceof Error ? e.message : String(e);
+			dispatch(setFeedback({
+				severity: 'error',
+				title: message || 'Failed to delete product records.',
+			}));
+		} finally {
+			setDeletingProducts(false);
+			refreshProductsTotal();
+		}
+	}, [deletingProducts, dispatch, refreshProductsTotal]);
 
 	const handleCheckAWINFeedSnapshot = React.useCallback(async () => {
 		if (checkingAWINFeedSnapshot) {
@@ -279,7 +357,7 @@ export default function Products() {
 
 			if (result.skippedIngest || result.configured === false) {
 				setUpdateRunResult({
-					severity: 'info',
+					severity: 'warning',
 					title: result.message || 'AWIN ingest is not configured.',
 					description: 'Run /api/awin/lookfantastic/sync after configuring the feed pipeline, then retry ingest.',
 				});
@@ -326,10 +404,6 @@ export default function Products() {
 
 					<Box sx={{}}>
 
-						
-
-						
-
 						<MightyButton
 							variant="outlined"
 							startIcon="awin"
@@ -337,7 +411,7 @@ export default function Products() {
 								dispatch(navigateTo(router, '/products/awin'));
 							}}
 							>
-							View AWIN Products
+							Add AWIN Products
 						</MightyButton>
 						<MightyButton
 							alignLeft
@@ -368,7 +442,7 @@ export default function Products() {
 						<MightyButton
 							alignLeft
 							variant="outlined"
-							startIcon="warning"
+							startIcon="manage"
 							disabled={loadingAWINProducts}
 							onClick={handleLoadAWINProducts}
 						>
@@ -384,7 +458,7 @@ export default function Products() {
 							<MightyButton
 								alignLeft
 								variant="outlined"
-								startIcon="warning"
+								startIcon="manage"
 								disabled={deletingProductQueue}
 								onClick={() => setConfirmDeleteProductQueueOpen(true)}
 							>
@@ -401,11 +475,28 @@ export default function Products() {
 							<MightyButton
 								alignLeft
 								variant="outlined"
-								startIcon="warning"
+								startIcon="manage"
 								disabled={deletingQueue}
 								onClick={() => setConfirmDeleteQueueOpen(true)}
 							>
 								{deletingQueue ? 'Dropping Queue Table...' : 'Drop Queue Table'}
+							</MightyButton>
+						</Box>
+					) : null}
+
+					{productsTotal > 0 ? (
+						<Box sx={{}}>
+							<Typography variant="h6" sx={{ my: 2 }}>
+								Permanently clear Products table.
+							</Typography>
+							<MightyButton
+								alignLeft
+								variant="outlined"
+								startIcon="manage"
+								disabled={deletingProducts}
+								onClick={() => setConfirmDeleteProductsOpen(true)}
+							>
+								{deletingProducts ? 'Dropping Products Table...' : 'Drop Products Table'}
 							</MightyButton>
 						</Box>
 					) : null}
@@ -458,6 +549,15 @@ export default function Products() {
 				body="This will permanently clear every record from the AWIN table."
 				handleConfirm={handleDeleteProductQueue}
 				handleClose={() => setConfirmDeleteProductQueueOpen(false)}
+			/>
+
+			<ConfirmAction
+				open={confirmDeleteProductsOpen}
+				icon="delete"
+				title="Clear all products?"
+				body="This will permanently clear every record from the products table."
+				handleConfirm={handleDeleteProducts}
+				handleClose={() => setConfirmDeleteProductsOpen(false)}
 			/>
 		</Box>
 	);
