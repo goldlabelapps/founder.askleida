@@ -86,21 +86,6 @@ export default function Selected({
               </Typography>
               <Typography variant="body2">{selectedImageData.descriptionPreview}</Typography>
 
-              <Box sx={{ mt: 1.5 }}>
-                <MightyButton
-                  variant="text"
-                  icon="api"
-                  onClick={() => setShowMoreInfo((value) => !value)}
-                >
-                  Raw Object
-                </MightyButton>
-
-                <Collapse in={showMoreInfo}>
-                  <Box sx={{ mt: 0.5 }}>
-                      <pre>{JSON.stringify(productDataDraft, null, 2)}</pre>
-                  </Box>
-                </Collapse>
-              </Box>
             </Box>
           </Box>
         </CardContent>
@@ -123,17 +108,21 @@ export default function Selected({
             />
 
             <MightyButton
-              variant="outlined"
-              endIcon="start"
-              fullWidth
-              disabled={isDeleting || isProcessing}
-              onClick={onSaveAndProcess}
+              kind="icon"
+              icon="api"
+              onClick={() => setShowMoreInfo((value) => !value)}
             >
-              {isProcessing ? 'Processing...' : 'Start'}
+              Raw Object
             </MightyButton>
+
+           
           </Box>
         </CardActions>
-
+        <Collapse in={showMoreInfo}>
+          <Box sx={{ p:2 }}>
+            <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontSize: 11 }}>{JSON.stringify(productDataDraft, null, 2)}</pre>
+          </Box>
+        </Collapse>
 
       </Card>
 

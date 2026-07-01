@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import type { T_AWINProcessedPayload, T_AWINProduct } from '../../../types.d';
 import {
+    Backdrop,
     Box,
     CircularProgress,
     Typography,
@@ -477,6 +478,15 @@ export default function AWIN() {
                 onClose={() => setSelectedAWIN(null)}
                 onProcessed={handleProcessed}
             />
+
+            <Backdrop open={bulkDecision === 'queue'} sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                    <CircularProgress />
+                    <Typography variant="overline">
+                        Adding products to queue...
+                    </Typography>
+                </Box>
+            </Backdrop>
         </Box>
     );
 }
