@@ -29,7 +29,7 @@ import type { T_QueueListRow, T_QueueRow } from '../../../types.d';
 const RESULTS_PER_PAGE = 100;
 const RIGHT_LIST_PAGE_SIZE = 10;
 const TWEET_MAX_LENGTH = 280;
-const AUTO_PROGRESS_SECONDS = 4;
+const AUTO_PROGRESS_SECONDS = 1;
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== 'object') {
@@ -657,9 +657,22 @@ export default function Queue() {
         ) : null}
 
         {!loading && !hasQueryError && queueRows.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            No queue items found.
-          </Typography>
+          <>
+            <Typography variant="body2" color="text.secondary">
+              Nothing in the queue. Add products from Awin.
+            </Typography>
+            <Box sx={{ height: 24 }} />
+            <MightyButton
+                variant="outlined"
+                startIcon="awin"
+                fullWidth={false}
+                onClick={() => {
+                  dispatch(navigateTo(router, '/products/awin'));
+                }}
+              >
+                Add
+              </MightyButton>
+          </>
         ) : null}
 
         {!loading && !hasQueryError && selectedRow ? (
@@ -678,6 +691,7 @@ export default function Queue() {
               <MightyButton
                 variant="outlined"
                 startIcon="awin"
+                fullWidth={false}
                 onClick={() => {
                   dispatch(navigateTo(router, '/products/awin'));
                 }}
@@ -708,7 +722,7 @@ export default function Queue() {
                       thickness={5}
                       color="inherit"
                     />
-                    <span>{countdown > 0 ? countdown : '…'}</span>
+                    <span>{''}</span>
                     <span>Pause</span>
                   </Box>
                 ) : 'Start'}

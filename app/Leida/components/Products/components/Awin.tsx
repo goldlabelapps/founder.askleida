@@ -432,6 +432,7 @@ export default function AWIN() {
                     rows={displayedRows}
                     loading={loading}
                     smokeTestLoading={runningSmokeTest}
+                    activeQuery={activeQuery}
                     total={displayedTotal}
                     page={page}
                     resultsPerPage={resultsPerPage}

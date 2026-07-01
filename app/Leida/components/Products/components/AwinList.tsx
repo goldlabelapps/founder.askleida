@@ -17,6 +17,7 @@ export default function AWINList({
     rows,
     loading,
     smokeTestLoading = false,
+    activeQuery = '',
     total,
     page,
     resultsPerPage,
@@ -134,6 +135,23 @@ export default function AWINList({
     }
 
     if (!loading && rows.length === 0) {
+        const trimmedQuery = activeQuery.trim();
+        const showTableEmptyState = total === 0 && !trimmedQuery;
+
+        if (!showTableEmptyState) {
+            if (trimmedQuery) {
+                return null;
+            }
+
+            return (
+                <Box sx={{ width: '100%' }}>
+                    <Typography variant="body1" color="text.secondary">
+                        No products found.
+                    </Typography>
+                </Box>
+            );
+        }
+
         return (
             <Box sx={{ width: '100%' }}>
                     <Typography variant="h6">
