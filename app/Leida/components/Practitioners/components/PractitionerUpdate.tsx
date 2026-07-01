@@ -15,14 +15,14 @@ import {
 	MenuItem,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { Icon, ConfirmAction, navigateTo } from '../../../../NX/DesignSystem';
+import { Icon, ConfirmAction, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
 import { 
 	fetchLeida,
 	setLeida,
 	useLeidaBus,
 	deletePractitioner,
 	updatePractitionerProfile,
-	MightyButton,
+	Back,
 } from '../../../../Leida';
 import { 
 	Editable, 
@@ -125,10 +125,6 @@ const PractitionerUpdate = () => {
 		setConfirmOpen(true);
 	};
 
-	const handleBack = React.useCallback(() => {
-		router.back();
-	}, [router]);
-
 	const handleConfirmDelete = async () => {
 		try {
 			setConfirmOpen(false);
@@ -230,14 +226,7 @@ const PractitionerUpdate = () => {
 							direction="row"
 							sx={{ mb: 1 }}
 						>
-							<MightyButton
-								startIcon="left"
-								variant="text"
-								disabled={deleting}
-								onClick={handleBack}
-							>
-								Back
-							</MightyButton>
+							<Back disabled={deleting} />
 							<Box sx={{ flexGrow: 1 }} />
 						</Stack>
 					</>
@@ -268,7 +257,7 @@ const PractitionerUpdate = () => {
 									<Grid size={{
 										xs: 12,
 										sm: 4,
-									}} sx={{ alignSelf: 'flex-start', order: { xs: 1, sm: 2 } }}>
+									}} sx={{ alignSelf: 'flex-start', order: { xs: 1, sm: 1 } }}>
 										<Box sx={{ 
 											display: 'flex', 
 											justifyContent: 'center', 
@@ -324,7 +313,7 @@ const PractitionerUpdate = () => {
 									<Grid size={{
 										xs: 12,
 										sm: 8,
-									}} sx={{ order: { xs: 2, sm: 1 } }}>
+									}} sx={{ order: { xs: 2, sm: 2 } }}>
 											<Box sx={{ height: 24 }} />
 											<Editable
 												helperText={email}

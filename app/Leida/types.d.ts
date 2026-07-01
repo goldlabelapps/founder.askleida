@@ -298,6 +298,50 @@ export type T_QueueRow = {
     [key: string]: unknown;
 };
 
+export type T_QueueListRow = {
+    id: string;
+    position: number;
+    queueId: string;
+    title: string;
+    source: string | null;
+    source_table: string | null;
+    source_product_id: string | null;
+    decision: string | null;
+    status: string | null;
+    practitioner_id: string | null;
+    created: string | null;
+    updated: string | null;
+    data: Record<string, unknown>;
+    row: T_QueueRow;
+};
+
+export type T_SelectedImageData = {
+    thumbnailUrl: string | null;
+    mainImageUrl: string | null;
+    priceLabel: string | null;
+    awDeepLink: string | null;
+    awProductId: string | null;
+    slug: string | null;
+    merchantName: string | null;
+    merchantDeepLink: string | null;
+    description: string | null;
+    descriptionPreview: string;
+    displayImageUrl: string | null;
+};
+
+export type T_SelectedProps = {
+    selectedRow: T_QueueListRow;
+    selectedImageData: T_SelectedImageData;
+    productDataDraft: Record<string, unknown>;
+    deletingQueueId: string | null;
+    processingQueueId: string | null;
+    confirmDeleteOpen: boolean;
+    onOpenDeleteConfirm: () => void;
+    onSaveAndProcess: () => void;
+    onConfirmDelete: () => void;
+    onCloseDeleteConfirm: () => void;
+};
+
 export type T_ImageMeta = {
     status: 'idle' | 'loaded' | 'error';
     width: number;

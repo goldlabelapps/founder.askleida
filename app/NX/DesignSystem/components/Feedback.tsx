@@ -12,7 +12,7 @@ export default function Feedback() {
     if (feedback && !feedback.hidden) {
       const timer = setTimeout(() => {
         dispatch(setFeedback(null));
-      }, 3000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [feedback, dispatch]);
@@ -36,7 +36,7 @@ export default function Feedback() {
         onClose={handleClose}
       >
         <Alert
-          variant="filled"
+          variant="outlined"
           severity={severity}
           sx={{ minWidth: 250 }}
           action={

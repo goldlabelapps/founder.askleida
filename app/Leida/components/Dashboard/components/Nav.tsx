@@ -170,14 +170,14 @@ export default function Nav({
           nested,
           badgeContent: item.route === '/products/queue'
             ? (typeof queueCount === 'number' && queueCount > 0 ? queueCount : undefined)
-            : item.route === '/products/list'
+            : item.route === '/products'
               ? productCount ?? undefined
               : undefined,
         }}
       />
       )}
       {item.children?.map((child) => renderItem(child, true))}
-      {!nested ? <Divider /> : null}
+      {/* {!nested ? <Divider /> : null} */}
     </React.Fragment>
   ), [isRouteActive, navigateToRoute, open, productCount, queueCount]);
 

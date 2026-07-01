@@ -1,114 +1,74 @@
 'use client';
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  Avatar,
   Box,
-  Button,
-  Chip,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Stack,
-  TextField,
+  List,
+  ListItemButton,
+  ListItemText,
+  Pagination,
   Typography,
 } from '@mui/material';
-import {
-  DataGrid,
-  type GridColDef,
-  type GridRenderCellParams,
-  type GridSortModel,
-} from '@mui/x-data-grid';
-import { setFeedback } from '../../../../NX/DesignSystem';
+import { MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { initQueue, MightyButton, processQueueItem, setLeida } from '../../../index';
-import type { T_QueueRow } from '../../../types.d';
-import { toDate } from '../../../lib/toDate';
-import { toLabel } from '../../../lib/toLabel';
+import {
+  deleteQueueSelection,
+  formatUkPrice,
+  getQueueRowTitle,
+  initQueue,
+  notifyProductsCountRefresh,
+  notifyQueueCountRefresh,
+  processQueueItem,
+  queueAsText,
+  Selected,
+  setLeida,
+} from '../../../index';
+import type { T_QueueListRow, T_QueueRow } from '../../../types.d';
 
-const RESULTS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
-const QUEUE_COUNT_REFRESH_EVENT = 'leida:queue-count-refresh';
-const PRODUCTS_COUNT_REFRESH_EVENT = 'leida:products-count-refresh';
+const RESULTS_PER_PAGE = 100;
+const RIGHT_LIST_PAGE_SIZE = 10;
+const TWEET_MAX_LENGTH = 280;
 
-type T_QueueListRow = {
-  id: string;
-  position: number;
-  queueId: string;
-  title: string;
-  source: string | null;
-  source_table: string | null;
-  source_product_id: string | null;
-  decision: string | null;
-  status: string | null;
-  practitioner_id: string | null;
-  created: string | null;
-  updated: string | null;
-  data: Record<string, unknown>;
-  row: T_QueueRow;
-};
-
-function asText(value: unknown): string {
-  return typeof value === 'string' ? value.trim() : '';
+function asRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+  return value as Record<string, unknown>;
 }
 
-function asObject(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {};
-}
-
-function getQueueRowTitle(row: T_QueueRow): string {
-  const data = asObject(row?.data);
-  const basic = asObject(data.product_basic);
-
-  const candidates: unknown[] = [
-    data.product_name,
-    basic.title,
-    basic.name,
-    data.title,
-    data.name,
-    row?.source_product_id,
-    data.merchant_product_id,
-    data.aw_product_id,
-  ];
-
-  for (const value of candidates) {
-    const text = asText(value);
+function pickFirstText(...values: unknown[]): string | null {
+  for (const value of values) {
+    const text = queueAsText(value);
     if (text) {
       return text;
     }
   }
-
-  return 'Queue item';
+  return null;
 }
 
-function notifyQueueCountRefresh() {
-  window.dispatchEvent(new Event(QUEUE_COUNT_REFRESH_EVENT));
-}
-
-function notifyProductsCountRefresh() {
-  window.dispatchEvent(new Event(PRODUCTS_COUNT_REFRESH_EVENT));
+function truncateWithEllipsis(text: string, maxLength: number): string {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.slice(0, maxLength).trimEnd()}...`;
 }
 
 export default function Queue() {
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const [rows, setRows] = React.useState<T_QueueRow[]>([]);
   const [total, setTotal] = React.useState(0);
-  const [page, setPage] = React.useState(1);
-  const [resultsPerPage, setResultsPerPage] = React.useState(100);
-  const [sortModel, setSortModel] = React.useState<GridSortModel>([
-    { field: 'created', sort: 'asc' },
-  ]);
   const [loading, setLoading] = React.useState(false);
   const [hasQueryError, setHasQueryError] = React.useState(false);
-  const [selectedQueueId, setSelectedQueueId] = React.useState<string | null>(null);
   const [refreshNonce, setRefreshNonce] = React.useState(0);
-  const [processOpen, setProcessOpen] = React.useState(false);
-  const [processing, setProcessing] = React.useState(false);
-  const [editedPayload, setEditedPayload] = React.useState('');
-  const hasAutoSelectedInitialRowRef = React.useRef(false);
+  const [selectedQueueId, setSelectedQueueId] = React.useState<string | null>(null);
+  const [rightPage, setRightPage] = React.useState(1);
+  const previousRightPageRef = React.useRef(rightPage);
+  const [deletingQueueId, setDeletingQueueId] = React.useState<string | null>(null);
+  const [processingQueueId, setProcessingQueueId] = React.useState<string | null>(null);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
 
   React.useEffect(() => {
     dispatch(initQueue());
@@ -116,27 +76,10 @@ export default function Queue() {
 
   React.useEffect(() => {
       dispatch(setLeida('header', {
-        title: `Queue (Total ${total})`,
+        title: `Queue (${total})`,
         icon: 'queue',
       }));
   }, [dispatch, total]);
-
-  const activeSort = sortModel[0] || { field: 'created', sort: 'asc' as const };
-  const sortBy = (() => {
-    switch (activeSort.field) {
-      case 'updated':
-        return 'updated';
-      case 'status':
-        return 'status';
-      case 'decision':
-        return 'decision';
-      case 'source_table':
-        return 'source_table';
-      default:
-        return 'created';
-    }
-  })();
-  const sortOrder = activeSort.sort === 'desc' ? 'desc' : 'asc';
   const statusFilter = 'pending';
 
   React.useEffect(() => {
@@ -148,10 +91,10 @@ export default function Queue() {
 
       try {
         const params = new URLSearchParams({
-          page: String(page),
-          pageSize: String(resultsPerPage),
-          sortBy,
-          sortOrder,
+          page: '1',
+          pageSize: String(RESULTS_PER_PAGE),
+          sortBy: 'updated',
+          sortOrder: 'desc',
         });
 
         if (statusFilter) {
@@ -203,122 +146,299 @@ export default function Queue() {
     return () => {
       cancelled = true;
     };
-  }, [dispatch, page, refreshNonce, resultsPerPage, sortBy, sortOrder, statusFilter]);
+  }, [dispatch, refreshNonce, statusFilter]);
 
-  const gridRows = React.useMemo<T_QueueListRow[]>(() => {
+  const queueRows = React.useMemo<T_QueueListRow[]>(() => {
     const mapped = rows.map((row, index) => {
-      const queueId = asText(row.queue_id) || asText(row.id) || `queue-${index}`;
+      const queueId = queueAsText(row.queue_id) || queueAsText(row.id) || `queue-${index}`;
       return {
         id: queueId,
-        position: ((page - 1) * resultsPerPage) + index + 1,
+        position: index + 1,
         queueId,
         title: getQueueRowTitle(row),
-        source: asText(row.source) || null,
-        source_table: asText(row.source_table) || null,
-        source_product_id: asText(row.source_product_id) || null,
-        decision: asText(row.decision) || null,
-        status: asText(row.status) || null,
-        practitioner_id: asText(row.practitioner_id) || null,
-        created: asText(row.created) || null,
-        updated: asText(row.updated) || null,
-        data: asObject(row.data),
+        source: queueAsText(row.source) || null,
+        source_table: queueAsText(row.source_table) || null,
+        source_product_id: queueAsText(row.source_product_id) || null,
+        decision: queueAsText(row.decision) || null,
+        status: queueAsText(row.status) || null,
+        practitioner_id: queueAsText(row.practitioner_id) || null,
+        created: queueAsText(row.created) || null,
+        updated: queueAsText(row.updated) || null,
+        data: {},
         row,
       };
     });
 
     return mapped;
-  }, [page, resultsPerPage, rows]);
+  }, [rows]);
 
   React.useEffect(() => {
-    if (!gridRows.length) {
+    if (!queueRows.length) {
       setSelectedQueueId(null);
       return;
     }
 
-    const exists = selectedQueueId
-      ? gridRows.some((row) => row.id === selectedQueueId)
-      : false;
-
-    if (selectedQueueId && !exists) {
-      setSelectedQueueId(null);
-    }
-  }, [gridRows, selectedQueueId]);
-
-  React.useEffect(() => {
-    if (hasAutoSelectedInitialRowRef.current || selectedQueueId || !gridRows.length) {
+    if (!selectedQueueId) {
+      setSelectedQueueId(queueRows[0].id);
       return;
     }
 
-    hasAutoSelectedInitialRowRef.current = true;
-    setSelectedQueueId(gridRows[0].id);
-  }, [gridRows, selectedQueueId]);
+    const stillExists = queueRows.some((row) => row.id === selectedQueueId);
+    if (!stillExists) {
+      setSelectedQueueId(queueRows[0].id);
+    }
+  }, [queueRows, selectedQueueId]);
 
   const selectedRow = React.useMemo(
-    () => (selectedQueueId ? gridRows.find((row) => row.id === selectedQueueId) || null : null),
-    [gridRows, selectedQueueId],
+    () => (selectedQueueId ? queueRows.find((row) => row.id === selectedQueueId) || null : queueRows[0] || null),
+    [queueRows, selectedQueueId],
   );
 
-  const listRows = React.useMemo(() => {
-    if (!selectedQueueId) {
-      return gridRows;
-    }
+  const selectedImageData = React.useMemo(() => {
+    const rowRecord = asRecord(selectedRow?.row);
+    const rowData = asRecord(rowRecord?.data);
+    const nestedData = asRecord(rowData?.data);
 
-    return gridRows.filter((row) => row.id !== selectedQueueId);
-  }, [gridRows, selectedQueueId]);
+    const thumbnailUrl = pickFirstText(
+      rowRecord?.aw_image_url,
+      rowData?.aw_image_url,
+      nestedData?.aw_image_url,
+      rowRecord?.thumbnail,
+      rowData?.thumbnail,
+      nestedData?.thumbnail,
+    );
 
-  const visibleRowIds = React.useMemo(() => {
-    return new Set(gridRows.map((row) => String(row.id)));
-  }, [gridRows]);
+    const mainImageUrl = pickFirstText(
+      rowRecord?.merchant_image_url,
+      rowData?.merchant_image_url,
+      nestedData?.merchant_image_url,
+      rowRecord?.image_url,
+      rowData?.image_url,
+      nestedData?.image_url,
+      rowRecord?.image,
+      rowData?.image,
+      nestedData?.image,
+    );
 
-  const openProcessDialog = React.useCallback(() => {
-    if (!selectedRow) {
-      return;
-    }
+    const displayPrice = pickFirstText(
+      rowRecord?.display_price,
+      rowData?.display_price,
+      nestedData?.display_price,
+    );
 
-    setEditedPayload(JSON.stringify(selectedRow.data || {}, null, 2));
-    setProcessOpen(true);
+    const searchPrice = pickFirstText(
+      rowRecord?.search_price,
+      rowData?.search_price,
+      nestedData?.search_price,
+    );
+
+    const currency = pickFirstText(
+      rowRecord?.currency,
+      rowData?.currency,
+      nestedData?.currency,
+    );
+
+    const numericFromSearchPrice = searchPrice ? Number(searchPrice) : NaN;
+    const numericFromDisplayPrice = displayPrice
+      ? Number(String(displayPrice).replace(/[^\d.-]/g, ''))
+      : NaN;
+    const formattedUkPrice = Number.isFinite(numericFromSearchPrice)
+      ? formatUkPrice(numericFromSearchPrice)
+      : Number.isFinite(numericFromDisplayPrice)
+        ? formatUkPrice(numericFromDisplayPrice)
+        : null;
+
+    const priceLabel = formattedUkPrice || displayPrice || (searchPrice ? `${currency || ''}${searchPrice}` : null);
+
+    const awDeepLink = pickFirstText(
+      rowRecord?.aw_deep_link,
+      rowData?.aw_deep_link,
+      nestedData?.aw_deep_link,
+    );
+
+    const awProductId = pickFirstText(
+      rowRecord?.aw_product_id,
+      rowData?.aw_product_id,
+      nestedData?.aw_product_id,
+    );
+
+    const slug = pickFirstText(
+      rowRecord?.slug,
+      rowData?.slug,
+      nestedData?.slug,
+    );
+
+    const merchantName = pickFirstText(
+      rowRecord?.merchant_name,
+      rowData?.merchant_name,
+      nestedData?.merchant_name,
+    );
+
+    const merchantDeepLink = pickFirstText(
+      rowRecord?.merchant_deep_link,
+      rowData?.merchant_deep_link,
+      nestedData?.merchant_deep_link,
+    );
+
+    return {
+      thumbnailUrl,
+      mainImageUrl,
+      priceLabel,
+      awDeepLink,
+      awProductId,
+      slug,
+      merchantName,
+      merchantDeepLink,
+      description: pickFirstText(
+        rowRecord?.description,
+        rowData?.description,
+        nestedData?.description,
+      ),
+      descriptionPreview: truncateWithEllipsis(
+        pickFirstText(
+          rowRecord?.description,
+          rowData?.description,
+          nestedData?.description,
+        ) || 'No description available.',
+        TWEET_MAX_LENGTH,
+      ),
+      displayImageUrl: thumbnailUrl || mainImageUrl,
+    };
   }, [selectedRow]);
 
-  const handleProcessConfirm = React.useCallback(async () => {
-    if (!selectedRow || processing) {
+  const productDataDraft = React.useMemo<Record<string, unknown>>(() => {
+    const rowRecord = asRecord(selectedRow?.row);
+    const rowData = asRecord(rowRecord?.data);
+    const nestedData = asRecord(rowData?.data);
+
+    const thumbnail = pickFirstText(
+      rowRecord?.aw_image_url,
+      rowData?.aw_image_url,
+      nestedData?.aw_image_url,
+      rowRecord?.thumbnail,
+      rowData?.thumbnail,
+      nestedData?.thumbnail,
+    );
+
+    const image = pickFirstText(
+      rowRecord?.merchant_image_url,
+      rowData?.merchant_image_url,
+      nestedData?.merchant_image_url,
+      rowRecord?.image_url,
+      rowData?.image_url,
+      nestedData?.image_url,
+      rowRecord?.image,
+      rowData?.image,
+      nestedData?.image,
+      thumbnail,
+    );
+
+    const productName = pickFirstText(
+      rowRecord?.product_name,
+      rowData?.product_name,
+      nestedData?.product_name,
+      selectedRow?.title,
+    );
+
+    const rawPrice = pickFirstText(
+      rowRecord?.search_price,
+      rowData?.search_price,
+      nestedData?.search_price,
+      rowRecord?.price,
+      rowData?.price,
+      nestedData?.price,
+      rowRecord?.display_price,
+      rowData?.display_price,
+      nestedData?.display_price,
+    );
+    const parsedPrice = rawPrice ? Number(String(rawPrice).replace(/[^\d.-]/g, '')) : NaN;
+    const price = Number.isFinite(parsedPrice) ? parsedPrice : null;
+
+    return {
+      slug: pickFirstText(rowRecord?.slug, rowData?.slug, nestedData?.slug),
+      title: productName,
+      description: pickFirstText(rowRecord?.description, rowData?.description, nestedData?.description),
+      id_awin: pickFirstText(rowRecord?.aw_product_id, rowData?.aw_product_id, nestedData?.aw_product_id),
+      url_awin: pickFirstText(rowRecord?.aw_deep_link, rowData?.aw_deep_link, nestedData?.aw_deep_link),
+      thumbnail,
+      image,
+      ...(price !== null ? { price, search_price: price } : {}),
+      merchant: pickFirstText(rowRecord?.merchant_name, rowData?.merchant_name, nestedData?.merchant_name),
+      id_merchant: pickFirstText(rowRecord?.merchant_product_id, rowData?.merchant_product_id, nestedData?.merchant_product_id),
+      url_merchant: pickFirstText(rowRecord?.merchant_deep_link, rowData?.merchant_deep_link, nestedData?.merchant_deep_link),
+    };
+  }, [selectedRow]);
+
+  const listRows = queueRows;
+
+  const rightPageCount = Math.max(1, Math.ceil(listRows.length / RIGHT_LIST_PAGE_SIZE));
+
+  React.useEffect(() => {
+    if (rightPage > rightPageCount) {
+      setRightPage(rightPageCount);
+    }
+  }, [rightPage, rightPageCount]);
+
+  React.useEffect(() => {
+    const start = (rightPage - 1) * RIGHT_LIST_PAGE_SIZE;
+    const firstRowOnPage = listRows[start] || null;
+
+    if (!firstRowOnPage) {
+      previousRightPageRef.current = rightPage;
       return;
     }
 
-    setProcessing(true);
+    const pageChanged = previousRightPageRef.current !== rightPage;
+    previousRightPageRef.current = rightPage;
+
+    if (pageChanged) {
+      if (firstRowOnPage.id !== selectedQueueId) {
+        setSelectedQueueId(firstRowOnPage.id);
+      }
+      return;
+    }
+
+    const selectedStillExists = selectedQueueId
+      ? listRows.some((row) => row.id === selectedQueueId)
+      : false;
+
+    if (!selectedStillExists) {
+      setSelectedQueueId(firstRowOnPage.id);
+    }
+  }, [listRows, rightPage, selectedQueueId]);
+
+  const paginatedOtherRows = React.useMemo(() => {
+    const start = (rightPage - 1) * RIGHT_LIST_PAGE_SIZE;
+    const end = start + RIGHT_LIST_PAGE_SIZE;
+    return listRows.slice(start, end);
+  }, [listRows, rightPage]);
+
+  const remainingCount = Math.max(0, queueRows.length - 1);
+
+  const handleDeleteSelected = React.useCallback(async () => {
+    if (!selectedRow || deletingQueueId) {
+      return;
+    }
+
+    setDeletingQueueId(selectedRow.id);
 
     try {
-      let awinProduct: Record<string, unknown>;
-      try {
-        const parsed = JSON.parse(editedPayload);
-        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-          throw new Error('Edited payload must be a JSON object.');
-        }
-        awinProduct = parsed as Record<string, unknown>;
-      } catch (jsonError: unknown) {
-        const message = jsonError instanceof Error ? jsonError.message : String(jsonError);
-        throw new Error(message || 'Invalid JSON payload.');
-      }
-
-      const practitionerId = selectedRow.practitioner_id || '';
-      if (!practitionerId) {
-        throw new Error('Selected queue row is missing practitioner_id.');
-      }
-
-      const result = await dispatch(processQueueItem({
-        queueId: selectedRow.id,
-        practitionerId,
-        awinProduct,
+      const result = await dispatch(deleteQueueSelection({
+        selection: {
+          type: 'include',
+          ids: [selectedRow.id],
+        },
       }));
 
       if (!result?.ok) {
-        throw new Error(result?.error || 'Failed to process selected queue item.');
+        throw new Error(result?.error || 'Failed to delete selected queue item.');
       }
 
-      setProcessOpen(false);
       dispatch(setFeedback({
         severity: 'success',
-        title: 'Processed selected queue item and removed it from the queue.',
+        title: `Deleted queue item ${selectedRow.position}.`,
       }));
+
       setRefreshNonce((value) => value + 1);
       notifyQueueCountRefresh();
       notifyProductsCountRefresh();
@@ -326,228 +446,179 @@ export default function Queue() {
       const message = e instanceof Error ? e.message : String(e);
       dispatch(setFeedback({
         severity: 'warning',
+        title: message || 'Failed to delete selected queue item.',
+      }));
+    } finally {
+      setDeletingQueueId(null);
+    }
+  }, [deletingQueueId, dispatch, selectedRow]);
+
+  const handleOpenDeleteConfirm = React.useCallback(() => {
+    setConfirmDeleteOpen(true);
+  }, []);
+
+  const handleCloseDeleteConfirm = React.useCallback(() => {
+    setConfirmDeleteOpen(false);
+  }, []);
+
+  const handleConfirmDelete = React.useCallback(() => {
+    setConfirmDeleteOpen(false);
+    void handleDeleteSelected();
+  }, [handleDeleteSelected]);
+
+  const handleSaveAndProcessSelected = React.useCallback(async () => {
+    if (!selectedRow || deletingQueueId || processingQueueId) {
+      return;
+    }
+
+    const practitionerId = queueAsText(selectedRow.practitioner_id);
+    const hasDraft = productDataDraft && Object.keys(productDataDraft).length > 0;
+
+    if (!practitionerId || !hasDraft) {
+      dispatch(setFeedback({
+        severity: 'warning',
+        title: 'Unable to process this queue item due to missing practitioner or product draft data.',
+      }));
+      return;
+    }
+
+    setProcessingQueueId(selectedRow.id);
+
+    try {
+      const result = await dispatch(processQueueItem({
+        queueId: selectedRow.id,
+        practitionerId,
+        productDataDraft,
+      }));
+
+      if (!result?.ok) {
+        throw new Error(result?.error || 'Failed to process selected queue item.');
+      }
+
+      dispatch(setFeedback({
+        severity: 'success',
+        title: `Saved and processed queue item ${selectedRow.position}.`,
+      }));
+
+      setRefreshNonce((value) => value + 1);
+      notifyQueueCountRefresh();
+      notifyProductsCountRefresh();
+      dispatch(navigateTo(router, '/products'));
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      dispatch(setFeedback({
+        severity: 'warning',
         title: message || 'Failed to process selected queue item.',
       }));
     } finally {
-      setProcessing(false);
+      setProcessingQueueId(null);
     }
-  }, [dispatch, editedPayload, processing, selectedRow]);
-
-  const columns = React.useMemo<GridColDef[]>(() => {
-    return [
-      {
-        field: 'position',
-        headerName: '#',
-        width: 72,
-        sortable: false,
-        align: 'center',
-        headerAlign: 'center',
-      },
-      {
-        field: 'title',
-        headerName: '',
-        flex: 1.5,
-        minWidth: 280,
-        sortable: false,
-        renderCell: (params: GridRenderCellParams) => (
-          <Button
-            variant="text"
-            sx={{ justifyContent: 'flex-start', textTransform: 'none', px: 0 }}
-            onClick={() => {
-              setSelectedQueueId(String(params.row.id));
-            }}
-          >
-            {String(params.value || 'Queue item')}
-          </Button>
-        ),
-      },
-      {
-        field: 'status',
-        headerName: 'Status',
-        width: 120,
-        sortable: true,
-        renderCell: (params: GridRenderCellParams) => (
-          <Chip size="small" label={toLabel(params.value)} />
-        ),
-      },
-      {
-        field: 'decision',
-        headerName: 'Decision',
-        width: 120,
-        sortable: true,
-        renderCell: (params: GridRenderCellParams) => toLabel(params.value),
-      },
-      {
-        field: 'source_table',
-        headerName: 'Table',
-        width: 170,
-        sortable: true,
-      },
-      {
-        field: 'source_product_id',
-        headerName: 'Source Product ID',
-        minWidth: 220,
-        flex: 1,
-        sortable: false,
-      },
-      {
-        field: 'created',
-        headerName: 'Created',
-        width: 180,
-        sortable: true,
-        renderCell: (params: GridRenderCellParams) => toDate(params.value),
-      },
-    ];
-  }, []);
+  }, [deletingQueueId, dispatch, processingQueueId, productDataDraft, router, selectedRow]);
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Stack spacing={2}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
+    <Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        {loading ? (
+          <Box sx={{ py: 1 }}>
+            <CircularProgress size={20} />
+          </Box>
+        ) : null}
 
-
-          <Box sx={{ flexGrow: 1 }} />
-        </Stack>
-
-        {!loading && !hasQueryError && listRows.length === 0 ? (
+        {!loading && !hasQueryError && queueRows.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             No queue items found.
           </Typography>
         ) : null}
 
-        {selectedRow ? (
+        {!loading && !hasQueryError && selectedRow ? (
           <Box
             sx={{
-              border: (theme) => `1px solid ${theme.palette.divider}`,
-              borderRadius: 1,
-              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
             }}
           >
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Avatar
-                sx={{ width: 40, height: 40, flex: '0 0 auto' }}
-              >
-                1
-              </Avatar>
-              <Stack spacing={1} sx={{ minWidth: 0, flex: 1 }}>
-                <Typography variant="overline">
-                  Next product
-                </Typography>
-                <Typography variant="subtitle1">
-                  {selectedRow.title}
-                </Typography>
-                <Box>
+            <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+              <Box sx={{flexGrow: 1}} />
+              <Box>
                 <MightyButton
                   variant="contained"
-                  endIcon="start"
-                  disabled={processing}
-                  onClick={openProcessDialog}
+                  startIcon="awin"
+                  onClick={() => {
+                    dispatch(navigateTo(router, '/products/awin'));
+                  }}
                 >
-                  {processing ? <CircularProgress size={18} color="inherit" /> : 'Start'}
+                  Add
                 </MightyButton>
               </Box>
-              </Stack>
-            </Stack>
+            </Box>
+
+            <Box sx={{ height: 16 }} />
+
+            <Box key={selectedRow.id}>
+              <Box sx={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                <Selected
+                  selectedRow={selectedRow}
+                  selectedImageData={selectedImageData}
+                  productDataDraft={productDataDraft}
+                  deletingQueueId={deletingQueueId}
+                  processingQueueId={processingQueueId}
+                  confirmDeleteOpen={confirmDeleteOpen}
+                  onOpenDeleteConfirm={handleOpenDeleteConfirm}
+                  onSaveAndProcess={handleSaveAndProcessSelected}
+                  onConfirmDelete={handleConfirmDelete}
+                  onCloseDeleteConfirm={handleCloseDeleteConfirm}
+                />
+              </Box>
+            </Box>
+
+            <Box>
+
+              {listRows.length === 0 ? (
+                <Typography variant="body2" color="text.secondary" sx={{ px: 1, py: 0.5 }}>
+                  No queue items.
+                </Typography>
+              ) : (
+                <>
+                  <Box sx={{ height: 32 }} />
+                  {listRows.length > RIGHT_LIST_PAGE_SIZE ? (
+                    <Box sx={{ px: 1, py: 0.5, display: 'flex', justifyContent: 'flex-start' }}>
+                      
+                      <Pagination
+                        color="primary"
+                        count={rightPageCount}
+                        page={rightPage}
+                        onChange={(_, nextPage) => setRightPage(nextPage)}
+                      />
+                    </Box>
+                  ) : null}
+                  <Box sx={{ height: 32 }} />
+                  <List disablePadding dense>
+                    {paginatedOtherRows.map((row) => (
+                      <ListItemButton
+                        key={row.id}
+                        onClick={() => setSelectedQueueId(row.id)}
+                        disabled={Boolean(deletingQueueId) || row.id === selectedQueueId}
+                        selected={row.id === selectedQueueId}
+                        sx={{ py: 0.25, px: 1 }}
+                      >
+                        <ListItemText
+                          primary={`#${row.position} ${row.title}`}
+                          primaryTypographyProps={{
+                            variant: 'body2',
+                            noWrap: true,
+                            sx: { fontSize: '0.8rem' },
+                          }}
+                        />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </>
+              )}
+            </Box>
           </Box>
         ) : null}
-
-        {loading || listRows.length > 0 ? (
-          <Box sx={{ width: '100%' }}>
-            <DataGrid
-              rows={listRows}
-              columns={columns}
-              autoHeight
-              columnHeaderHeight={0}
-              initialState={{
-                columns: {
-                  columnVisibilityModel: {
-                    decision: false,
-                    source_table: false,
-                    source_product_id: false,
-                    created: false,
-                  },
-                },
-              }}
-              loading={loading}
-              disableRowSelectionOnClick
-              pagination
-              paginationMode="server"
-              sortingMode="server"
-              rowCount={total}
-              pageSizeOptions={RESULTS_PER_PAGE_OPTIONS}
-              paginationModel={{ page: page - 1, pageSize: resultsPerPage }}
-              onPaginationModelChange={(model) => {
-                setPage((typeof model?.page === 'number' ? model.page : 0) + 1);
-                if (typeof model?.pageSize === 'number' && model.pageSize !== resultsPerPage) {
-                  setPage(1);
-                  setResultsPerPage(model.pageSize);
-                }
-              }}
-              sortModel={sortModel}
-              onSortModelChange={(nextModel) => {
-                const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
-                  ? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'desc' ? 'desc' : 'asc' }]
-                  : [{ field: 'created', sort: 'asc' as const }];
-                setPage(1);
-                setSortModel(normalized);
-              }}
-              onCellClick={(params) => {
-                setSelectedQueueId(String(params.row.id));
-              }}
-              sx={{
-                border: 0,
-                '& .MuiDataGrid-columnHeaders': {
-                  display: 'none',
-                },
-                '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
-                  outline: 'none',
-                },
-              }}
-            />
-          </Box>
-        ) : null}
-      </Stack>
-
-      <Dialog
-        open={processOpen}
-        onClose={() => setProcessOpen(false)}
-        fullWidth
-        maxWidth="md"
-      >
-        <DialogTitle>
-          Confirm + edit queue payload
-        </DialogTitle>
-        <DialogContent>
-          <Stack spacing={1.5} sx={{ pt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary">
-              Review and edit the payload before sending it to the AWIN save route. This is the one-by-one AI handoff step.
-            </Typography>
-
-            {selectedRow ? (
-              <Typography variant="caption" color="text.secondary">
-                Queue ID: {selectedRow.queueId} | Practitioner: {selectedRow.practitioner_id || 'N/A'}
-              </Typography>
-            ) : null}
-
-            <TextField
-              multiline
-              minRows={16}
-              fullWidth
-              value={editedPayload}
-              onChange={(event) => setEditedPayload(event.target.value)}
-              placeholder={'{\n  "product_name": "..."\n}'}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setProcessOpen(false)} color="inherit" disabled={processing}>
-            Cancel
-          </Button>
-          <Button onClick={handleProcessConfirm} variant="contained" disabled={!selectedRow || processing}>
-            {processing ? 'Processing...' : 'Confirm and process'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      </Box>
     </Box>
   );
 }

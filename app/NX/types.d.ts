@@ -378,6 +378,7 @@ export type I_Icon = {
         | 'fish'
         | 'mobile'
         | 'blog'
+    | 'manage'
         | 'search'
         | 'cancel'
         | 'delete'

@@ -66,7 +66,7 @@ const PractitionerList = () => {
 
 	return (
 		<>
-			<Stack spacing={1.5}>
+			<Stack spacing={1}>
 				
 				{practitionersBus?.error && <Alert severity="error">{practitionersBus.error}</Alert>}
 				{!practitionersBus?.loading && sortedRows.length === 0 && (

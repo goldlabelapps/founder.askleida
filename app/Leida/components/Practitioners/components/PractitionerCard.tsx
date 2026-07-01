@@ -94,7 +94,7 @@ const PractitionerCard = ({
 			disabled={!canEdit}
 			sx={{ display: 'block', width: '100%', textAlign: 'left', borderRadius: 1 }}
 		>
-			<Paper variant="outlined" sx={{ p: 1.5, width: '100%' }}>
+			<Paper variant="outlined" sx={{ p: 1, width: '100%' }}>
 				
 				<Box sx={{
 					display: 'flex',

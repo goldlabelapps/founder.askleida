@@ -9,7 +9,7 @@ import {
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import { grey } from '@mui/material/colors';
 import { useDispatch } from '../../../Uberedux';
-import { Icon } from '../../../DesignSystem';
+import { Icon, MightyButton } from '../../../DesignSystem';
 import {
     Header,
     pwaAlert,
@@ -20,7 +20,6 @@ import {
 import { 
     DashNav, 
     PageRouter,
-    MightyButton,
 } from '../../../../Leida';
 import { NAV_ROUTES, sanitizePath, getActiveFromPathname } from '../PageRouter';
 

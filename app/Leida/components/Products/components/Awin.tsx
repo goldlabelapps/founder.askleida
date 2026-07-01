@@ -6,7 +6,6 @@ import type { T_AWINProcessedPayload, T_AWINProduct } from '../../../types.d';
 import {
     Box,
     CircularProgress,
-    Stack,
     Typography,
 } from '@mui/material';
 import {
@@ -15,13 +14,13 @@ import {
 } from '@mui/x-data-grid';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { usePaywall } from '../../../../NX/Paywall';
-import { navigateTo, setFeedback } from '../../../../NX/DesignSystem';
+import { MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { Editable } from '../../../../NX/NXAdmin';
 import {
     asText,
+    Back,
     fetchLeida,
     fetchAWINFeedIngestPreflight,
-    MightyButton,
     orderByFromSortField,
     productCategory,
     productDeepLink,
@@ -118,7 +117,8 @@ export default function AWIN() {
     const totalPages = Math.max(1, Math.ceil(total / resultsPerPage));
     const activeQuery = debouncedSearchTerm.trim();
     const isTableEmpty = !loading && !activeQuery && total === 0;
-    const showAWINControls = !loading && !isTableEmpty;
+    const hideControlsForInitialLoad = loading && isInitialLoad;
+    const showAWINControls = !isTableEmpty && !hideControlsForInitialLoad;
 
     const statusMessage = React.useMemo(() => {
         if (loading) {
@@ -141,7 +141,7 @@ export default function AWIN() {
         dispatch(setFeedback({
             severity: 'success',
             title: decision === 'queue'
-                ? `Queued ${productName(processedAWIN)} and marked it as queued in the AWIN source table.`
+                ? `${productName(processedAWIN)} was added to the queue.`
                 : `Marked ${productName(processedAWIN)} as skipped in the AWIN source table.`,
         }));
         setSelectionModel({
@@ -347,66 +347,77 @@ export default function AWIN() {
 
     return (
         <Box sx={{ p: 2 }}>
-            <Stack spacing={2}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {showAWINControls ? (
                     <>
-                        <Box sx={{
-                            width: { xs: '100%', md: 300 },
-                            maxWidth: '100%',
-                            ml: { md: 'auto' },
-                        }}>
-                            <Editable
-                                variant="standard"
-                                value={searchTerm}
-                                onChange={(value: string) => {
-                                    setPage(1);
-                                    setSearchTerm(value);
-                                }}
-                                disabled={Boolean(bulkDecision)}
-                                startAdornment={'search'}
-                                endAdornment={(
-                                    <MightyButton
-                                        kind="icon"
-                                        icon="cancel"
-                                        disabled={!searchTerm.trim() || Boolean(bulkDecision)}
-                                        onClick={() => {
-                                            setPage(1);
-                                            setSearchTerm('');
-                                            setDebouncedSearchTerm('');
-                                        }}
-                                    />
-                                )}
-                            />
-                        </Box>
-
-                        <Stack
-                            direction={{ xs: 'column', md: 'row' }}
-                            spacing={1.5}
-                            alignItems={{ xs: 'stretch', md: 'center' }}
-                            justifyContent="space-between"
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                flexWrap: 'wrap',
+                                gap: 1.5,
+                                alignItems: 'center',
+                            }}
                         >
-                            <Stack direction="row" spacing={1.5} alignItems="center">
+                            <Back kind="icon" />
+
+                            <Box sx={{
+                                width: { xs: '100%', md: 320 },
+                                maxWidth: '100%',
+                            }}>
+                                <Editable
+                                    variant="standard"
+                                    value={searchTerm}
+                                    onChange={(value: string) => {
+                                        setPage(1);
+                                        setSearchTerm(value);
+                                    }}
+                                    disabled={Boolean(bulkDecision)}
+                                    startAdornment={'search'}
+                                    endAdornment={(
+                                        <MightyButton
+                                            kind="icon"
+                                            icon="close"
+                                            disabled={!searchTerm.trim() || Boolean(bulkDecision)}
+                                            onClick={() => {
+                                                setPage(1);
+                                                setSearchTerm('');
+                                                setDebouncedSearchTerm('');
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </Box>
+
+                            <Box sx={{ flexGrow: 1 }} />
+
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    gap: 1.5,
+                                    alignItems: 'center',
+                                }}
+                            >
 
                                 <MightyButton
+                                    kind="icon"
+                                    icon={bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : 'delete'}
+                                    disabled={!selectedCount || Boolean(bulkDecision)}
+                                    onClick={() => handleBulkProcess('delete')}
+                                />
+                                <MightyButton
                                     startIcon="queue"
-                                    variant="outlined"
+                                    variant="contained"
                                     disabled={!selectedCount || Boolean(bulkDecision)}
                                     onClick={() => handleBulkProcess('queue')}
                                 >
-                                    {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add to Queue${selectedCount ? ` (${selectedCount})` : ''}`}
+                                    {bulkDecision === 'queue' ? <CircularProgress size={18} color="primary" /> : `Add ${selectedCount ? ` (${selectedCount})` : ''}`}
                                 </MightyButton>
 
-                                <MightyButton
-                                    variant="text"
-                                    startIcon="delete"
-                                    disabled={!selectedCount || Boolean(bulkDecision)}
-                                    onClick={() => handleBulkProcess('delete')}
-                                >
-                                    {bulkDecision === 'delete' ? <CircularProgress size={18} color="inherit" /> : `Skip${selectedCount ? ` (${selectedCount})` : ''}`}
-                                </MightyButton>
-
-                            </Stack>
-                        </Stack>
+                                
+                            </Box>
+                        </Box>
 
                         {activeQuery ? (
                             <Typography variant="body2" color="text.secondary">
@@ -458,7 +469,7 @@ export default function AWIN() {
                     }}
                     onRunSmokeTest={handleRunSmokeTest}
                 />
-            </Stack>
+            </Box>
 
             <AWINDetail
                 open={Boolean(selectedAWIN)}

@@ -43,6 +43,8 @@ export function PageRouter({ active }: I_PageRouter) {
     case 'flash':
       return <LeidaFlash />;
     case 'products':
+      return <ListProducts />;
+    case 'products/manage':
       return <Products />;
     case 'products/list':
       return <ListProducts />;

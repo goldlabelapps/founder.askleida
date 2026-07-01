@@ -4,7 +4,7 @@ import { setUbereduxKey } from '../../../../NX/Uberedux';
 type T_ProcessQueueItemParams = {
   queueId: string;
   practitionerId: string;
-  awinProduct: Record<string, unknown>;
+  productDataDraft: Record<string, unknown>;
 };
 
 type T_ProcessQueueItemResult = {
@@ -15,25 +15,36 @@ type T_ProcessQueueItemResult = {
 };
 
 export const processQueueItem =
-  ({ queueId, practitionerId, awinProduct }: T_ProcessQueueItemParams): any =>
+  ({ queueId, practitionerId, productDataDraft }: T_ProcessQueueItemParams): any =>
     async (dispatch: Dispatch): Promise<T_ProcessQueueItemResult> => {
       try {
-        const saveRes = await fetch('/api/awin/lookfantastic/save', {
+        const slug = typeof productDataDraft.slug === 'string' ? productDataDraft.slug : null;
+
+        const saveRes = await fetch('/api/supabase', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
           },
           body: JSON.stringify({
-            practitioner_id: practitionerId,
-            awinProduct,
+            resource: 'table-row',
+            table: 'products',
+            values: {
+              practitioner_id: practitionerId,
+              ...(slug ? { slug } : {}),
+              data: {
+                ...productDataDraft,
+                status: 'draft',
+              },
+              updated: new Date().toISOString(),
+            },
           }),
         });
 
         const saveJson = await saveRes.json().catch(() => null);
 
         if (!saveRes.ok) {
-          const message = saveJson?.message || `Failed to process queue item (${saveRes.status})`;
+          const message = saveJson?.message || `Failed to create product from queue item (${saveRes.status})`;
           throw new Error(message);
         }
 

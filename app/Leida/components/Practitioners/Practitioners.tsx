@@ -8,13 +8,12 @@ import {
 	Fab,
 } from '@mui/material';
 import { useDispatch } from '../../../NX/Uberedux';
-import { Icon, navigateTo } from '../../../NX/DesignSystem';
+import { Icon, MightyButton, navigateTo } from '../../../NX/DesignSystem';
 import {
 	setLeida,
 	initPractitioners,
 	usePractitioners,
 	PractitionerList,
-	MightyButton,
 } from '../../../Leida';
 
 const Practitioners = () => {
@@ -41,17 +40,23 @@ const Practitioners = () => {
 	}
 
 	return <>
-			<Box sx={{ p: 2 }}>
-				<MightyButton
-					kind="button"
-					variant="outlined"
-					color="primary"
-					onClick={handleNewPractitioner}
-					endIcon="add"
-				>
-					New
-				</MightyButton>
-				<Box sx={{ height: 24 }} />
+			<Box >
+				<Box sx={{ display: 'flex' }}>
+					<Box sx={{flexGrow:1}}/>
+					<Box>
+						<MightyButton
+							kind="button"
+							variant="outlined"
+							color="primary"
+							onClick={handleNewPractitioner}
+							endIcon="add"
+						>
+							New
+						</MightyButton>
+					</Box>
+					<Box sx={{ height: 12 }} />
+				</Box>
+				<Box sx={{ height: 12 }} />
 				<PractitionerList />
 			</Box>		
 	</>;

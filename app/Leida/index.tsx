@@ -17,14 +17,14 @@ import AWINDetail from './components/Products/components/AwinDetail';
 import AWINList from './components/Products/components/AwinList';
 import AWINProcess from './components/Products/components/AwinProcess';
 import Queue from './components/Products/components/Queue';
+import { Selected } from './components/Products/components';
 import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
 import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
-import { MightyButton } from './components/UI';
+import { Back, LeidaFlash, Thumbnail, LEIDA_DATA_GRID_SX } from './components/UI';
 import ConfirmAction from '../NX/DesignSystem/components/ConfirmAction';
 import Editable from '../NX/NXAdmin/components/UI/Editable';
-import { LeidaFlash } from './components/LeidaFlash';
 import {
     PractitionerList,
     PractitionerCard,
@@ -63,6 +63,7 @@ import { initQueue } from './components/Products/actions/initQueue';
 import { fetchQueue } from './components/Products/actions/fetchQueue';
 import { deleteQueueSelection } from './components/Products/actions/deleteQueueSelection';
 import { deleteProductQueueRecords } from './components/Products/actions/deleteProductQueueRecords';
+import { deleteProductsRecords } from './components/Products/actions/deleteProductsRecords';
 import { fetchAWINFeedIngestPreflight } from './components/Products/actions/fetchAwinFeedIngestPreflight';
 import { fetchAWINFeedSnapshot } from './components/Products/actions/fetchAwinFeedSnapshot';
 import { setProducts } from './components/Products/actions/setProducts';
@@ -126,6 +127,13 @@ import { getSupabaseFieldValue } from './lib/getSupabaseFieldValue';
 import { parseSupabaseFieldValue } from './lib/parseSupabaseFieldValue';
 import { getTableFormPreset } from './lib/getTableFormPreset';
 import { normalizeColumnsForPreset } from './lib/normalizeColumnsForPreset';
+import {
+    getQueueRowTitle,
+    notifyProductsCountRefresh,
+    notifyQueueCountRefresh,
+    queueAsObject,
+    queueAsText,
+} from './lib/queue';
 
 const AWINSearch = AWIN;
 const Awin = AWIN;
@@ -162,10 +170,13 @@ export {
     Claude,
     Products,
     Queue,
+    Selected,
     ListProducts,
     RenderProduct,
     FindProduct,
-    MightyButton,
+    Back,
+    Thumbnail,
+    LEIDA_DATA_GRID_SX,
     ConfirmAction,
     Editable,
     LeidaFlash,
@@ -198,6 +209,7 @@ export {
     fetchQueue,
     deleteQueueSelection,
     deleteProductQueueRecords,
+    deleteProductsRecords,
     fetchAWINFeedIngestPreflight,
     fetchAWINFeedSnapshot,
     setLeida,
@@ -270,6 +282,11 @@ export {
     parseSupabaseFieldValue,
     getTableFormPreset,
     normalizeColumnsForPreset,
+    queueAsText,
+    queueAsObject,
+    getQueueRowTitle,
+    notifyQueueCountRefresh,
+    notifyProductsCountRefresh,
 }
 
 export type * from './types';
