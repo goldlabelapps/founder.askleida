@@ -1,6 +1,6 @@
 "use client";
 import * as React from 'react';
-import { Alert, Box, LinearProgress, Stack } from '@mui/material';
+import { Alert, Backdrop, CircularProgress, Stack } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { fetchLeida, useLeidaBus } from '../../../../Leida';
 import { parsePractitionerData } from '../../../lib/parsePractitionerData';
@@ -26,7 +26,7 @@ function getRecordUpdatedTime(record: T_PractitionerRecord | null): number {
 		toTime((data as Record<string, unknown>).updated_at)
 	);
 }
-	import { Alert, Backdrop, CircularProgress, Stack } from '@mui/material';
+
 function getRecordCreatedTime(record: T_PractitionerRecord | null): number {
 	if (!record) return 0;
 	const data = parsePractitionerData(record.data);
@@ -66,24 +66,24 @@ const PractitionerList = () => {
 
 	return (
 		<>
-			<Stack spacing={1}>
+			<Stack spacing={1} sx={{ position: 'relative' }}>
 				
 				{practitionersBus?.error && <Alert severity="error">{practitionersBus.error}</Alert>}
 				{!practitionersBus?.loading && sortedRows.length === 0 && (
 					<Alert severity="info">No practitioners found.</Alert>
-					<Backdrop
-						open={Boolean(practitionersBus?.loading)}
-						sx={{ position: 'absolute', zIndex: (theme) => theme.zIndex.mobileStepper }}
-					>
-						<CircularProgress />
-					</Backdrop>
+				})}
+				{sortedRows.map((row, index) => {
+					const key = typeof row?.practitioner_id === 'string' && row.practitioner_id
 						? row.practitioner_id
 						: `practitioner-${index}`;
 					return <PractitionerCard key={key} practitioner={row} />;
 				})}
-				<Box sx={{ height: 12 }}>
-					{practitionersBus?.loading && <LinearProgress />}
-				</Box>
+				<Backdrop
+					open={Boolean(practitionersBus?.loading)}
+					sx={{ position: 'absolute', zIndex: (theme) => theme.zIndex.mobileStepper }}
+				>
+					<CircularProgress />
+				</Backdrop>
 			</Stack>
 		</>
 	);
