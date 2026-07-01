@@ -2,9 +2,7 @@
 import * as React from 'react';
 import {useRouter} from 'next/navigation';
 import {
-	Backdrop,
 	Box,
-	CircularProgress,
 	Stack,
 	Typography,
 } from '@mui/material';
@@ -14,7 +12,7 @@ import {
 	type GridRenderCellParams,
 	type GridSortModel,
 } from '@mui/x-data-grid';
-import { MightyButton, setFeedback, navigateTo } from '../../../../NX/DesignSystem';
+import { BlockingOverlay, MightyButton, setFeedback, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import {
 	formatUkPrice,
@@ -358,14 +356,7 @@ const ListProducts = ({
 	return (
 		<Stack spacing={2}>
 			{isResolvingInitialProducts ? (
-				<Box sx={{ minHeight: 120, position: 'relative' }}>
-					<Backdrop
-						open
-						sx={{ position: 'absolute', zIndex: (theme) => theme.zIndex.mobileStepper }}
-					>
-						<CircularProgress />
-					</Backdrop>
-				</Box>
+				<BlockingOverlay open label="Loading products..." />
 			) : showEmptyLibraryState ? (
 				<Box sx={{ py: 4 }}>
 					<Typography variant="body1" color="text.secondary">
@@ -398,33 +389,11 @@ const ListProducts = ({
 				</Box>
 			) : (
 					<Box sx={{display: 'flex'}}>
-						<Box>
-							<Editable
-								variant="standard"
-								value={searchTerm}
-								onChange={(value: string) => {
-									setPage(1);
-									setSearchTerm(value);
-								}}
-								startAdornment={'search'}
-								endAdornment={(
-									<MightyButton
-										kind="icon"
-										icon="close"
-										disabled={!searchTerm.trim()}
-										onClick={() => {
-											setPage(1);
-											setSearchTerm('');
-											setDebouncedSearchTerm('');
-										}}
-									/>
-								)}
-							/>
-						</Box>
-					<Box sx={{ flexGrow: 1 }} />
+						
+					
 					<Box>
 						<MightyButton
-							variant="contained"
+							variant="outlined"
 							startIcon="awin"
 							onClick={() => {
 							dispatch(navigateTo(router, '/products/awin'));
@@ -433,6 +402,30 @@ const ListProducts = ({
 							Add
 						</MightyButton>
 					</Box>
+							<Box sx={{ flexGrow: 1 }} />
+							<Box>
+								<Editable
+									variant="standard"
+									value={searchTerm}
+									onChange={(value: string) => {
+										setPage(1);
+										setSearchTerm(value);
+									}}
+									startAdornment={'search'}
+									endAdornment={(
+										<MightyButton
+											kind="icon"
+											icon="close"
+											disabled={!searchTerm.trim()}
+											onClick={() => {
+												setPage(1);
+												setSearchTerm('');
+												setDebouncedSearchTerm('');
+											}}
+										/>
+									)}
+								/>
+							</Box>
 					</Box>
 			)}
 

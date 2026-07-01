@@ -1,6 +1,7 @@
 "use client";
 import * as React from 'react';
-import { Alert, Backdrop, CircularProgress, Stack } from '@mui/material';
+import { Alert, Stack } from '@mui/material';
+import { BlockingOverlay } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { fetchLeida, useLeidaBus } from '../../../../Leida';
 import { parsePractitionerData } from '../../../lib/parsePractitionerData';
@@ -66,24 +67,19 @@ const PractitionerList = () => {
 
 	return (
 		<>
-			<Stack spacing={1} sx={{ position: 'relative' }}>
+			<Stack spacing={1}>
 				
 				{practitionersBus?.error && <Alert severity="error">{practitionersBus.error}</Alert>}
 				{!practitionersBus?.loading && sortedRows.length === 0 && (
 					<Alert severity="info">No practitioners found.</Alert>
-				})}
+				)}
 				{sortedRows.map((row, index) => {
 					const key = typeof row?.practitioner_id === 'string' && row.practitioner_id
 						? row.practitioner_id
 						: `practitioner-${index}`;
 					return <PractitionerCard key={key} practitioner={row} />;
 				})}
-				<Backdrop
-					open={Boolean(practitionersBus?.loading)}
-					sx={{ position: 'absolute', zIndex: (theme) => theme.zIndex.mobileStepper }}
-				>
-					<CircularProgress />
-				</Backdrop>
+				<BlockingOverlay open={Boolean(practitionersBus?.loading)} label="Loading practitioners..." />
 			</Stack>
 		</>
 	);

@@ -10,6 +10,7 @@ import { setFeedback } from './actions/setFeedback';
 // Components
 import DesignSystem from "./DesignSystem";
 import ConfirmAction from './components/ConfirmAction';
+import BlockingOverlay from './components/BlockingOverlay';
 import EditableStr from './components/Forms/EditableStr';
 import Feedback from './components/Feedback';
 import Footer from './components/Footer';
@@ -40,6 +41,7 @@ export {
     setFeedback,
 
     // Components
+    BlockingOverlay,
     CleverText,
     ConfirmAction,
     DesignSystem,

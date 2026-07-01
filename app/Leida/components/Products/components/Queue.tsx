@@ -630,12 +630,24 @@ export default function Queue() {
 
       dispatch(setFeedback({
         severity: 'success',
-        title: `Saved queue item ${selectedRow.position}.`,
+        title: `${selectedRow.title} saved. Opening for enhancement...`,
       }));
 
       setRefreshNonce((value) => value + 1);
       notifyQueueCountRefresh();
       notifyProductsCountRefresh();
+
+      const queryParams = new URLSearchParams();
+      if (typeof result.productId === 'string' && result.productId.trim()) {
+        queryParams.set('productId', result.productId.trim());
+      }
+      if (typeof result.slug === 'string' && result.slug.trim()) {
+        queryParams.set('slug', result.slug.trim());
+      }
+      const targetRoute = queryParams.toString()
+        ? `/products/edit?${queryParams.toString()}`
+        : '/products/edit';
+      dispatch(navigateTo(router, targetRoute));
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);
       dispatch(setFeedback({
@@ -645,7 +657,7 @@ export default function Queue() {
     } finally {
       setProcessingQueueId(null);
     }
-  }, [deletingQueueId, dispatch, processingQueueId, productDataDraft, selectedRow]);
+  }, [deletingQueueId, dispatch, processingQueueId, productDataDraft, router, selectedRow]);
 
   return (
     <Box>
@@ -699,9 +711,11 @@ export default function Queue() {
                 Add
               </MightyButton>
 
+             
+
               <MightyButton
-                variant={'contained'}
-                endIcon={autoProgress ? 'pause' : 'start'}
+                variant={'outlined'}
+                startIcon={autoProgress ? 'pause' : 'reset'}
                 fullWidth={false}
                 onClick={() => {
                   if (autoProgress) {
@@ -716,16 +730,25 @@ export default function Queue() {
                 {autoProgress ? (
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                     <CircularProgress
-                      variant="determinate"
-                      value={(countdown / AUTO_PROGRESS_SECONDS) * 100}
                       size={16}
                       thickness={5}
                       color="inherit"
                     />
-                    <span>{''}</span>
                     <span>Pause</span>
                   </Box>
-                ) : 'Start'}
+                ) : 'Auto'}
+              </MightyButton>
+
+              <MightyButton
+                startIcon="start"
+                variant="contained"
+                fullWidth={false}
+                onClick={() => {
+                  void handleSaveAndProcessSelected();
+                }}
+                disabled={queueRows.length === 0 || !!deletingQueueId || !!processingQueueId || autoProgress}
+              >
+                Next
               </MightyButton>
               
             </Box>

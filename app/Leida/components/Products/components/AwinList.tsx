@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import type { T_AWINListProps, T_AWINProduct } from '../../../types.d';
-import { Backdrop, Box, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import {
     DataGrid,
     type GridColDef,
@@ -10,7 +10,7 @@ import {
 } from '@mui/x-data-grid';
 import { formatUkPrice, getAffiliateImageUrl, setLeida, Thumbnail } from '../../../index';
 import { LEIDA_DATA_GRID_SX } from '../../UI';
-import { Icon, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
+import { BlockingOverlay, Icon, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 
 export default function AWINList({
@@ -128,14 +128,7 @@ export default function AWINList({
 
     if (loading && rows.length === 0) {
         return (
-            <Box sx={{ width: '100%', minHeight: 200, position: 'relative' }}>
-                <Backdrop
-                    open
-                    sx={{ position: 'absolute', zIndex: (theme) => theme.zIndex.mobileStepper }}
-                >
-                    <CircularProgress />
-                </Backdrop>
-            </Box>
+            <BlockingOverlay open label="Loading AWIN products..." />
         );
     }
 

@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 
 import type { T_AWINProcessedPayload, T_AWINProduct } from '../../../types.d';
 import {
-    Backdrop,
     Box,
     CircularProgress,
     Typography,
@@ -15,7 +14,7 @@ import {
 } from '@mui/x-data-grid';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { usePaywall } from '../../../../NX/Paywall';
-import { MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
+import { BlockingOverlay, MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { Editable } from '../../../../NX/NXAdmin';
 import {
     asText,
@@ -480,14 +479,7 @@ export default function AWIN() {
                 onProcessed={handleProcessed}
             />
 
-            <Backdrop open={bulkDecision === 'queue'} sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                    <CircularProgress />
-                    <Typography variant="overline">
-                        Adding products to queue...
-                    </Typography>
-                </Box>
-            </Backdrop>
+            <BlockingOverlay open={bulkDecision === 'queue'} label="Adding products to queue..." />
         </Box>
     );
 }

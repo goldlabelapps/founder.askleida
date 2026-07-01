@@ -2,12 +2,10 @@
 import * as React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
-	Backdrop,
 	Paper, 
 	Grid,
 	Stack,
 	Collapse,
-	CircularProgress,
 	Typography,
 	Button,
 	IconButton,
@@ -16,7 +14,7 @@ import {
 	MenuItem,
 } from '@mui/material';
 import { useDispatch } from '../../../../NX/Uberedux';
-import { Icon, ConfirmAction, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
+import { BlockingOverlay, Icon, ConfirmAction, MightyButton, navigateTo } from '../../../../NX/DesignSystem';
 import { 
 	fetchLeida,
 	setLeida,
@@ -219,19 +217,10 @@ const PractitionerUpdate = () => {
 			id={`practitioner-update-${uuid}`}
 			sx={{ pb: 'calc(104px + env(safe-area-inset-bottom))', position: 'relative' }}
 		>
-			<Backdrop
+			<BlockingOverlay
 				open={Boolean(deleting || loading)}
-				sx={{ position: 'absolute', zIndex: (theme) => theme.zIndex.modal + 1 }}
-			>
-				<Stack spacing={1} sx={{ alignItems: 'center' }}>
-					<CircularProgress />
-					{deleting ? (
-						<Typography variant="body2" color="text.secondary">
-							Deleting Practitioner and related account data...
-						</Typography>
-					) : null}
-				</Stack>
-			</Backdrop>
+				label={deleting ? 'Deleting practitioner...' : 'Loading practitioner...'}
+			/>
 			<>
 				{!loading && !deleting && (
 					<>

@@ -120,7 +120,8 @@ export default function Selected({
         </CardActions>
         <Collapse in={showMoreInfo}>
           <Box sx={{ p:2 }}>
-            <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontSize: 11 }}>{JSON.stringify(productDataDraft, null, 2)}</pre>
+            <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontSize: 11 }}>
+              productDataDraft{JSON.stringify(productDataDraft, null, 2)}</pre>
           </Box>
         </Collapse>
 
