@@ -1,4 +1,4 @@
-name: NX°
+name: NX° Robot
 
 on:
   pull_request:
@@ -8,42 +8,51 @@ on:
   push:
     branches:
       - staging
+      - master
   workflow_dispatch:
 
-# Workflow semantic version (manual for now):
-# - bump PATCH for text/placeholder-only edits (v0.1.1)
-# - bump MINOR for non-breaking workflow behavior updates (v0.2.0)
-# - bump MAJOR for breaking CI flow changes (v1.0.0)
-env:
-  WORKFLOW_VERSION: 0.1.0
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  placeholder:
-    name: Placeholder only (no real CI)
+  typecheck:
+    name: TypeScript
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
-      - name: Placeholder
-        run: |
-          echo "CI workflow is currently a placeholder."
-          echo "Workflow version: ${WORKFLOW_VERSION}"
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Real CI is intentionally disabled for now.
-      # Uncomment and restore when ready to re-enable pipeline execution.
-      # - name: Checkout
-      #   uses: actions/checkout@v4
-      #
-      # - name: Setup Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: 20
-      #     cache: yarn
-      #
-      # - name: Install dependencies
-      #   run: yarn install --frozen-lockfile
-      #
-      # - name: Lint
-      #   run: yarn lint
-      #
-      # - name: Build
-      #   run: yarn build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Type check
+        run: yarn typecheck
+
+  build:
+    name: Build
+    needs: typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build

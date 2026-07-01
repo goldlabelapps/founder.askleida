@@ -1,9 +1,8 @@
-import type { T_Product } from '../types.d';
 import { findNestedTextByKeys } from './findNestedTextByKeys';
 import { normalizeUrl } from './normalizeUrl';
 import { pickFirstText } from './pickFirstText';
 
-export function getAffiliateImageUrl(product: T_Product | undefined): string {
+export function getAffiliateImageUrl(product: unknown): string {
   if (!product) return 'https://via.placeholder.com/1200x630?text=No+Image';
 
   const image = pickFirstText(product, [

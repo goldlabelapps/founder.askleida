@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "yarn kill && yarn install && rm -rf .next && next dev -p 2005 --webpack",
     "build": "next build --webpack",
+    "typecheck": "tsc --noEmit",
     "start": "next start",
     "lint": "eslint",
     "clean": "yarn kill && bash app/NX/lib/bash/clean.sh",
