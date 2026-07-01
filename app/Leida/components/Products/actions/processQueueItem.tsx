@@ -9,10 +9,22 @@ type T_ProcessQueueItemParams = {
 
 type T_ProcessQueueItemResult = {
   ok: true;
+  productId?: string | null;
+  slug?: string | null;
 } | {
   ok: false;
   error: string;
 };
+
+function asText(value: unknown): string | null {
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim();
+  }
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return String(value);
+  }
+  return null;
+}
 
 export const processQueueItem =
   ({ queueId, practitionerId, productDataDraft }: T_ProcessQueueItemParams): any =>
@@ -48,6 +60,31 @@ export const processQueueItem =
           throw new Error(message);
         }
 
+        const payload = saveJson?.data ?? saveJson;
+        const createdRecord = (() => {
+          if (Array.isArray(payload)) {
+            return payload[0] || null;
+          }
+
+          if (!payload || typeof payload !== 'object') {
+            return null;
+          }
+
+          const maybeRows = (payload as Record<string, unknown>).rows;
+          if (Array.isArray(maybeRows)) {
+            return maybeRows[0] || null;
+          }
+
+          const maybeRow = (payload as Record<string, unknown>).row;
+          if (maybeRow && typeof maybeRow === 'object') {
+            return maybeRow;
+          }
+
+          return payload;
+        })() as Record<string, unknown> | null;
+        const createdProductId = asText(createdRecord?.product_id) || asText(createdRecord?.id) || asText(createdRecord?.uuid);
+        const createdSlug = asText(createdRecord?.slug) || slug;
+
         const removeRes = await fetch('/api/products/queue', {
           method: 'DELETE',
           headers: {
@@ -69,7 +106,11 @@ export const processQueueItem =
           throw new Error(message);
         }
 
-        return { ok: true };
+        return {
+          ok: true,
+          productId: createdProductId,
+          slug: createdSlug,
+        };
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
         dispatch(setUbereduxKey({ key: 'error', value: message }));

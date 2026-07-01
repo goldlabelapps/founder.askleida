@@ -20,6 +20,7 @@ import Queue from './components/Products/components/Queue';
 import { Selected } from './components/Products/components';
 import Products from './components/Products/Products';
 import ListProducts from './components/Products/components/ListProducts';
+import ProductEdit from './components/Products/components/ProductEdit';
 import RenderProduct from './components/Products/components/RenderProduct';
 import FindProduct from './components/Products/components/FindProduct';
 import { Back, LeidaFlash, Thumbnail, LEIDA_DATA_GRID_SX } from './components/UI';
@@ -172,6 +173,7 @@ export {
     Queue,
     Selected,
     ListProducts,
+    ProductEdit,
     RenderProduct,
     FindProduct,
     Back,
