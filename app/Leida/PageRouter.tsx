@@ -10,6 +10,7 @@ import {
   AWIN,
   PractitionerNew,
   Products,
+  ProductEdit,
   ListProducts,
   Queue,
   LeidaFlash,
@@ -44,6 +45,8 @@ export function PageRouter({ active }: I_PageRouter) {
       return <LeidaFlash />;
     case 'products':
       return <ListProducts />;
+    case 'products/edit':
+      return <ProductEdit />;
     case 'products/manage':
       return <Products />;
     case 'products/list':

@@ -340,7 +340,7 @@ export default function AWIN() {
 
     React.useEffect(() => {
         dispatch(setLeida('header', {
-            title: total > 0 ? `AWIN (Total ${total})` : 'AWIN',
+            title: total > 0 ? `AWIN (${total})` : 'AWIN',
             icon: 'awin',
         }));
     }, [dispatch, total]);
