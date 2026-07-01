@@ -47,6 +47,19 @@ function pickFirstText(...values: unknown[]): string | null {
   return null;
 }
 
+function normalizeDescriptionText(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === 'product_short_description') {
+    return null;
+  }
+
+  return trimmed;
+}
+
 function truncateWithEllipsis(text: string, maxLength: number): string {
   if (text.length <= maxLength) {
     return text;
@@ -290,12 +303,18 @@ export default function Queue() {
       merchantName,
       merchantDeepLink,
       description: pickFirstText(
+        rowRecord?.body,
+        rowData?.body,
+        nestedData?.body,
         rowRecord?.description,
         rowData?.description,
         nestedData?.description,
       ),
       descriptionPreview: truncateWithEllipsis(
         pickFirstText(
+          rowRecord?.body,
+          rowData?.body,
+          nestedData?.body,
           rowRecord?.description,
           rowData?.description,
           nestedData?.description,
@@ -353,16 +372,33 @@ export default function Queue() {
     );
     const parsedPrice = rawPrice ? Number(String(rawPrice).replace(/[^\d.-]/g, '')) : NaN;
     const price = Number.isFinite(parsedPrice) ? parsedPrice : null;
+    const longDescription = normalizeDescriptionText(
+      pickFirstText(rowRecord?.description, rowData?.description, nestedData?.description),
+    );
+    const productShortDescription = normalizeDescriptionText(
+      pickFirstText(
+        rowRecord?.product_short_description,
+        rowData?.product_short_description,
+        nestedData?.product_short_description,
+      ),
+    );
 
     return {
       slug: pickFirstText(rowRecord?.slug, rowData?.slug, nestedData?.slug),
       title: productName,
-      description: pickFirstText(rowRecord?.description, rowData?.description, nestedData?.description),
+      description: productShortDescription || '',
+      body: longDescription || '',
       id_awin: pickFirstText(rowRecord?.aw_product_id, rowData?.aw_product_id, nestedData?.aw_product_id),
       url_awin: pickFirstText(rowRecord?.aw_deep_link, rowData?.aw_deep_link, nestedData?.aw_deep_link),
       thumbnail,
       image,
       ...(price !== null ? { price, search_price: price } : {}),
+      ...(pickFirstText(rowRecord?.specifications, rowData?.specifications, nestedData?.specifications)
+        ? { specifications: pickFirstText(rowRecord?.specifications, rowData?.specifications, nestedData?.specifications) }
+        : {}),
+      ...(pickFirstText(rowRecord?.ean, rowData?.ean, nestedData?.ean)
+        ? { ean: pickFirstText(rowRecord?.ean, rowData?.ean, nestedData?.ean) }
+        : {}),
       merchant: pickFirstText(rowRecord?.merchant_name, rowData?.merchant_name, nestedData?.merchant_name),
       id_merchant: pickFirstText(rowRecord?.merchant_product_id, rowData?.merchant_product_id, nestedData?.merchant_product_id),
       url_merchant: pickFirstText(rowRecord?.merchant_deep_link, rowData?.merchant_deep_link, nestedData?.merchant_deep_link),
@@ -497,13 +533,23 @@ export default function Queue() {
 
       dispatch(setFeedback({
         severity: 'success',
-        title: `Saved and processed queue item ${selectedRow.position}.`,
+        title: `Saved queue item ${selectedRow.position}. Opening editor...`,
       }));
 
       setRefreshNonce((value) => value + 1);
       notifyQueueCountRefresh();
       notifyProductsCountRefresh();
-      dispatch(navigateTo(router, '/products'));
+      const queryParams = new URLSearchParams();
+      if (typeof result.productId === 'string' && result.productId.trim()) {
+        queryParams.set('productId', result.productId.trim());
+      }
+      if (typeof result.slug === 'string' && result.slug.trim()) {
+        queryParams.set('slug', result.slug.trim());
+      }
+      const targetRoute = queryParams.toString()
+        ? `/products/edit?${queryParams.toString()}`
+        : '/products/edit';
+      dispatch(navigateTo(router, targetRoute));
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);
       dispatch(setFeedback({

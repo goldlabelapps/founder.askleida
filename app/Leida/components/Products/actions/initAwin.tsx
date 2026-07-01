@@ -1,16 +1,14 @@
 import type { Dispatch } from 'redux';
 import { setUbereduxKey } from '../../../../NX/Uberedux';
 import { setLeida } from '../../../actions/setLeida';
-import { fetchLeida } from '../../../actions/fetchLeida';
+import { fetchAWIN } from './fetchAwin';
 
-const AWIN_ROUTE = '/api/awin?limit=25&orderBy=created_at&orderDir=desc';
+const AWIN_INITIAL_LIMIT = 100;
 
 export const initAWIN = (): any =>
     async (dispatch: Dispatch, getState: () => any) => {
         try {
             const leida = getState()?.redux?.leida || {};
-            const initialBus = leida?.bus || {};
-            const currentRouteEntry = initialBus?.[AWIN_ROUTE];
             if (!leida.awin) {
                 await dispatch(setLeida('awin', {
                     initted: true,
@@ -20,34 +18,29 @@ export const initAWIN = (): any =>
                 }));
             }
 
-            if (!currentRouteEntry) {
-                await dispatch(fetchLeida(AWIN_ROUTE));
+            const currentAWIN = getState()?.redux?.leida?.awin || {};
+            const alreadyInitted = Boolean(currentAWIN?.initted);
+
+            if (alreadyInitted) {
+                return;
             }
 
-            const latestLeida = getState()?.redux?.leida || {};
-            const bus = latestLeida?.bus || {};
-            const routeEntry = bus?.[AWIN_ROUTE] || {};
-            const routeData = Array.isArray(routeEntry?.data) ? routeEntry.data : [];
-            const first = routeData[0] || {};
+            const result = await dispatch(fetchAWIN({
+                page: 1,
+                limit: AWIN_INITIAL_LIMIT,
+                orderBy: 'created_at',
+                orderDir: 'desc',
+            }));
 
-            const rows = Array.isArray(first?.rows)
-                ? first.rows
-                : routeData;
-            const products = rows;
-            const count = typeof first?.count === 'number'
-                ? first.count
-                : products.length;
-            const scanned = products.length;
+            if (!result?.ok) {
+                throw new Error(result?.error || 'Failed to initialize AWIN products');
+            }
 
-            const currentAWIN = latestLeida?.awin || {};
+            const latestAWIN = getState()?.redux?.leida?.awin || {};
             await dispatch(setLeida('awin', {
-                ...currentAWIN,
+                ...latestAWIN,
                 initted: true,
-                rows,
-                products,
-                count,
-                scanned,
-                sourceRoute: AWIN_ROUTE,
+                sourceRoute: result.route,
             }));
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);

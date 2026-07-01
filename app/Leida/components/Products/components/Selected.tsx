@@ -97,7 +97,7 @@ export default function Selected({
 
                 <Collapse in={showMoreInfo}>
                   <Box sx={{ mt: 0.5 }}>
-                            <pre>{JSON.stringify(productDataDraft, null, 2)}</pre>
+                      <pre>{JSON.stringify(productDataDraft, null, 2)}</pre>
                   </Box>
                 </Collapse>
               </Box>
@@ -116,23 +116,20 @@ export default function Selected({
           >
             
             <MightyButton
-              variant="outlined"
-              startIcon="delete"
-              fullWidth
+              kind="icon"
+              icon="delete"
               disabled={isDeleting || isProcessing}
               onClick={onOpenDeleteConfirm}
-            >
-              {isDeleting ? 'Deleting...' : 'Nah, get rid.'}
-            </MightyButton>
+            />
 
             <MightyButton
-              variant="contained"
-              startIcon="ai"
+              variant="outlined"
+              endIcon="start"
               fullWidth
               disabled={isDeleting || isProcessing}
               onClick={onSaveAndProcess}
             >
-              {isProcessing ? 'Processing...' : 'Yes!'}
+              {isProcessing ? 'Processing...' : 'Start'}
             </MightyButton>
           </Box>
         </CardActions>

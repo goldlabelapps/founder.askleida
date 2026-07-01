@@ -3,9 +3,6 @@ import * as React from 'react';
 import {useRouter} from 'next/navigation';
 import {
 	Box,
-	Dialog,
-	DialogContent,
-	DialogTitle,
 	LinearProgress,
 	Stack,
 	Typography,
@@ -74,25 +71,36 @@ const ListProducts = ({
 	const [error, setError] = React.useState<string | null>(null);
 	const [queueTotal, setQueueTotal] = React.useState(0);
 	const [refreshNonce, setRefreshNonce] = React.useState(0);
-	const [previewProduct, setPreviewProduct] = React.useState<T_Product | null>(null);
 	const lastSearchFeedbackKeyRef = React.useRef('');
 
-	const openProductPreview = React.useCallback((product: T_Product) => {
+	const openProductEditor = React.useCallback((product: T_Product) => {
 		onProductSelect?.(product);
-		setPreviewProduct(product);
-	}, [onProductSelect]);
+		const productRecord = (product && typeof product === 'object' ? product : {}) as Record<string, unknown>;
+		const dataRecord = (productRecord.data && typeof productRecord.data === 'object'
+			? productRecord.data
+			: {}) as Record<string, unknown>;
+		const productId = typeof productRecord.product_id === 'string'
+			? productRecord.product_id
+			: (typeof productRecord.product_id === 'number' && Number.isFinite(productRecord.product_id)
+				? String(productRecord.product_id)
+				: '');
+		const slug = typeof productRecord.slug === 'string'
+			? productRecord.slug
+			: (typeof dataRecord.slug === 'string' ? dataRecord.slug : '');
 
-	const previewText = React.useMemo(() => {
-		if (!previewProduct) {
-			return '';
+		const queryParams = new URLSearchParams();
+		if (productId.trim()) {
+			queryParams.set('productId', productId.trim());
+		}
+		if (slug.trim()) {
+			queryParams.set('slug', slug.trim());
 		}
 
-		try {
-			return JSON.stringify(previewProduct, null, 2);
-		} catch {
-			return '{\n  "error": "Unable to stringify product"\n}';
-		}
-	}, [previewProduct]);
+		const targetRoute = queryParams.toString()
+			? `/products/edit?${queryParams.toString()}`
+			: '/products/edit';
+		dispatch(navigateTo(router, targetRoute));
+	}, [dispatch, onProductSelect, router]);
 
 	React.useEffect(() => {
 		dispatch(initProducts());
@@ -315,7 +323,7 @@ const ListProducts = ({
 	const columns = React.useMemo<GridColDef[]>(() => {
 		return [
 			{
-				field: 'thumbnailUrl',
+				field: 'thumbnail',
 				headerName: '',
 				width: 72,
 				sortable: false,
@@ -323,7 +331,7 @@ const ListProducts = ({
 				disableColumnMenu: true,
 				renderCell: (params: GridRenderCellParams) => (
 					<Thumbnail
-						src={typeof params.value === 'string' ? params.value : null}
+						src={typeof params.row?.thumbnailUrl === 'string' ? params.row.thumbnailUrl : null}
 						alt="Product thumbnail"
 						size={40}
 					/>
@@ -343,35 +351,8 @@ const ListProducts = ({
 					</Box>
 				),
 			},
-			{
-				field: 'category',
-				headerName: 'Category',
-				flex: 1,
-				minWidth: 180,
-				sortable: false,
-			},
-			{
-				field: 'status',
-				headerName: 'Status',
-				width: 140,
-				sortable: false,
-				renderCell: (params: GridRenderCellParams) => (
-					<Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
-						{typeof params.value === 'string' && params.value.trim() ? params.value : 'n/a'}
-					</Typography>
-				),
-			},
-			{
-				field: 'price',
-				headerName: 'Price',
-				width: 140,
-				sortable: false,
-				align: 'right',
-				headerAlign: 'right',
-				renderCell: (params: GridRenderCellParams) => formatUkPrice(typeof params.value === 'number' ? params.value : null),
-			},
 		];
-	}, [openProductPreview]);
+	}, []);
 
 	return (
 		<Stack spacing={2}>
@@ -479,38 +460,31 @@ const ListProducts = ({
 							const normalized: GridSortModel = Array.isArray(nextModel) && nextModel.length
 								? [{ field: nextModel[0].field, sort: nextModel[0].sort === 'desc' ? 'desc' : 'asc' }]
 								: [{ field: 'title', sort: 'asc' as const }];
-							setPage(1);
-							setSortModel(normalized);
+							const currentSort = sortModel[0];
+							const nextSort = normalized[0];
+							const sortUnchanged =
+								currentSort?.field === nextSort?.field &&
+								currentSort?.sort === nextSort?.sort;
+							if (sortUnchanged && page === 1) {
+								return;
+							}
+
+							window.setTimeout(() => {
+								if (!sortUnchanged) {
+									setSortModel(normalized);
+								}
+								if (page !== 1) {
+									setPage(1);
+								}
+							}, 0);
 						}}
 						onCellClick={(params) => {
-							openProductPreview(params.row.product as T_Product);
+							openProductEditor(params.row.product as T_Product);
 						}}
 						sx={LEIDA_DATA_GRID_SX}
 					/>
 				</Box>
 			) : null}
-
-			<Dialog
-				open={Boolean(previewProduct)}
-				onClose={() => setPreviewProduct(null)}
-				fullWidth
-				maxWidth="md"
-			>
-				<DialogTitle>Product JSON</DialogTitle>
-				<DialogContent>
-					<Box
-						component="pre"
-						sx={{
-							m: 0,
-							whiteSpace: 'pre-wrap',
-							wordBreak: 'break-word',
-							fontSize: '0.8rem',
-						}}
-					>
-						{previewText}
-					</Box>
-				</DialogContent>
-			</Dialog>
 		</Stack>
 	);
 };
