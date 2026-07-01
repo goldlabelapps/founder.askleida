@@ -6,7 +6,12 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
   CircularProgress,
+  Divider,
   Stack,
   TextField,
   Typography,
@@ -14,6 +19,7 @@ import {
 import { Icon, MightyButton, navigateTo, setFeedback } from '../../../../NX/DesignSystem';
 import { useDispatch } from '../../../../NX/Uberedux';
 import { Back, setLeida, asRecord, asText } from '../../../index';
+import { formatUkPrice } from '../../../lib/formatUkPrice';
 import { slugify } from '../../../lib/slugify';
 
 export default function ProductEdit() {
@@ -38,6 +44,17 @@ export default function ProductEdit() {
   const [initialBody, setInitialBody] = React.useState('');
   const [baseData, setBaseData] = React.useState<Record<string, unknown>>({});
   const derivedSlug = React.useMemo(() => slugify(title), [title]);
+  const cardTitle = React.useMemo(() => asText(baseData.title) || title || 'Untitled Product', [baseData, title]);
+  const cardDescription = React.useMemo(() => asText(baseData.description) || description, [baseData, description]);
+  const cardBody = React.useMemo(() => asText(baseData.body) || body, [baseData, body]);
+  const cardSlug = React.useMemo(() => asText(baseData.slug) || derivedSlug, [baseData, derivedSlug]);
+  const cardImage = React.useMemo(() => asText(baseData.image) || asText(baseData.thumbnail), [baseData]);
+  const cardMerchant = React.useMemo(() => asText(baseData.merchant), [baseData]);
+  const cardStatus = React.useMemo(() => asText(baseData.status) || 'draft', [baseData]);
+  const cardPrice = React.useMemo(() => {
+    const numeric = Number(baseData.price ?? baseData.search_price);
+    return Number.isFinite(numeric) ? numeric : null;
+  }, [baseData]);
 
   const isDirty = React.useMemo(
     () => title !== initialTitle || description !== initialDescription || body !== initialBody,
@@ -227,6 +244,13 @@ export default function ProductEdit() {
     }
   }, [baseData, body, description, dispatch, fallbackMatchId, matchId, router, title]);
 
+  const handleAskLeida = React.useCallback(() => {
+    dispatch(setFeedback({
+      severity: 'info',
+      title: 'Ask Leida action coming next.',
+    }));
+  }, [dispatch]);
+
   return (
     <Stack spacing={2}>
      
@@ -278,22 +302,81 @@ export default function ProductEdit() {
           </Accordion>
 
           {Object.keys(baseData).length > 0 && (
-            <Box sx={{ p: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="overline" sx={{ mb: 1, fontWeight: 600 }}>
-                Current Product
-              </Typography>
-              <Typography
-                variant="body2"
-                component="pre"
-                sx={{
-                  fontSize: '0.75rem',
-                  overflow: 'auto',
-                  color: 'text.secondary',
-                }}
-              >
-                {JSON.stringify(baseData, null, 2)}
-              </Typography>
-            </Box>
+            <Card variant="outlined">
+              <CardContent>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gap: 2,
+                    gridTemplateColumns: { xs: '1fr', md: '220px 1fr' },
+                    alignItems: 'start',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      borderRadius: 1,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      bgcolor: 'grey.100',
+                      p: 1,
+                      minHeight: 250,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {cardImage ? (
+                      <Box
+                        component="img"
+                        src={cardImage}
+                        alt={cardTitle}
+                        sx={{
+                          width: '100%',
+                          maxHeight: 250,
+                          objectFit: 'contain',
+                          objectPosition: 'center',
+                        }}
+                      />
+                    ) : (
+                      <Typography variant="caption" color="text.secondary">
+                        No image
+                      </Typography>
+                    )}
+                  </Box>
+
+                  <Stack spacing={1}>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                      <Chip size="small" label={`Status: ${cardStatus}`} />
+                      {cardMerchant ? <Chip size="small" variant="outlined" label={cardMerchant} /> : null}
+                      {cardPrice !== null ? <Chip size="small" color="primary" label={formatUkPrice(cardPrice)} /> : null}
+                    </Stack>
+
+                    <Typography variant="h6">{cardTitle}</Typography>
+
+                    {/* {cardSlug ? (
+                      <Typography variant="caption" color="text.secondary">/{cardSlug}</Typography>
+                    ) : null} */}
+
+                    {cardDescription ? (
+                      <Typography variant="body2" color="text.secondary">{cardDescription}</Typography>
+                    ) : null}
+                  </Stack>
+                </Box>
+
+                {/* {cardBody ? (
+                  <>
+                    <Divider sx={{ my: 2 }} />
+                    <Typography variant="body2">{cardBody}</Typography>
+                  </>
+                ) : null} */}
+              </CardContent>
+
+              <CardActions>
+                <MightyButton fullWidth variant="outlined" startIcon="ai" onClick={handleAskLeida}>
+                  Ask Leida
+                </MightyButton>
+              </CardActions>
+            </Card>
           )}
 
           <Box sx={{ display: 'flex', gap: 1.5 }}>
