@@ -70,12 +70,10 @@ export default function MiniListItem({
                               {label}
                           </Typography>
                           {typeof badgeContent === 'number' ? (
-                              <Badge
-                                color="secondary"
-                                badgeContent={badgeContent} 
-                                max={50000}
-                                sx={{ mr: 1.5 }}
-                              />
+                                <Badge
+                                    color="default"
+                                    badgeContent={badgeContent}
+                                />
                           ) : null}
                       </Box>
                   }

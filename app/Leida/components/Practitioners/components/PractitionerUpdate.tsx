@@ -257,7 +257,7 @@ const PractitionerUpdate = () => {
 									<Grid size={{
 										xs: 12,
 										sm: 4,
-									}} sx={{ alignSelf: 'flex-start', order: { xs: 1, sm: 2 } }}>
+									}} sx={{ alignSelf: 'flex-start', order: { xs: 1, sm: 1 } }}>
 										<Box sx={{ 
 											display: 'flex', 
 											justifyContent: 'center', 
@@ -313,7 +313,7 @@ const PractitionerUpdate = () => {
 									<Grid size={{
 										xs: 12,
 										sm: 8,
-									}} sx={{ order: { xs: 2, sm: 1 } }}>
+									}} sx={{ order: { xs: 2, sm: 2 } }}>
 											<Box sx={{ height: 24 }} />
 											<Editable
 												helperText={email}

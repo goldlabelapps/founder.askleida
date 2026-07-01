@@ -435,13 +435,13 @@ const ListProducts = ({
 					<Box sx={{ flexGrow: 1 }} />
 					<Box>
 						<MightyButton
-							variant="outlined"
+							variant="contained"
 							startIcon="awin"
 							onClick={() => {
 							dispatch(navigateTo(router, '/products/awin'));
 							}}
 						>
-							Add more
+							Add
 						</MightyButton>
 					</Box>
 					</Box>
